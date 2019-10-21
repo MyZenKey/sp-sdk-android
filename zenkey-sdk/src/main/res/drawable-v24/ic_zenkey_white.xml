@@ -1,0 +1,27 @@
+<!--
+Copyright 2019 XCI JV, LLC.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <path
+      android:pathData="M3.0001,3L21.0001,3L18.4313,5.5685L3.0001,5.5685L3.0001,3ZM19.4447,8.1438L19.4447,10.7123L13.2877,10.7123L15.8561,8.1438L19.4447,8.1438ZM14.3008,13.2876L14.3008,15.8561L8.1439,15.8561L10.7123,13.2876L14.3008,13.2876ZM5.5686,18.4314L21.0002,18.4314L21,20.9999L3.0001,20.9999L5.5686,18.4314Z"
+      android:strokeWidth="1"
+      android:fillColor="#FFFFFF"
+      android:fillType="evenOdd"
+      android:strokeColor="#00000000"/>
+</vector>

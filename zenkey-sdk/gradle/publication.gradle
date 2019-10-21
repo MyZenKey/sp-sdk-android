@@ -1,0 +1,52 @@
+apply plugin: 'digital.wup.android-maven-publish'
+
+def CLASSIFIER_JAVADOC = 'javadoc'
+def CLASSIFIER_SOURCES = 'sources'
+def CLASSIFIER_TEST_REPORT = 'test-report'
+def PUBLISHING_GROUP = 'publishing'
+
+group = "com.xci.android"
+
+task generateSourceJar(type: Jar) {
+    group PUBLISHING_GROUP
+    setDescription('Generates source Archive')
+    classifier CLASSIFIER_SOURCES
+    from android.sourceSets.main.kotlin.srcDirs
+}
+
+task generateJacocoTestReportJar(type: Jar) {
+    group PUBLISHING_GROUP
+    setDescription('Generates Jacoco Test report Archive')
+    classifier = CLASSIFIER_TEST_REPORT
+    from jacocoTestReport
+}
+
+task generateDocumentationJar(type: Jar) {
+    group = PUBLISHING_GROUP
+    setDescription('Generates Documentation Archive')
+    classifier = CLASSIFIER_JAVADOC
+    from dokka
+}
+
+publishing {
+    publications {
+        android.libraryVariants.all { variant ->
+
+            variant.outputs.all { output ->
+                if (outputFile != null && outputFileName.endsWith('.aar')) {
+                    outputFileName = "${project.name}-${project.version}.aar"
+                }
+            }
+
+            "${variant.name}"(MavenPublication) {
+                from components.findByName("android${variant.name.capitalize()}")
+                artifactId project.name
+                
+                version project.version
+                artifact generateSourceJar
+                artifact generateJacocoTestReportJar
+                artifact generateDocumentationJar
+            }
+        }
+    }
+}

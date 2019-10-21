@@ -1,0 +1,79 @@
+import com.android.builder.core.BuilderConstants
+
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply from: "$projectDir/gradle/coverage.gradle"
+apply from: "$projectDir/gradle/version.gradle"
+
+android {
+    compileSdkVersion buildConfig.compileSdk
+
+    defaultConfig {
+        minSdkVersion buildConfig.minSdk
+        targetSdkVersion buildConfig.targetSdk
+        versionName SEMANTIC_VERSION.name
+        versionCode SEMANTIC_VERSION.code
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        qa {
+            minifyEnabled false
+            debuggable true
+            buildConfigField "String", "DISCOVERY_ENDPOINT", "\"https://discoveryissuer-qa.myzenkey.com/\""
+        }
+        prod {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            consumerProguardFiles 'proguard-rules.pro'
+            buildConfigField "String", "DISCOVERY_ENDPOINT", "\"https://discoveryissuer.myzenkey.com/\""
+        }
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+        test.java.srcDirs += 'src/test/kotlin'
+    }
+
+    testOptions.unitTests.includeAndroidResources = true
+
+    variantFilter { variant ->
+        def build = variant.buildType.name
+        if (build == BuilderConstants.DEBUG || build == BuilderConstants.RELEASE) {
+            variant.setIgnore(true)
+        }
+    }
+}
+
+dependencies {
+
+    implementation libs.kotlin.stdlib
+    implementation libs.kotlin.reflect
+    implementation libs.android.support.customTabs
+
+    testImplementation libs.android.test.mockito.core
+    testImplementation libs.android.test.mockito.kotlin
+    testImplementation libs.android.test.core
+    testImplementation libs.android.test.rules
+    testImplementation libs.android.test.runner
+    testImplementation libs.android.test.robolectric
+    testImplementation libs.android.test.ext.junit
+    testImplementation libs.android.test.powermock.junit
+    testImplementation libs.android.test.powermock.rules
+    testImplementation libs.android.test.powermock.mockito2
+    testImplementation libs.android.test.powermock.classloading
+    testImplementation libs.android.test.espresso.core
+    testImplementation libs.android.test.espresso.intent
+
+    androidTestImplementation libs.android.test.runner
+    androidTestImplementation libs.android.test.rules
+    androidTestImplementation libs.android.test.espresso.core
+    androidTestImplementation libs.android.test.espresso.intent
+}
+
+apply from: "$projectDir/gradle/documentation.gradle"
+apply from: "$projectDir/gradle/publication.gradle"
+apply from: "$projectDir/gradle/bintray.gradle"
+

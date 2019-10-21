@@ -1,0 +1,58 @@
+def buildConfig = [:]
+buildConfig.minSdk = 16
+buildConfig.targetSdk = 28
+buildConfig.compileSdk = 28
+ext.buildConfig = buildConfig
+
+def versions = [:]
+versions.kotlin = '1.3.50'
+versions.supportLib = '27.1.1'
+versions.espresso = '3.1.0'
+versions.atsl = '1.1.0'
+versions.ext = '1.0.0'
+versions.robolectric = '4.2.1'
+versions.mockito = '3.0.0'
+versions.mockitoKotlin = '2.2.0'
+versions.powermockito = '2.0.2'
+versions.jacoco = '0.8.2'
+versions.uiautomator = '2.2.0'
+ext.versions = versions
+
+ext.libs = [
+        'kotlin'     : [
+                'stdlib' : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${versions.kotlin}",
+                'reflect': "org.jetbrains.kotlin:kotlin-reflect:${versions.kotlin}",
+        ],
+        'android'    : [
+                'support': [
+                        'annotations'     : "com.android.support:support-annotations:${versions.supportLib}",
+                        'customTabs'      : "com.android.support:customtabs:${versions.supportLib}",
+                ],
+                'test'   : [
+                        'espresso'   : [
+                                'core'   : "androidx.test.espresso:espresso-core:${versions.espresso}",
+                                'contrib': "androidx.test.espresso:espresso-contrib:${versions.espresso}",
+                                'intent' : "androidx.test.espresso:espresso-intents:${versions.espresso}"
+                        ],
+                        'mockito'    : [
+                                'core': "org.mockito:mockito-core:${versions.mockito}",
+                                'kotlin': "com.nhaarman.mockitokotlin2:mockito-kotlin:${versions.mockitoKotlin}"
+                        ],
+                        'powermock'  : [
+                                'junit'       : "org.powermock:powermock-module-junit4:${versions.powermockito}",
+                                'rules'       : "org.powermock:powermock-module-junit4-rule:${versions.powermockito}",
+                                'mockito2'    : "org.powermock:powermock-api-mockito2:${versions.powermockito}",
+                                'classloading': "org.powermock:powermock-classloading-xstream:${versions.powermockito}",
+                        ],
+                        'core'       : "androidx.test:core:${versions.atsl}",
+                        'runner'     : "androidx.test:runner:${versions.atsl}",
+                        'rules'      : "androidx.test:rules:${versions.atsl}",
+                        'ext'        : [
+                                'junit': "androidx.test.ext:junit:${versions.ext}",
+                                'truth': "androidx.test.ext:truth:${versions.ext}"
+                        ],
+                        'robolectric': "org.robolectric:robolectric:${versions.robolectric}",
+                        'uiautomator': "androidx.test.uiautomator:uiautomator:${versions.uiautomator}"
+                ]
+        ]
+]

@@ -1,0 +1,7 @@
+apply plugin: 'org.jetbrains.dokka'
+
+dokka {
+    moduleName = project.name
+    outputFormat = 'html'
+    outputDirectory = "$buildDir/dokka"
+}

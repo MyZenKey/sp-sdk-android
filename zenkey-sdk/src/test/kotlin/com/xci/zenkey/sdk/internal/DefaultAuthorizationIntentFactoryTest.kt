@@ -1,0 +1,116 @@
+/*
+ * Copyright 2019 XCI JV, LLC.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.xci.zenkey.sdk.internal
+
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
+import com.xci.zenkey.sdk.internal.contract.NativeIntentFactory
+import com.xci.zenkey.sdk.internal.contract.PackageManager
+import com.xci.zenkey.sdk.internal.contract.WebIntentFactory
+import com.xci.zenkey.sdk.internal.model.AuthorizationRequest
+import com.xci.zenkey.sdk.internal.model.OpenIdConfiguration
+import org.junit.Assert.assertEquals
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.anyString
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
+import java.util.*
+
+@RunWith(RobolectricTestRunner::class)
+@Config(manifest = Config.NONE, sdk = [Build.VERSION_CODES.N])
+class DefaultAuthorizationIntentFactoryTest {
+
+    private val mockWebIntentFactory = mock<WebIntentFactory>()
+    private val mockNativeIntentFactory = mock<NativeIntentFactory>()
+    private val mockPackageManager = mock<PackageManager>()
+    private val mockConfiguration = mock<OpenIdConfiguration>()
+    private val mockRequest = mock<AuthorizationRequest>()
+    private val mockUri = mock<Uri>()
+
+    private lateinit var factory: DefaultAuthorizationIntentFactory
+
+    @Before
+    fun setUp() {
+        whenever(mockConfiguration.authorizationEndpoint).thenReturn(AUTHORIZE_ENDPOINT)
+        factory = DefaultAuthorizationIntentFactory(mockNativeIntentFactory, mockWebIntentFactory, mockPackageManager)
+    }
+
+    @Test
+    @Config(sdk = [Build.VERSION_CODES.M])
+    fun shouldCreateAppAuthWebIntentIfBelowNougat() {
+        val webIntent = Intent()
+        whenever(mockWebIntentFactory.create(mockUri)).thenReturn(webIntent)
+
+        val intent = factory.createAuthorizeIntent(mockUri, ArrayList())
+
+        assertEquals(webIntent, intent)
+    }
+
+    @Test
+    fun shouldCreateWebIntentIfNativeAppNotAvailable() {
+        val webIntent = Intent()
+        whenever(mockWebIntentFactory.create(mockUri)).thenReturn(webIntent)
+
+        whenever(mockPackageManager.anyValidPackageFor(any(), ArgumentMatchers.anyList())).thenReturn(false)
+
+        val intent = factory.createAuthorizeIntent(mockUri, ArrayList())
+
+        verify(mockPackageManager).anyValidPackageFor(any(), ArgumentMatchers.anyList())
+
+        assertEquals(webIntent, intent)
+    }
+
+    @Test
+    fun shouldCreateNativeIntentIfNativeAppAvailable() {
+        val nativeIntent = Intent()
+        whenever(mockRequest.toAuthorizationUri(anyString())).thenReturn(mockUri)
+        whenever(mockNativeIntentFactory.create(mockUri)).thenReturn(nativeIntent)
+
+        whenever(mockPackageManager.anyValidPackageFor(any(), ArgumentMatchers.anyList())).thenReturn(true)
+
+        val intent = factory.createAuthorizeIntent(mockUri, ArrayList())
+
+        verify(mockPackageManager).anyValidPackageFor(any(), ArgumentMatchers.anyList())
+
+        assertEquals(nativeIntent, intent)
+    }
+
+    @Test
+    fun shouldCreateDiscoverUIIntent() {
+        val discoverUiIntent = Intent()
+        whenever(mockWebIntentFactory.create(mockUri)).thenReturn(discoverUiIntent)
+
+        val intent = factory.createDiscoverUIIntent(mockUri)
+
+        verify(mockWebIntentFactory).create(mockUri)
+        assertEquals(discoverUiIntent, intent)
+    }
+
+    companion object {
+        private const val SCHEME = "https"
+        private const val AUTHORITY = "test.xci.com"
+        private const val AUTHORIZE_PATH = "authorize"
+        private const val AUTHORIZE_ENDPOINT = "$SCHEME://$AUTHORITY/$AUTHORIZE_PATH"
+    }
+}
