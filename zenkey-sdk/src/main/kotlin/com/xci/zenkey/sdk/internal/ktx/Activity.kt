@@ -13,23 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.xci.zenkey.sdk.param
 
-import androidx.test.filters.SmallTest
+package com.xci.zenkey.sdk.internal.ktx
 
-import org.junit.Test
+import android.app.Activity
+import android.content.ActivityNotFoundException
+import android.content.Intent
 
-import org.junit.Assert.assertEquals
-
-@SmallTest
-class ScopesTest {
-
-    @Test
-    fun shouldUseExpectedValues() {
-        assertEquals("name", Scopes.NAME.value)
-        assertEquals("email", Scopes.EMAIL.value)
-        assertEquals("phone", Scopes.PHONE.value)
-        assertEquals("openid", Scopes.OPEN_ID.value)
-        assertEquals("postal_code", Scopes.POSTAL_CODE.value)
+internal fun Activity.startAuthorizationFlowActivity(intentToStart: Intent, onActivityNotFound: () -> Unit){
+    intent = intent.setData(null)
+    try {
+        startActivity(intentToStart)
+    } catch (e: ActivityNotFoundException) {
+        onActivityNotFound.invoke()
     }
 }

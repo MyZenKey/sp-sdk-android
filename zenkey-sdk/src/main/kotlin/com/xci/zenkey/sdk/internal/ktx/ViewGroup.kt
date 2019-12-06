@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
+
 package com.xci.zenkey.sdk.internal.ktx
 
-import android.graphics.drawable.Drawable
-import android.support.annotation.ColorRes
-import android.support.annotation.DrawableRes
-import com.xci.zenkey.sdk.widget.ZenKeyButton
+import android.support.annotation.LayoutRes
+import android.view.View
+import android.view.ViewGroup
 
-internal fun ZenKeyButton.getColor(@ColorRes id: Int): Int {
-    return context.getColorCompat(id)
-}
-
-internal fun ZenKeyButton.getDrawable(@DrawableRes id: Int): Drawable {
-    return context.getDrawableCompat(id)
+internal fun ViewGroup.inflate(
+        @LayoutRes layoutRes: Int,
+        asRoot: Boolean = true
+): View {
+    return inflate(layoutRes, if (asRoot) this else null)
 }

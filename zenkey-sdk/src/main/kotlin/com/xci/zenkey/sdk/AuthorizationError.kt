@@ -74,7 +74,7 @@ enum class AuthorizationError {
     }
 
     override fun toString(): String {
-        return "AuthorizationError(description=$description)"
+        return "AuthorizationError($name - description=$description)"
     }
 }
 

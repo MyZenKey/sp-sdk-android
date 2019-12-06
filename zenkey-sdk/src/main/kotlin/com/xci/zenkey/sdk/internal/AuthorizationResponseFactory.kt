@@ -17,9 +17,11 @@ package com.xci.zenkey.sdk.internal
 
 import android.net.Uri
 import android.support.annotation.VisibleForTesting
-
 import com.xci.zenkey.sdk.AuthorizationError
+import com.xci.zenkey.sdk.AuthorizationError.*
 import com.xci.zenkey.sdk.AuthorizationResponse
+import com.xci.zenkey.sdk.internal.contract.Logger
+import com.xci.zenkey.sdk.internal.ktx.*
 import com.xci.zenkey.sdk.internal.model.AuthorizationRequest
 import com.xci.zenkey.sdk.internal.model.error.OAuth2Error
 import com.xci.zenkey.sdk.internal.model.error.OIDCError
@@ -27,21 +29,8 @@ import com.xci.zenkey.sdk.internal.model.error.ZenKeyError
 import com.xci.zenkey.sdk.internal.model.exception.AssetsNotFoundException
 import com.xci.zenkey.sdk.internal.model.exception.ProviderNotFoundException
 import com.xci.zenkey.sdk.internal.network.stack.HttpException
-
 import org.json.JSONException
 import org.json.JSONObject
-
-import com.xci.zenkey.sdk.AuthorizationError.DISCOVERY_STATE
-import com.xci.zenkey.sdk.AuthorizationError.INVALID_REQUEST
-import com.xci.zenkey.sdk.AuthorizationError.UNKNOWN
-import com.xci.zenkey.sdk.internal.contract.Logger
-import com.xci.zenkey.sdk.internal.ktx.containCode
-import com.xci.zenkey.sdk.internal.ktx.containError
-import com.xci.zenkey.sdk.internal.ktx.error
-import com.xci.zenkey.sdk.internal.ktx.errorDescription
-import com.xci.zenkey.sdk.internal.ktx.state
-import com.xci.zenkey.sdk.internal.ktx.code
-
 
 internal class AuthorizationResponseFactory
     : AuthorizationResponse.Factory {
@@ -54,7 +43,7 @@ internal class AuthorizationResponseFactory
             if (request.isNotMatching(uri.state)) {
                 create(mcc_mnc, request.redirectUri, INVALID_REQUEST.withDescription("state miss-match"))
             } else {
-                AuthorizationResponse(mcc_mnc, request.redirectUri, uri.code!!)
+                AuthorizationResponse(mcc_mnc, request, uri.code!!)
             }
         } else {
             create(mcc_mnc, request.redirectUri, UNKNOWN)
@@ -64,7 +53,6 @@ internal class AuthorizationResponseFactory
     override fun create(mcc_mnc: String?, redirectUri: Uri, throwable: Throwable)
             : AuthorizationResponse {
         return when (throwable) {
-            is ProviderNotFoundException -> create(mcc_mnc, redirectUri, DISCOVERY_STATE.withDescription("Provider Not Found"))
             is AssetsNotFoundException -> create(mcc_mnc, redirectUri, DISCOVERY_STATE.withDescription(throwable.message))
             is HttpException -> create(mcc_mnc, redirectUri, createError(throwable))
             else -> create(mcc_mnc, redirectUri, UNKNOWN.withDescription(throwable.message))

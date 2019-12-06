@@ -17,7 +17,9 @@
 package com.xci.zenkey.sdk
 
 import android.net.Uri
+import android.util.Base64
 import com.xci.zenkey.sdk.internal.DefaultAuthorizationService
+import com.xci.zenkey.sdk.internal.ktx.encodeToString
 import com.xci.zenkey.sdk.internal.model.AuthorizationRequest
 import com.xci.zenkey.sdk.param.ACR
 import com.xci.zenkey.sdk.param.Prompt
@@ -26,8 +28,10 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.security.MessageDigest
 
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest = Config.NONE)
@@ -35,9 +39,11 @@ class AuthorizeIntentBuilderTest {
 
     private lateinit var intentBuilder: AuthorizeIntentBuilder
 
+    private val mockMessageDigest = Mockito.mock(MessageDigest::class.java)
+
     @Before
     fun setUp() {
-        intentBuilder = AuthorizeIntentBuilder(PACKAGE_NAME, CLIENT_ID, REDIRECT_URI)
+        intentBuilder = AuthorizeIntentBuilder(PACKAGE_NAME, CLIENT_ID, mockMessageDigest, REDIRECT_URI)
     }
 
     @Test
@@ -129,7 +135,7 @@ class AuthorizeIntentBuilderTest {
         assertEquals(CLIENT_ID, request!!.clientId)
         assertEquals(REDIRECT_URI, request.redirectUri)
         assertEquals(scope.value, request.scope)
-        assertEquals(state, request.state)
+        assertEquals(state.encodeToString(flags = Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING), request.state)
         assertEquals(acr.value, request.acr)
         assertEquals(nonce, request.nonce)
         assertEquals(prompt.value, request.prompt)

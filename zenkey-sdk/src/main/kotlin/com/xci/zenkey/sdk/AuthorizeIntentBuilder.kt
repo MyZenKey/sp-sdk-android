@@ -15,35 +15,34 @@
  */
 package com.xci.zenkey.sdk
 
-import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Intent
 import android.net.Uri
 import android.support.annotation.VisibleForTesting
 import android.util.Base64
 import com.xci.zenkey.sdk.internal.AuthorizationRequestActivity
+import com.xci.zenkey.sdk.internal.ktx.proofKeyForCodeExchange
+import com.xci.zenkey.sdk.internal.ktx.encodeToString
+import com.xci.zenkey.sdk.internal.ktx.random
 import com.xci.zenkey.sdk.internal.model.AuthorizationRequest
 import com.xci.zenkey.sdk.param.ACR
 import com.xci.zenkey.sdk.param.Prompt
 import com.xci.zenkey.sdk.param.Scope
 import com.xci.zenkey.sdk.param.Scopes
-import java.security.SecureRandom
+import java.security.MessageDigest
 import java.util.*
 
 /**
  * This class is an @[Intent] build for authorization request.
  * This class is responsible to build the authorization intent containing all the requested or default parameters.
  */
-class AuthorizeIntentBuilder
-/**
- * Constructor for [AuthorizeIntentBuilder]
- * @param packageName the package name of the host application.
- * @param clientId the ZenKey clientId
- * @param redirectUri the default redirect [Uri]
- */
-(private val packageName: String,
- private val clientId: String,
- private var redirectUri: Uri) {
+class AuthorizeIntentBuilder(
+        private val packageName: String,
+        private val clientId: String,
+        private val messageDigest: MessageDigest,
+        private var redirectUri: Uri
+) {
+
     private var scopes: List<Scope> = listOf(Scopes.OPEN_ID)
     @VisibleForTesting
     internal var state: String? = null
@@ -58,7 +57,7 @@ class AuthorizeIntentBuilder
     private var failureIntent: PendingIntent? = null
 
     init {
-        this.state = generateRandomState()
+        this.state = random().encodeToString(Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE)
     }
 
     /**
@@ -87,7 +86,7 @@ class AuthorizeIntentBuilder
      * @return this [AuthorizeIntentBuilder] instance
      */
     fun withState(state: String): AuthorizeIntentBuilder {
-        this.state = state
+        this.state = state.encodeToString(flags = Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE)
         return this
     }
 
@@ -200,7 +199,7 @@ class AuthorizeIntentBuilder
     fun build(): Intent {
         return AuthorizationRequestActivity.createStartForResultIntent(packageName,
                 AuthorizationRequest(clientId, redirectUri,
-                        scope(), state, acr(), nonce, prompt(), correlationId, context),
+                        scope(), state, acr(), nonce, prompt(), correlationId, context, messageDigest.proofKeyForCodeExchange),
                 successIntent, failureIntent, completedIntent, canceledIntent)
     }
 
@@ -224,7 +223,7 @@ class AuthorizeIntentBuilder
     @VisibleForTesting
     internal fun prompt(): String? {
         return prompt?.let { prompts ->
-            if(prompts.isEmpty()) null
+            if (prompts.isEmpty()) null
             else prompts.joinToString(separator = " ") { it.value }
         }
     }
@@ -237,26 +236,8 @@ class AuthorizeIntentBuilder
     @VisibleForTesting
     internal fun acr(): String? {
         return acrValues?.let { ACR ->
-            if(ACR.isEmpty()) null
+            if (ACR.isEmpty()) null
             else ACR.joinToString(separator = " ") { it.value }
-        }
-    }
-
-    companion object {
-
-        private const val STATE_LENGTH = 16
-
-        /**
-         * Create a random string for the request default state
-         *
-         * @return a random [String]
-         */
-        @SuppressLint("TrulyRandom")
-        private fun generateRandomState(): String {
-            val sr = SecureRandom()
-            val random = ByteArray(STATE_LENGTH)
-            sr.nextBytes(random)
-            return Base64.encodeToString(random, Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE)
         }
     }
 }

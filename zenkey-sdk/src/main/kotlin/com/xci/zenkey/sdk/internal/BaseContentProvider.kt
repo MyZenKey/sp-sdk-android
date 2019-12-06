@@ -24,9 +24,10 @@ import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
 import android.support.annotation.VisibleForTesting
-import com.xci.zenkey.sdk.BuildConfig
 import com.xci.zenkey.sdk.IdentityProvider
 import com.xci.zenkey.sdk.R
+import com.xci.zenkey.sdk.internal.model.AndroidMessageDigestAlgorithm
+import java.security.MessageDigest
 
 internal abstract class BaseContentProvider
     : ContentProvider() {
@@ -45,7 +46,8 @@ internal abstract class BaseContentProvider
                 Uri.Builder()
                         .scheme(clientId)
                         .authority("com.xci.provider.sdk")
-                        .build())
+                        .build(),
+                MessageDigest.getInstance(AndroidMessageDigestAlgorithm.SHA_256.value))
         create(clientId, applicationContext)
         return false
     }

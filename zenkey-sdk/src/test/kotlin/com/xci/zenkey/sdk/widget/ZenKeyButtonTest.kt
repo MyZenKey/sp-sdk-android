@@ -24,7 +24,6 @@ import android.content.Intent
 import android.content.res.TypedArray
 import android.net.Uri
 import android.util.AttributeSet
-import android.view.ViewGroup
 import android.widget.Button
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -59,7 +58,6 @@ class ZenKeyButtonTest {
     private val mockFragment = mock<Fragment>()
     private val mockActivity = mock<Activity>()
     private val mockIntent = mock<Intent>()
-    private val mockContainer = mock<ViewGroup>()
 
     @Before
     fun setUp() {
@@ -180,7 +178,7 @@ class ZenKeyButtonTest {
         doNothing().whenever(mockFragment).startActivityForResult(any(), anyInt())
         zenKeyButton.setFragment(mockFragment)
 
-        zenKeyButton.startRequest(mockContainer, Intent())
+        zenKeyButton.startRequest(mockActivity, Intent())
 
         verify(mockFragment).startActivityForResult(any(), anyInt())
     }
@@ -188,11 +186,9 @@ class ZenKeyButtonTest {
     @Test
     fun shouldStartRequestFromActivity() {
         doNothing().`when`(mockActivity).startActivityForResult(any(), anyInt())
-        whenever(mockContainer.context).thenReturn(mockActivity)
 
-        zenKeyButton.startRequest(mockContainer, Intent())
+        zenKeyButton.startRequest(mockActivity, Intent())
 
-        verify(mockContainer).context
         verify(mockActivity).startActivityForResult(any(), anyInt())
     }
 
@@ -200,23 +196,19 @@ class ZenKeyButtonTest {
     fun shouldStartRequestUsingCustomRequestCode() {
         val requestCode = 888
         doNothing().`when`(mockActivity).startActivityForResult(any(), eq(requestCode))
-        whenever(mockContainer.context).thenReturn(mockActivity)
         zenKeyButton.setRequestCode(requestCode)
 
-        zenKeyButton.startRequest(mockContainer, Intent())
+        zenKeyButton.startRequest(mockActivity, Intent())
 
-        verify(mockContainer).context
         verify(mockActivity).startActivityForResult(any(), eq(requestCode))
     }
 
     @Test
     fun shouldStartRequestUsingDefaultRequestCode() {
         doNothing().`when`(mockActivity).startActivityForResult(any(), eq(ZenKeyButton.DEFAULT_REQUEST_CODE))
-        whenever(mockContainer.context).thenReturn(mockActivity)
 
-        zenKeyButton.startRequest(mockContainer, Intent())
+        zenKeyButton.startRequest(mockActivity, Intent())
 
-        verify(mockContainer).context
         verify(mockActivity).startActivityForResult(any(), eq(ZenKeyButton.DEFAULT_REQUEST_CODE))
     }
 
@@ -264,7 +256,6 @@ class ZenKeyButtonTest {
         val prompt = Prompt.CONSENT
         val context = "context"
 
-        whenever(mockContainer.context).thenReturn(mockActivity)
         doNothing().`when`(mockActivity).startActivityForResult(eq(mockIntent), eq(ZenKeyButton.DEFAULT_REQUEST_CODE))
 
         zenKeyButton.setRedirectUri(mockValidRedirectUri)
@@ -276,7 +267,7 @@ class ZenKeyButtonTest {
         zenKeyButton.setPrompt(prompt)
         zenKeyButton.setContext(context)
 
-        zenKeyButton.onClick(mockContainer)
+        zenKeyButton.onClick(mockActivity)
 
         verify(mockIntentBuilder).withRedirectUri(mockValidRedirectUri)
         verify(mockIntentBuilder).withScopes(scope)
@@ -288,7 +279,6 @@ class ZenKeyButtonTest {
         verify(mockIntentBuilder).withContext(context)
         verify(mockIntentBuilder).build()
 
-        verify(mockContainer).context
         verify(mockActivity).startActivityForResult(mockIntent, ZenKeyButton.DEFAULT_REQUEST_CODE)
     }
 

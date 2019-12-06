@@ -21,7 +21,6 @@ import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
 import android.support.annotation.VisibleForTesting
-
 import com.xci.zenkey.sdk.internal.model.AuthorizationRequest
 
 /**
@@ -60,6 +59,10 @@ class AuthorizationResponse : Parcelable {
      */
     val redirectUri: Uri?
 
+    /**
+     * The ZenKey SDK version.
+     */
+    val sdkVersion: String = BuildConfig.VERSION_NAME
 
     /**
      * Check if an Authorization Request was successful.
@@ -70,18 +73,24 @@ class AuthorizationResponse : Parcelable {
         get() = (error == null) and (authorizationCode != null)
 
     /**
+     * The PKCE challenge code_verifier
+     */
+    val codeVerifier: String?
+
+    /**
      * Constructor for Successful [AuthorizationResponse]
      *
      * @param authorizationCode the authorization code
      * @param mcc_mnc           the MCC/MNC used for the request.
      */
     constructor(mcc_mnc: String,
-                redirectUri: Uri,
+                request: AuthorizationRequest,
                 authorizationCode: String) {
         this.authorizationCode = authorizationCode
         this.mccMnc = mcc_mnc
-        this.redirectUri = redirectUri
+        this.redirectUri = request.redirectUri
         this.error = null
+        this.codeVerifier = request.proofKeyForCodeExchange.codeVerifier
     }
 
     /**
@@ -97,6 +106,7 @@ class AuthorizationResponse : Parcelable {
         this.mccMnc = mcc_mnc
         this.redirectUri = redirectUri
         this.error = error
+        this.codeVerifier = null
     }
 
     /**
@@ -125,6 +135,11 @@ class AuthorizationResponse : Parcelable {
             null
         }
 
+        codeVerifier = if (`in`.readInt() == NON_NULL_VALUE) {
+            `in`.readString()
+        } else {
+            null
+        }
     }
 
     /**
@@ -146,7 +161,7 @@ class AuthorizationResponse : Parcelable {
     override fun writeToParcel(dest: Parcel, flags: Int) {
         dest.writeParcelable(redirectUri, 0)
 
-        if(mccMnc != null){
+        if (mccMnc != null) {
             dest.writeInt(NON_NULL_VALUE)
             dest.writeString(mccMnc)
         } else {
@@ -167,6 +182,13 @@ class AuthorizationResponse : Parcelable {
         } else {
             dest.writeInt(NULL_VALUE)
         }
+
+        if (codeVerifier != null) {
+            dest.writeInt(NON_NULL_VALUE)
+            dest.writeString(codeVerifier)
+        } else {
+            dest.writeInt(NULL_VALUE)
+        }
     }
 
 
@@ -183,7 +205,12 @@ class AuthorizationResponse : Parcelable {
     }
 
     override fun toString(): String {
-        return "AuthorizationResponse(authorizationCode=$authorizationCode, mccMnc=$mccMnc, error=$error, redirectUri=$redirectUri)"
+        return "AuthorizationResponse(" +
+                "authorizationCode=$authorizationCode, " +
+                "mccMnc=$mccMnc, " +
+                "error=$error, " +
+                "redirectUri=$redirectUri, " +
+                "codeVerifier=$codeVerifier)"
     }
 
     /**
@@ -224,7 +251,6 @@ class AuthorizationResponse : Parcelable {
                    redirectUri: Uri,
                    error: AuthorizationError): AuthorizationResponse
     }
-
 
 
     companion object {

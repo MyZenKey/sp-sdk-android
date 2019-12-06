@@ -4,6 +4,7 @@ import android.net.Uri
 import android.os.Parcel
 import android.os.Parcelable
 import android.support.annotation.VisibleForTesting
+import com.xci.zenkey.sdk.BuildConfig
 
 import com.xci.zenkey.sdk.internal.Json
 import com.xci.zenkey.sdk.internal.ktx.appendQueryParameterIfNotNull
@@ -13,25 +14,27 @@ class AuthorizationRequest
     : Parcelable {
 
     @VisibleForTesting
-    val clientId: String?
+    internal val clientId: String?
     @VisibleForTesting
-    val redirectUri: Uri
+    internal val redirectUri: Uri
     @VisibleForTesting
-    val scope: String?
+    internal val scope: String?
     @VisibleForTesting
-    val state: String?
+    internal val state: String?
     @VisibleForTesting
-    val acr: String?
+    internal val acr: String?
     @VisibleForTesting
-    val nonce: String?
+    internal val nonce: String?
     @VisibleForTesting
-    val prompt: String?
+    internal val prompt: String?
     @VisibleForTesting
-    val correlationId: String?
+    internal val correlationId: String?
     @VisibleForTesting
-    val context: String?
+    internal val context: String?
     @VisibleForTesting
-    var loginHintToken: String? = null
+    internal val proofKeyForCodeExchange: ProofKeyForCodeExchange
+    @VisibleForTesting
+    internal var loginHintToken: String? = null
         private set
 
     internal constructor(clientId: String,
@@ -42,7 +45,8 @@ class AuthorizationRequest
                          nonce: String?,
                          prompt: String?,
                          correlationId: String?,
-                         context: String?) {
+                         context: String?,
+                         proofKeyForCodeExchange: ProofKeyForCodeExchange) {
         this.clientId = clientId
         this.scope = scope
         this.state = state
@@ -52,10 +56,12 @@ class AuthorizationRequest
         this.prompt = prompt
         this.correlationId = correlationId
         this.context = context
+        this.proofKeyForCodeExchange = proofKeyForCodeExchange
     }
 
     private constructor(`in`: Parcel) {
         clientId = `in`.readString()!!
+        proofKeyForCodeExchange = `in`.readParcelable(javaClass.classLoader)!!
         redirectUri = `in`.readParcelable(javaClass.classLoader)!!
 
         scope = if (`in`.readInt() == NON_NULL_VALUE) {
@@ -109,6 +115,7 @@ class AuthorizationRequest
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
         dest.writeString(clientId)
+        dest.writeParcelable(proofKeyForCodeExchange, flags)
         dest.writeParcelable(redirectUri, flags)
 
         if (scope != null) {
@@ -172,30 +179,34 @@ class AuthorizationRequest
         return 0
     }
 
-    fun withLoginHintToken(loginHintToken: String?): AuthorizationRequest {
+    internal fun withLoginHintToken(loginHintToken: String?): AuthorizationRequest {
         this.loginHintToken = loginHintToken
         return this
     }
 
-    fun isNotMatching(responseState: String?): Boolean {
+    internal fun isNotMatching(responseState: String?): Boolean {
         return (state == null) and (responseState != null) || state != null && state != responseState
     }
 
-    fun toDiscoverUiUri(endpoint: String)
+    internal fun toDiscoverUiUri(endpoint: String)
             : Uri = Uri.parse(endpoint)
             .buildUpon()
+            .appendQueryParameter(Json.KEY_SDK_VERSION, BuildConfig.VERSION_NAME)
             .appendQueryParameter(Json.KEY_CLIENT_ID, clientId)
             .appendQueryParameter(Json.KEY_REDIRECT_URI, redirectUri.toString())
             .appendQueryParameterIfNotNull(Json.KEY_STATE, state)
             .build()
 
 
-    fun toAuthorizationUri(endpoint: String)
+    internal fun toAuthorizationUri(endpoint: String)
             : Uri = Uri.parse(endpoint)
             .buildUpon()
+            .appendQueryParameter(Json.KEY_SDK_VERSION, BuildConfig.VERSION_NAME)
             .appendQueryParameter(Json.KEY_CLIENT_ID, clientId)
             .appendQueryParameter(Json.KEY_RESPONSE_TYPE, ResponseType.CODE.type)
             .appendQueryParameter(Json.KEY_REDIRECT_URI, redirectUri.toString())
+            .appendQueryParameter(Json.KEY_CODE_CHALLENGE, proofKeyForCodeExchange.codeChallenge)
+            .appendQueryParameter(Json.KEY_CODE_CHALLENGE_METHOD, proofKeyForCodeExchange.codeChallengeMethod.value)
             .appendQueryParameterIfNotNull(Json.KEY_SCOPE, scope)
             .appendQueryParameterIfNotNull(Json.KEY_STATE, state)
             .appendQueryParameterIfNotNull(Json.KEY_PROMPT, prompt)
@@ -221,7 +232,7 @@ class AuthorizationRequest
                 '}'
     }
 
-    companion object {
+    internal companion object {
 
         private const val NULL_VALUE = 0
         private const val NON_NULL_VALUE = 1

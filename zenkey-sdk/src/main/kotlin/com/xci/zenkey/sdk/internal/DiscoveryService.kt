@@ -20,6 +20,7 @@ import android.support.annotation.VisibleForTesting
 import com.xci.zenkey.sdk.IdentityProvider
 import com.xci.zenkey.sdk.internal.contract.ICache
 import com.xci.zenkey.sdk.internal.contract.IDiscoveryService
+import com.xci.zenkey.sdk.internal.ktx.isNetworkFailure
 import com.xci.zenkey.sdk.internal.model.DiscoveryResponse
 import com.xci.zenkey.sdk.internal.model.OpenIdConfiguration
 import com.xci.zenkey.sdk.internal.model.Package
@@ -149,7 +150,7 @@ internal class DiscoveryService internal constructor(
                                                      cachedOIDC: OpenIdConfiguration?,
                                                      onSuccess: (OpenIdConfiguration) -> Unit,
                                                      onError: (Throwable) -> Unit) {
-        if (isANetworkError(throwable) and (cachedOIDC != null)) {
+        if (throwable.isNetworkFailure and (cachedOIDC != null)) {
             onSuccess.invoke(cachedOIDC!!)
         } else {
             onError.invoke(throwable)
@@ -178,17 +179,5 @@ internal class DiscoveryService internal constructor(
         } else {
             onError.invoke(AssetsNotFoundException("Unable to fetch assetLinks.json " + response.rawBody))
         }
-    }
-
-    /**
-     * Check if a [Throwable] is a network error.
-     *
-     * @param throwable the [Throwable] to check.
-     * @return true if the {@param throwable} is a [SocketTimeoutException]
-     * or a [UnknownHostException], false else.
-     */
-    @VisibleForTesting
-    internal fun isANetworkError(throwable: Throwable): Boolean {
-        return throwable is SocketTimeoutException || throwable is UnknownHostException
     }
 }

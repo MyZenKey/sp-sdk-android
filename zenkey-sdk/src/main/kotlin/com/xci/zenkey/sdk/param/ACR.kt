@@ -30,14 +30,14 @@ enum class ACR(val value: String) {
     /**
      * Device token
      */
-    AAL1("aal1"),
+    AAL1("a1"),
     /**
      *
      */
-    AAL2("aal2"),
+    AAL2("a2"),
     /**
      * New device registered + carrier auth + 2nd factor.
      * Remembered Device (aka) + user (pin or bio)
      */
-    AAL3("aal3");
+    AAL3("a3");
 }

@@ -24,9 +24,9 @@ import com.xci.zenkey.sdk.internal.ktx.code
 import com.xci.zenkey.sdk.internal.ktx.error
 import com.xci.zenkey.sdk.internal.ktx.state
 import com.xci.zenkey.sdk.internal.model.AuthorizationRequest
+import com.xci.zenkey.sdk.internal.model.ProofKeyForCodeExchange
 import com.xci.zenkey.sdk.internal.model.error.OIDCError
 import com.xci.zenkey.sdk.internal.model.exception.AssetsNotFoundException
-import com.xci.zenkey.sdk.internal.model.exception.ProviderNotFoundException
 import com.xci.zenkey.sdk.internal.network.stack.HttpException
 import org.junit.Assert.*
 import org.junit.Test
@@ -38,6 +38,7 @@ class AuthorizationResponseFactoryTest {
     private val mockUri = mock<Uri>()
     private val mockRequest = mock<AuthorizationRequest>()
     private val mockRedirectUri = mock<Uri>()
+    private val mockPKCEChallenge = mock<ProofKeyForCodeExchange>()
     private val factory = AuthorizationResponseFactory()
 
     @Test
@@ -49,6 +50,8 @@ class AuthorizationResponseFactoryTest {
         whenever(mockUri.state).thenReturn(state)
         whenever(mockRequest.state).thenReturn(state)
         whenever(mockRequest.redirectUri).thenReturn(mockRedirectUri)
+        whenever(mockPKCEChallenge.codeVerifier).thenReturn(CODE_VERIFIER)
+        whenever(mockRequest.proofKeyForCodeExchange).thenReturn(mockPKCEChallenge)
 
         val response = factory.create(MCC_MNC, mockRequest, mockUri)
 
@@ -56,6 +59,7 @@ class AuthorizationResponseFactoryTest {
         assertEquals(MCC_MNC, response.mccMnc)
         assertTrue(response.isSuccessful)
         assertEquals(code, response.authorizationCode)
+        assertEquals(CODE_VERIFIER, response.codeVerifier)
     }
 
     @Test
@@ -125,16 +129,6 @@ class AuthorizationResponseFactoryTest {
     @Test
     fun shouldGetDiscoveryStateErrorResponseForAssetsNotFoundException() {
         val response = factory.create(MCC_MNC, mockRedirectUri, AssetsNotFoundException("message"))
-
-        assertNotNull(response)
-        assertEquals(MCC_MNC, response.mccMnc)
-        assertFalse(response.isSuccessful)
-        assertEquals(AuthorizationError.DISCOVERY_STATE, response.error)
-    }
-
-    @Test
-    fun shouldGetDiscoveryStateErrorResponseForProviderNotFoundException() {
-        val response = factory.create(MCC_MNC, mockRedirectUri, ProviderNotFoundException(null))
 
         assertNotNull(response)
         assertEquals(MCC_MNC, response.mccMnc)
@@ -218,5 +212,6 @@ class AuthorizationResponseFactoryTest {
 
     companion object {
         private const val MCC_MNC = "MCC_MNC"
+        private const val CODE_VERIFIER = "CODE_VERIFIER"
     }
 }

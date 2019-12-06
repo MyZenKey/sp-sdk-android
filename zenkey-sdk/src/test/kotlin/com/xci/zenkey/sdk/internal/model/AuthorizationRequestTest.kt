@@ -37,7 +37,7 @@ class AuthorizationRequestTest {
 
     @Before
     fun setUp() {
-        request = AuthorizationRequest(CLIENT_ID, REDIRECT, SCOPE, STATE, ACR, NONCE, PROMPT, CORRELATION_ID, CONTEXT)
+        request = AuthorizationRequest(CLIENT_ID, REDIRECT, SCOPE, STATE, ACR, NONCE, PROMPT, CORRELATION_ID, CONTEXT, PKCE_CHALLENGE)
     }
 
     @Test
@@ -51,6 +51,9 @@ class AuthorizationRequestTest {
 
         assertEquals(CLIENT_ID, createdFromParcel.clientId)
         assertEquals(REDIRECT, createdFromParcel.redirectUri)
+        assertEquals(CODE_CHALLENGE, createdFromParcel.proofKeyForCodeExchange.codeChallenge)
+        assertEquals(CODE_CHALLENGE_METHOD, createdFromParcel.proofKeyForCodeExchange.codeChallengeMethod)
+        assertEquals(CODE_VERIFIER, createdFromParcel.proofKeyForCodeExchange.codeVerifier)
         assertEquals(SCOPE, createdFromParcel.scope)
         assertEquals(STATE, createdFromParcel.state)
         assertEquals(ACR, createdFromParcel.acr)
@@ -66,7 +69,7 @@ class AuthorizationRequestTest {
     @Test
     fun shouldReadRequestFromParcelWithoutOptionalValues() {
         request = AuthorizationRequest(CLIENT_ID,
-                REDIRECT, null, null, null, null, null, null, null)
+                REDIRECT, null, null, null, null, null, null, null, PKCE_CHALLENGE)
         val parcel = Parcel.obtain()
         request.writeToParcel(parcel, request.describeContents())
 
@@ -76,6 +79,9 @@ class AuthorizationRequestTest {
 
         assertEquals(CLIENT_ID, createdFromParcel.clientId)
         assertEquals(REDIRECT, createdFromParcel.redirectUri)
+        assertEquals(CODE_CHALLENGE, createdFromParcel.proofKeyForCodeExchange.codeChallenge)
+        assertEquals(CODE_CHALLENGE_METHOD, createdFromParcel.proofKeyForCodeExchange.codeChallengeMethod)
+        assertEquals(CODE_VERIFIER, createdFromParcel.proofKeyForCodeExchange.codeVerifier)
         assertNull(createdFromParcel.scope)
         assertNull(createdFromParcel.state)
         assertNull(createdFromParcel.acr)
@@ -90,15 +96,16 @@ class AuthorizationRequestTest {
 
     @Test
     fun shouldCreateUriFromRequest() {
-        val uri = AuthorizationRequest(CLIENT_ID, REDIRECT, SCOPE, STATE, ACR, NONCE, PROMPT, CORRELATION_ID, CONTEXT)
+        val uri = AuthorizationRequest(CLIENT_ID, REDIRECT, SCOPE, STATE, ACR, NONCE, PROMPT, CORRELATION_ID, CONTEXT, PKCE_CHALLENGE)
                 .toAuthorizationUri(ENDPOINT)
 
         assertEquals(SCHEME, uri.scheme)
         assertEquals(AUTHORITY, uri.authority)
         assertEquals(PATH, uri.pathSegments[0])
-
         assertEquals(CLIENT_ID, uri.clientId)
         assertEquals(REDIRECT.toString(), uri.redirectUri)
+        assertEquals(CODE_CHALLENGE, uri.codeChallenge)
+        assertEquals(CODE_CHALLENGE_METHOD.value, uri.codeChallengeMethod)
         assertEquals(SCOPE, uri.scope)
         assertEquals(STATE, uri.state)
         assertEquals(ACR, uri.acr)
@@ -120,7 +127,11 @@ class AuthorizationRequestTest {
         private const val SCHEME = "https"
         private const val AUTHORITY = "example.com"
         private const val PATH = "test"
+        private const val CODE_CHALLENGE = "codeChallenge"
+        private const val CODE_VERIFIER = "codeVerifier"
         private const val ENDPOINT = "${SCHEME}://${AUTHORITY}/${PATH}"
-        private val REDIRECT = Uri.EMPTY
+        private val CODE_CHALLENGE_METHOD = CodeChallengeMethod.PLAIN
+        private val REDIRECT = Uri.parse("app://redirect")
+        private val PKCE_CHALLENGE: ProofKeyForCodeExchange = ProofKeyForCodeExchange(CODE_VERIFIER, CODE_CHALLENGE, CODE_CHALLENGE_METHOD)
     }
 }

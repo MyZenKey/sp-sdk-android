@@ -33,6 +33,9 @@ import com.xci.zenkey.sdk.internal.DefaultAuthorizationService.Companion.EXTRA_K
 import com.xci.zenkey.sdk.internal.contract.AuthorizationIntentFactory
 import com.xci.zenkey.sdk.internal.contract.SimDataProvider
 import com.xci.zenkey.sdk.internal.ktx.isUserNotFoundError
+import com.xci.zenkey.sdk.internal.ktx.setResultCanceledAndFinish
+import com.xci.zenkey.sdk.internal.ktx.setResultOKAndFinish
+import com.xci.zenkey.sdk.internal.ktx.updateState
 import com.xci.zenkey.sdk.internal.model.AuthorizationRequest
 import com.xci.zenkey.sdk.internal.model.AuthorizationState
 import com.xci.zenkey.sdk.internal.model.OpenIdConfiguration
@@ -983,7 +986,7 @@ class DefaultAuthorizationServiceTest {
 
         doNothing().whenever(mockSuccessIntent).send(mockActivity, Activity.RESULT_OK, mockResponseIntent)
 
-        authorizationService.setResultAndFinish(mockActivity, mockResponse)
+        authorizationService.setResultOKAndFinish(mockActivity, mockResponse)
 
         verify(mockSuccessIntent).send(mockActivity, Activity.RESULT_OK, mockResponseIntent)
     }
@@ -998,7 +1001,7 @@ class DefaultAuthorizationServiceTest {
 
         doNothing().whenever(mockFailureIntent).send(mockActivity, Activity.RESULT_OK, mockResponseIntent)
 
-        authorizationService.setResultAndFinish(mockActivity, mockResponse)
+        authorizationService.setResultOKAndFinish(mockActivity, mockResponse)
 
         verify(mockFailureIntent).send(mockActivity, Activity.RESULT_OK, mockResponseIntent)
     }
@@ -1013,7 +1016,7 @@ class DefaultAuthorizationServiceTest {
 
         doNothing().whenever(mockCompletionIntent).send(mockActivity, Activity.RESULT_OK, mockResponseIntent)
 
-        authorizationService.setResultAndFinish(mockActivity, mockResponse)
+        authorizationService.setResultOKAndFinish(mockActivity, mockResponse)
 
         verify(mockCompletionIntent).send(mockActivity, Activity.RESULT_OK, mockResponseIntent)
     }
@@ -1027,7 +1030,7 @@ class DefaultAuthorizationServiceTest {
         whenever(mockResponse.toIntent()).thenReturn(intent)
         doNothing().whenever(mockActivity).setResult(Activity.RESULT_OK, intent)
 
-        authorizationService.setResultAndFinish(mockActivity, mockResponse)
+        authorizationService.setResultOKAndFinish(mockActivity, mockResponse)
 
         verify(mockActivity).setResult(Activity.RESULT_OK, intent)
         verify(mockActivity).finish()
@@ -1041,7 +1044,7 @@ class DefaultAuthorizationServiceTest {
 
         doNothing().whenever(mockCancellationIntent).send(mockActivity, Activity.RESULT_CANCELED, null)
 
-        authorizationService.setCanceledAndFinish(mockActivity)
+        authorizationService.setResultCanceledAndFinish(mockActivity)
 
         verify(mockCancellationIntent).send(mockActivity, Activity.RESULT_CANCELED, null)
     }
@@ -1052,7 +1055,7 @@ class DefaultAuthorizationServiceTest {
         doNothing().whenever(mockActivity).finish()
         doNothing().whenever(mockActivity).setResult(Activity.RESULT_CANCELED)
 
-        authorizationService.setCanceledAndFinish(mockActivity)
+        authorizationService.setResultCanceledAndFinish(mockActivity)
 
         verify(mockActivity).setResult(Activity.RESULT_CANCELED)
         verify(mockActivity).finish()

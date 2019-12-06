@@ -15,7 +15,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -39,18 +38,11 @@ limitations under the License.
         android:drawablePadding="16dp"
         android:paddingStart="16dp"
         android:paddingEnd="8dp" />
-    <TextView
-        android:id="@+id/zenKeyPoweredByTextView"
+    <com.xci.zenkey.sdk.widget.CarrierEndorsementView
+        android:id="@+id/carrierEndorsementView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:gravity="center"
-        android:padding="5dp"
-        android:textAllCaps="true"
-        android:textColor="@android:color/darker_gray"
-        android:textSize="12sp"
-        android:visibility="gone"
-        android:textAlignment="center"
-        tools:text="Powered by MNO"/>
+        android:layout_gravity="center"
+        android:visibility="gone"/>
 </LinearLayout>
 

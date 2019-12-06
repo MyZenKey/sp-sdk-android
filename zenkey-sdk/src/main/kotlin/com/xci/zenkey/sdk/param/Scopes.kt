@@ -18,17 +18,11 @@ package com.xci.zenkey.sdk.param
 /**
  * This enum is representing the available Scope parameters for an authorization request.
  */
-enum class Scopes constructor(override val value: String) : Scope {
-    //DATA scope
+enum class Scopes(override val value: String)
+    : Scope {
     OPEN_ID("openid"),
     EMAIL("email"),
     NAME("name"),
     PHONE("phone"),
     POSTAL_CODE("postal_code"),
-
-    //Context scope
-    AUTHORIZE("authorize"),
-    REGISTER("register"),
-    SECOND_FACTOR("2ndfactor"),
-    AUTHENTICATE("authenticate");
 }

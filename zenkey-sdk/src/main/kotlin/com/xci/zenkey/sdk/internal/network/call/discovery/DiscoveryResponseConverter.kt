@@ -16,6 +16,7 @@
 package com.xci.zenkey.sdk.internal.network.call.discovery
 
 import com.xci.zenkey.sdk.internal.Json
+import com.xci.zenkey.sdk.internal.model.Branding
 import com.xci.zenkey.sdk.internal.model.DiscoveryResponse
 import com.xci.zenkey.sdk.internal.model.OpenIdConfiguration
 import com.xci.zenkey.sdk.internal.network.stack.JsonConverter
@@ -35,7 +36,9 @@ internal class DiscoveryResponseConverter
             DiscoveryResponse(OpenIdConfiguration(
                     responseObject.getString(Json.KEY_ISSUER),
                     responseObject.getString(Json.KEY_AUTHORIZATION_ENDPOINT),
-                    responseObject.optString(Json.KEY_MCC_MNC)))
+                    responseObject.optString(Json.KEY_MCC_MNC),
+                    Branding(responseObject.getString(Json.KEY_LINK_BRANDING),
+                               responseObject.optString(Json.KEY_BRANDING))))
         }
     }
 }

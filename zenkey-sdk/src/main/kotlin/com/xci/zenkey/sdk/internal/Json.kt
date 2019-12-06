@@ -28,6 +28,9 @@ internal object Json {
     const val KEY_ACR_VALUES = "acr_values"
     const val KEY_CORRELATION_ID = "correlation_id"
     const val KEY_CONTEXT = "context"
+    const val KEY_SDK_VERSION = "sdk_version"
+    const val KEY_CODE_CHALLENGE = "code_challenge"
+    const val KEY_CODE_CHALLENGE_METHOD = "code_challenge_method"
 
     const val KEY_MCC_MNC = "mccmnc"
 
@@ -36,4 +39,6 @@ internal object Json {
     const val KEY_ERROR = "error"
     const val KEY_ERROR_DESCRIPTION = "error_description"
     const val KEY_CODE = "code"
+    const val KEY_BRANDING = "branding"
+    const val KEY_LINK_BRANDING = "link_branding"
 }

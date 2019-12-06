@@ -55,6 +55,7 @@ dependencies {
 
     testImplementation libs.android.test.mockito.core
     testImplementation libs.android.test.mockito.kotlin
+
     testImplementation libs.android.test.core
     testImplementation libs.android.test.rules
     testImplementation libs.android.test.runner

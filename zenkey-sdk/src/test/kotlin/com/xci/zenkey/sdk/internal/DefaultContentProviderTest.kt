@@ -50,11 +50,6 @@ class DefaultContentProviderTest {
     private var provider: DefaultContentProvider? = null
 
     @Test
-    fun shouldUseSHA256Algorithm() {
-        assertEquals("SHA-256", DefaultContentProvider.ALGORITHM)
-    }
-
-    @Test
     fun shouldUseX509Factory() {
         assertEquals("X509", DefaultContentProvider.CERTIFICATE_FACTORY_TYPE)
     }

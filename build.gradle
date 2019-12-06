@@ -17,7 +17,6 @@ buildscript {
 
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
         classpath 'digital.wup:android-maven-publish:3.6.2'
-        classpath 'de.felixschulze.gradle:gradle-hockeyapp-plugin:3.6'
     }
 }
 

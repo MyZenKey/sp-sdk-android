@@ -19,6 +19,8 @@ import android.content.Context
 import android.support.annotation.VisibleForTesting
 
 import com.xci.zenkey.sdk.internal.contract.AuthorizationService
+import com.xci.zenkey.sdk.internal.contract.SimDataProvider
+import com.xci.zenkey.sdk.internal.model.AndroidMessageDigestAlgorithm
 import com.xci.zenkey.sdk.internal.security.FingerprintFactory
 import com.xci.zenkey.sdk.internal.security.DefaultFingerprintFactory
 
@@ -30,30 +32,24 @@ import java.security.cert.CertificateFactory
 internal class DefaultContentProvider
     : BaseContentProvider() {
 
-    private lateinit var fingerprintFactory: FingerprintFactory
-
-    init {
-        try {
-            fingerprintFactory = DefaultFingerprintFactory(
-                    CertificateFactory.getInstance(CERTIFICATE_FACTORY_TYPE),
-                    MessageDigest.getInstance(ALGORITHM))
-        } catch (e: CertificateException) {
-            e.printStackTrace()
-        } catch (e: NoSuchAlgorithmException) {
-            e.printStackTrace()
-        }
-    }
-
     override fun create(clientId: String, context: Context) {
+
+        val fingerprintFactory = DefaultFingerprintFactory(
+                CertificateFactory.getInstance(CERTIFICATE_FACTORY_TYPE),
+                MessageDigest.getInstance(AndroidMessageDigestAlgorithm.SHA_256.value))
+
+        discoveryService = DiscoveryService(clientId)
+        simDataProvider = AndroidSimDataProvider(context)
+
         authorizationService = DefaultAuthorizationService(
-                DiscoveryService(clientId),
+                discoveryService,
                 DefaultAuthorizationIntentFactory(
                         DefaultNativeIntentFactory(),
                         DefaultWebIntentFactory(context),
                         AndroidPackageManager(
                                 context.packageManager,
                                 fingerprintFactory)),
-                AndroidSimDataProvider(context),
+                simDataProvider,
                 AuthorizationResponseFactory())
     }
 
@@ -61,11 +57,15 @@ internal class DefaultContentProvider
 
         @VisibleForTesting
         internal val CERTIFICATE_FACTORY_TYPE = "X509"
-        @VisibleForTesting
-        internal val ALGORITHM = "SHA-256"
 
         @Volatile
         internal lateinit var authorizationService: AuthorizationService
+
+        @Volatile
+        internal lateinit var discoveryService: DiscoveryService
+
+        @Volatile
+        internal lateinit var simDataProvider: SimDataProvider
 
         internal fun authorizationService(): AuthorizationService {
             return authorizationService

@@ -16,11 +16,10 @@
 package com.xci.zenkey.sdk.internal.security
 
 import android.support.annotation.VisibleForTesting
-
+import com.xci.zenkey.sdk.internal.ktx.hash
 import java.security.MessageDigest
 import java.security.cert.CertificateException
 import java.security.cert.CertificateFactory
-import java.util.Locale
 
 /**
  * Implementation of [FingerprintFactory]
@@ -42,20 +41,6 @@ internal class DefaultFingerprintFactory @VisibleForTesting internal constructor
      */
     @Throws(CertificateException::class)
     override fun create(signature: ByteArray): String {
-        val publicKey = publicKeyFactory.create(signature)
-        val hexString = StringBuilder()
-        for (aPublicKeyByte in publicKey) {
-            val appendString = Integer.toHexString(MX_VALUE and aPublicKeyByte.toInt())
-            if (appendString.length == 1) hexString.append(DEFAULT_EMPTY_CHAR)
-            hexString.append(appendString.toUpperCase(Locale.getDefault()))
-            hexString.append(SEPARATOR)
-        }
-        return hexString.deleteCharAt(hexString.length - 1).toString()
-    }
-
-    companion object {
-        private const val MX_VALUE = 0xFF
-        private const val DEFAULT_EMPTY_CHAR = "0"
-        private const val SEPARATOR = ":"
+        return publicKeyFactory.create(signature).hash(separator = ":", upperCase = true)
     }
 }

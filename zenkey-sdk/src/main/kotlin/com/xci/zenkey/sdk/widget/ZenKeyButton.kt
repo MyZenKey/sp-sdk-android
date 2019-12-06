@@ -33,11 +33,17 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.Button
 import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.TextView
 import com.xci.zenkey.sdk.AuthorizeIntentBuilder
 import com.xci.zenkey.sdk.R
 import com.xci.zenkey.sdk.internal.BaseContentProvider
+import com.xci.zenkey.sdk.internal.DefaultContentProvider
+import com.xci.zenkey.sdk.internal.DiscoveryService
+import com.xci.zenkey.sdk.internal.ktx.activity
 import com.xci.zenkey.sdk.internal.ktx.getColor
 import com.xci.zenkey.sdk.internal.ktx.getDrawable
+import com.xci.zenkey.sdk.internal.ktx.inflate
 import com.xci.zenkey.sdk.param.ACR
 import com.xci.zenkey.sdk.param.Prompt
 import com.xci.zenkey.sdk.param.Scope
@@ -52,7 +58,8 @@ import java.lang.ref.WeakReference
  */
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 @Keep
-class ZenKeyButton : FrameLayout {
+class ZenKeyButton
+    : FrameLayout {
 
     @VisibleForTesting
     internal var requestCode = DEFAULT_REQUEST_CODE
@@ -66,6 +73,8 @@ class ZenKeyButton : FrameLayout {
     internal var mode: Mode = Mode.DARK
     @VisibleForTesting
     internal var text: Text = Text.SIGN_IN
+    @VisibleForTesting
+    internal var enablePoweredBy: Boolean = false
 
     @Keep
     enum class Mode constructor(internal val contentColor: Int, internal val backgroundDrawable: Int) {
@@ -74,7 +83,7 @@ class ZenKeyButton : FrameLayout {
     }
 
     @Keep
-    enum class Text constructor(internal val stringResId: Int){
+    enum class Text constructor(internal val stringResId: Int) {
         CONTINUE(R.string.continue_with_zenkey),
         SIGN_IN(R.string.sign_in_with_zenkey)
     }
@@ -84,7 +93,7 @@ class ZenKeyButton : FrameLayout {
      * @param context the [Context] used to create this view.
      */
     constructor(context: Context) : super(context) {
-        inflate(context)
+        inflate()
         init(null)
     }
 
@@ -94,7 +103,7 @@ class ZenKeyButton : FrameLayout {
      * @param attrs the attributes set inside the XML
      */
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
-        inflate(context)
+        inflate()
         init(attrs)
     }
 
@@ -105,7 +114,7 @@ class ZenKeyButton : FrameLayout {
      * @param defStyleAttr the default style attributes
      */
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-        inflate(context)
+        inflate()
         init(attrs)
     }
 
@@ -118,7 +127,7 @@ class ZenKeyButton : FrameLayout {
      */
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes) {
-        inflate(context)
+        inflate()
         init(attrs)
     }
 
@@ -126,8 +135,8 @@ class ZenKeyButton : FrameLayout {
      * Inflate the XML associated with this custom component.
      * @param context the context to use for the inflation.
      */
-    private fun inflate(context: Context) {
-        View.inflate(context, R.layout.zenkey_button, this)
+    private fun inflate() {
+        inflate(R.layout.zenkey_button)
     }
 
     /**
@@ -140,20 +149,22 @@ class ZenKeyButton : FrameLayout {
             this.intentBuilder = BaseContentProvider.identityProvider().authorizeIntent()
         }
         this.button = findViewById(R.id.zenkeyInternalButton)
-        this.button.setOnClickListener { v -> this@ZenKeyButton.onClick(v) }
+        this.button.setOnClickListener { this@ZenKeyButton.onClick(context.activity()) }
         setBackgroundColor(getColor(android.R.color.transparent))
 
         extractAttributes(attrs)
+        applyPoweredBy()
         applyMode()
         applyText()
     }
 
     @VisibleForTesting
-    internal fun extractAttributes(attrs: AttributeSet?){
+    internal fun extractAttributes(attrs: AttributeSet?) {
         attrs?.let {
             val arr = context.obtainStyledAttributes(attrs, R.styleable.ZenKeyButton)
             mode = Mode.values()[arr.getInt(R.styleable.ZenKeyButton_mode, mode.ordinal)]
             text = Text.values()[arr.getInt(R.styleable.ZenKeyButton_text, text.ordinal)]
+            enablePoweredBy = arr.getBoolean(R.styleable.ZenKeyButton_enablePoweredBy, enablePoweredBy)
             arr.recycle()
         }
     }
@@ -162,7 +173,7 @@ class ZenKeyButton : FrameLayout {
      * Set the text of the Button.
      * @param text a {@Text} enum value.
      */
-    fun setText(@NonNull text: Text){
+    fun setText(@NonNull text: Text) {
         this.text = text
         applyText()
     }
@@ -294,11 +305,10 @@ class ZenKeyButton : FrameLayout {
 
     /**
      * Called when the button is clicked.
-     * @param v the button.
      */
     @VisibleForTesting
-    internal fun onClick(v: View) {
-        startRequest(v, buildAuthorizationIntent())
+    internal fun onClick(activity: Activity?) {
+        startRequest(activity, buildAuthorizationIntent())
     }
 
     /**
@@ -307,12 +317,11 @@ class ZenKeyButton : FrameLayout {
      * @param intent the intent to start.
      */
     @VisibleForTesting
-    internal fun startRequest(view: View, intent: Intent) {
+    internal fun startRequest(activity: Activity?, intent: Intent) {
         if (fragment != null) {
             fragment!!.get()?.startActivityForResult(intent, requestCode)
         } else {
-            val activity = view.context as Activity
-            activity.startActivityForResult(intent, requestCode)
+            activity?.startActivityForResult(intent, requestCode)
         }
     }
 
@@ -326,7 +335,7 @@ class ZenKeyButton : FrameLayout {
     }
 
     @VisibleForTesting
-    internal fun applyMode(){
+    internal fun applyMode() {
         val icon = getDrawable(R.drawable.ic_zenkey_white)
         this.button.setTextColor(getColor(mode.contentColor))
         icon.setColorFilter(getColor(mode.contentColor), PorterDuff.Mode.SRC_ATOP)
@@ -335,9 +344,29 @@ class ZenKeyButton : FrameLayout {
     }
 
     @VisibleForTesting
-    internal fun applyText(){
+    internal fun applyText() {
         this.button.setText(text.stringResId)
         this.button.contentDescription = context.getString(text.stringResId)
+    }
+
+    @VisibleForTesting
+    internal fun applyPoweredBy() {
+        if (enablePoweredBy) {
+            val carrierEndorsementView = findViewById<CarrierEndorsementView>(R.id.carrierEndorsementView)
+            carrierEndorsementView.visibility = View.VISIBLE
+            if(!isInEditMode) {
+                DefaultContentProvider.discoveryService.discoverConfiguration(
+                        DefaultContentProvider.simDataProvider.simOperator,
+                        false,
+                        {
+                            carrierEndorsementView.setCarrier(it.branding.carrierText, null, mode)
+                        }, {
+
+                })
+            } else {
+                carrierEndorsementView.setCarrier("Powered By MNO", null, mode)
+            }
+        }
     }
 
     companion object {

@@ -20,7 +20,12 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Parcel
 import androidx.test.filters.SmallTest
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
+import com.xci.zenkey.sdk.internal.model.AuthorizationRequest
+import com.xci.zenkey.sdk.internal.model.ProofKeyForCodeExchange
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -32,8 +37,19 @@ import org.robolectric.annotation.Config
 class AuthorizationResponseTest {
 
     private val error = AuthorizationError.UNKNOWN
-    private var successResponse = AuthorizationResponse(MCC_MNC, REDIRECT_URI, AUTHORIZATION_CODE)
-    private var failedResponse = AuthorizationResponse(MCC_MNC, REDIRECT_URI, error)
+    private val mockRequest = mock<AuthorizationRequest>()
+    private val mockPKCEChallenge = mock<ProofKeyForCodeExchange>()
+    private lateinit var successResponse: AuthorizationResponse
+    private lateinit var failedResponse: AuthorizationResponse
+
+    @Before
+    fun setUp() {
+        whenever(mockPKCEChallenge.codeVerifier).thenReturn(CODE_VERIFIER)
+        whenever(mockRequest.proofKeyForCodeExchange).thenReturn(mockPKCEChallenge)
+        whenever(mockRequest.redirectUri).thenReturn(REDIRECT_URI)
+        successResponse = AuthorizationResponse(MCC_MNC, mockRequest, AUTHORIZATION_CODE)
+        failedResponse = AuthorizationResponse(MCC_MNC, REDIRECT_URI, error)
+    }
 
     @Test
     fun shouldReadSuccessResponseFromParcel() {
@@ -47,6 +63,7 @@ class AuthorizationResponseTest {
         assertEquals(MCC_MNC, createdFromParcel.mccMnc)
         assertEquals(AUTHORIZATION_CODE, createdFromParcel.authorizationCode)
         assertEquals(REDIRECT_URI, createdFromParcel.redirectUri)
+        assertEquals(CODE_VERIFIER, createdFromParcel.codeVerifier)
         assertNull(createdFromParcel.error)
 
         val array = AuthorizationResponse.CREATOR.newArray(2)
@@ -84,6 +101,7 @@ class AuthorizationResponseTest {
 
         assertEquals(MCC_MNC, fromIntent.mccMnc)
         assertEquals(AUTHORIZATION_CODE, fromIntent.authorizationCode)
+        assertEquals(CODE_VERIFIER, fromIntent.codeVerifier)
         assertNull(fromIntent.error)
     }
 
@@ -114,7 +132,7 @@ class AuthorizationResponseTest {
 
     @Test
     fun shouldGetIntentContainingResponse() {
-        val authorizationResponse = AuthorizationResponse(MCC_MNC, REDIRECT_URI, AUTHORIZATION_CODE)
+        val authorizationResponse = AuthorizationResponse(MCC_MNC, mockRequest, AUTHORIZATION_CODE)
         val intent = authorizationResponse.toIntent()
         assertNotNull(intent)
         val extra = intent.extras!!
@@ -127,7 +145,7 @@ class AuthorizationResponseTest {
 
     @Test
     fun shouldBeSuccessful() {
-        val authorizationResponse = AuthorizationResponse(MCC_MNC, REDIRECT_URI, AUTHORIZATION_CODE)
+        val authorizationResponse = AuthorizationResponse(MCC_MNC, mockRequest, AUTHORIZATION_CODE)
         assertTrue(authorizationResponse.isSuccessful)
     }
 
@@ -140,6 +158,7 @@ class AuthorizationResponseTest {
     companion object {
         private const val MCC_MNC = "MCCMNC"
         private const val AUTHORIZATION_CODE = "1234"
+        private const val CODE_VERIFIER = "qwertyuiopasdfghjklzxcvbnm"
         private val REDIRECT_URI = Uri.EMPTY
     }
 

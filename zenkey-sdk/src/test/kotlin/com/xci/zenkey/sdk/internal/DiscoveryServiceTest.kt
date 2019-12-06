@@ -257,20 +257,7 @@ class DiscoveryServiceTest {
         verify(mockSuccessUnit).invoke(mockOidc)
     }
 
-    @Test
-    fun socketTimeoutExceptionShouldBeANetworkError() {
-        assertTrue(discoveryService.isANetworkError(SocketTimeoutException()))
-    }
 
-    @Test
-    fun unknownHostExceptionShouldBeANetworkError() {
-        assertTrue(discoveryService.isANetworkError(UnknownHostException()))
-    }
-
-    @Test
-    fun anyOtherExceptionShouldNotBeANetworkError() {
-        assertFalse(discoveryService.isANetworkError(Exception()))
-    }
 
     companion object {
         private const val MCC_MNC = "MCC_MNC"

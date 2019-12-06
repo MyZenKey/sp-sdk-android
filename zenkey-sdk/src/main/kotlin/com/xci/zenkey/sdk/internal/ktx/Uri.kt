@@ -22,6 +22,8 @@ import android.support.customtabs.CustomTabsService
 import com.xci.zenkey.sdk.internal.Json.KEY_ACR_VALUES
 import com.xci.zenkey.sdk.internal.Json.KEY_CLIENT_ID
 import com.xci.zenkey.sdk.internal.Json.KEY_CODE
+import com.xci.zenkey.sdk.internal.Json.KEY_CODE_CHALLENGE
+import com.xci.zenkey.sdk.internal.Json.KEY_CODE_CHALLENGE_METHOD
 import com.xci.zenkey.sdk.internal.Json.KEY_CONTEXT
 import com.xci.zenkey.sdk.internal.Json.KEY_CORRELATION_ID
 import com.xci.zenkey.sdk.internal.Json.KEY_ERROR
@@ -54,6 +56,12 @@ internal val Uri.mccMnc: String?
 
 internal val Uri.code: String?
     get() = getQueryParameter(KEY_CODE)
+
+internal val Uri.codeChallenge: String?
+    get() = getQueryParameter(KEY_CODE_CHALLENGE)
+
+internal val Uri.codeChallengeMethod: String?
+    get() = getQueryParameter(KEY_CODE_CHALLENGE_METHOD)
 
 internal val Uri.error: String?
     get() = getQueryParameter(KEY_ERROR)

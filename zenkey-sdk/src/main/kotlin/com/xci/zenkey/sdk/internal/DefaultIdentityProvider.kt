@@ -22,6 +22,7 @@ import com.xci.zenkey.sdk.AuthorizeIntentBuilder
 import com.xci.zenkey.sdk.IdentityProvider
 import com.xci.zenkey.sdk.ZenKey
 import com.xci.zenkey.sdk.internal.contract.SimDataProvider
+import java.security.MessageDigest
 
 /**
  * A [IdentityProvider] implementation.
@@ -39,10 +40,11 @@ import com.xci.zenkey.sdk.internal.contract.SimDataProvider
 internal class DefaultIdentityProvider internal constructor(
         private val packageName: String,
         private val clientId: String,
-        private val defaultRedirectUri: Uri
+        private val defaultRedirectUri: Uri,
+        private val messageDigest: MessageDigest
 ) : IdentityProvider {
 
     override fun authorizeIntent(): AuthorizeIntentBuilder {
-        return AuthorizeIntentBuilder(packageName, clientId, defaultRedirectUri)
+        return AuthorizeIntentBuilder(packageName, clientId, messageDigest, defaultRedirectUri)
     }
 }

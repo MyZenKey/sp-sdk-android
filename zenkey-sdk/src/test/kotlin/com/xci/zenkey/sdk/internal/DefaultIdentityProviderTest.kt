@@ -21,17 +21,21 @@ import com.xci.zenkey.sdk.param.Scopes
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito
 import org.robolectric.annotation.Config
+import java.security.MessageDigest
 
 @RunWith(AndroidJUnit4::class)
 @Config(manifest = Config.NONE)
 class DefaultIdentityProviderTest {
 
     private var identityProvider: DefaultIdentityProvider? = null
+    private val mockMessageDigest = Mockito.mock(MessageDigest::class.java)
+
 
     @Before
     fun setUp() {
-        identityProvider = DefaultIdentityProvider(PACKAGE_NAME, CLIENT_ID, DEFAULT_REDIRECT_URI)
+        identityProvider = DefaultIdentityProvider(PACKAGE_NAME, CLIENT_ID, DEFAULT_REDIRECT_URI, mockMessageDigest)
     }
 
     @Test

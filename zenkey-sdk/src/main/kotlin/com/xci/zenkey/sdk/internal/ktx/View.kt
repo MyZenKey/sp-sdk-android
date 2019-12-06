@@ -16,33 +16,20 @@
 
 package com.xci.zenkey.sdk.internal.ktx
 
-import android.app.Activity
-import android.content.Context
-import android.content.ContextWrapper
 import android.graphics.drawable.Drawable
-import android.os.Build
-import android.support.annotation.ColorInt
 import android.support.annotation.ColorRes
 import android.support.annotation.DrawableRes
+import android.support.annotation.LayoutRes
+import android.view.View
+import android.view.ViewGroup
 
-@ColorInt
-internal fun Context.getColorCompat(@ColorRes id: Int)
-        : Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-    getColor(id)
-} else {
-    @Suppress("DEPRECATION")
-    resources.getColor(id)
-}
+internal fun View.inflate(
+        @LayoutRes layoutRes: Int,
+        viewGroup: ViewGroup?
+): View = View.inflate(context, layoutRes, viewGroup)
 
-internal fun Context.getDrawableCompat(@DrawableRes id: Int)
-        : Drawable = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-    getDrawable(id)!!
-} else {
-    @Suppress("DEPRECATION")
-    resources.getDrawable(id)
-}
+internal fun View.getColor(@ColorRes id: Int)
+        : Int = context.getColorCompat(id)
 
-tailrec fun Context?.activity(): Activity? = when (this) {
-    is Activity -> this
-    else -> (this as? ContextWrapper)?.baseContext?.activity()
-}
+internal fun View.getDrawable(@DrawableRes id: Int)
+        : Drawable = context.getDrawableCompat(id)

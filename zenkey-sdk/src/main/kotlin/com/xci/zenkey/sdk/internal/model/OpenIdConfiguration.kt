@@ -49,6 +49,9 @@ internal class OpenIdConfiguration {
      */
     val issuer: String
 
+
+    val branding: Branding
+
     /**
      * Check if the OpenId configuration is considered expired.
      * The OpenId configuration validity is 15 minutes.
@@ -67,7 +70,8 @@ internal class OpenIdConfiguration {
      */
     constructor(issuer: String,
                 authorizationEndpoint: String,
-                mcc_mnc: String?) : this(issuer, authorizationEndpoint, mcc_mnc, Calendar.getInstance())
+                mcc_mnc: String?,
+                branding: Branding) : this(issuer, authorizationEndpoint, mcc_mnc, branding, Calendar.getInstance())
 
     /**
      * Constructor for [OpenIdConfiguration].
@@ -83,10 +87,12 @@ internal class OpenIdConfiguration {
     internal constructor(issuer: String,
                          authorizationEndpoint: String,
                          mcc_mnc: String?,
+                         branding: Branding,
                          receiveAt: Calendar) {
         this.issuer = issuer
         this.authorizationEndpoint = authorizationEndpoint
         this.mccMnc = mcc_mnc
+        this.branding = branding
         receiveAt.add(EXPIRATION_UNIT, EXPIRATION_AMOUNT)
         this.expiredAt = receiveAt.time
     }
@@ -103,20 +109,28 @@ internal class OpenIdConfiguration {
         this.expiredAt = configuration.expiredAt
         this.mccMnc = configuration.mccMnc
         this.packages = configuration.packages
+        this.branding = configuration.branding
     }
 
-    /**
-     * Check if configuration is equal to this configuration.
-     *
-     * @param other the [Object] to check against.
-     * @return true is the configurations are equals, false else.
-     */
+    companion object {
+        private const val EXPIRATION_UNIT = Calendar.MINUTE
+        private const val EXPIRATION_AMOUNT = 15
+    }
+
     override fun equals(other: Any?): Boolean {
-        return other is OpenIdConfiguration &&
-                other.authorizationEndpoint == authorizationEndpoint &&
-                other.issuer == issuer &&
-                other.mccMnc == mccMnc &&
-                other.expiredAt == expiredAt
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as OpenIdConfiguration
+
+        if (mccMnc != other.mccMnc) return false
+        if (authorizationEndpoint != other.authorizationEndpoint) return false
+        if (expiredAt != other.expiredAt) return false
+        if (packages != other.packages) return false
+        if (issuer != other.issuer) return false
+        if (branding != other.branding) return false
+
+        return true
     }
 
     override fun hashCode(): Int {
@@ -125,12 +139,7 @@ internal class OpenIdConfiguration {
         result = 31 * result + expiredAt.hashCode()
         result = 31 * result + packages.hashCode()
         result = 31 * result + issuer.hashCode()
+        result = 31 * result + branding.hashCode()
         return result
-    }
-
-    companion object {
-
-        private const val EXPIRATION_UNIT = Calendar.MINUTE
-        private const val EXPIRATION_AMOUNT = 15
     }
 }

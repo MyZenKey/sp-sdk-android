@@ -33,7 +33,7 @@ class OpenIdConfigurationTest {
 
     @Before
     fun setUp() {
-        configuration = OpenIdConfiguration(ISSUER, AUTHORIZATION_ENDPOINT, MCC_MNC)
+        configuration = OpenIdConfiguration(ISSUER, AUTHORIZATION_ENDPOINT, MCC_MNC, BRANDING)
     }
 
     @Test
@@ -47,34 +47,34 @@ class OpenIdConfigurationTest {
     fun shouldBeExpired() {
         val calendar = Calendar.getInstance()
         calendar.roll(Calendar.MINUTE, 20)
-        val configuration = OpenIdConfiguration(ISSUER, AUTHORIZATION_ENDPOINT, MCC_MNC, calendar)
+        val configuration = OpenIdConfiguration(ISSUER, AUTHORIZATION_ENDPOINT, MCC_MNC, BRANDING, calendar)
         assertFalse(configuration.isExpired)
     }
 
     @Test
     fun shouldNotBeExpired() {
-        val configuration = OpenIdConfiguration(ISSUER, AUTHORIZATION_ENDPOINT, MCC_MNC, Calendar.getInstance())
+        val configuration = OpenIdConfiguration(ISSUER, AUTHORIZATION_ENDPOINT, MCC_MNC, BRANDING, Calendar.getInstance())
         assertFalse(configuration.isExpired)
     }
 
     @Test
     fun shouldBeEqual() {
-        val configuration1 = OpenIdConfiguration(ISSUER, AUTHORIZATION_ENDPOINT, MCC_MNC)
+        val configuration1 = OpenIdConfiguration(ISSUER, AUTHORIZATION_ENDPOINT, MCC_MNC, BRANDING)
         val configuration2 = OpenIdConfiguration(configuration1)
         assertTrue(configuration1 == configuration2)
     }
 
     @Test
     fun shouldNotBeEqualIfIssuerDifferent() {
-        val configuration1 = OpenIdConfiguration(ISSUER, AUTHORIZATION_ENDPOINT, MCC_MNC)
-        val configuration2 = OpenIdConfiguration("any", AUTHORIZATION_ENDPOINT, MCC_MNC)
+        val configuration1 = OpenIdConfiguration(ISSUER, AUTHORIZATION_ENDPOINT, MCC_MNC, BRANDING)
+        val configuration2 = OpenIdConfiguration("any", AUTHORIZATION_ENDPOINT, MCC_MNC, BRANDING)
         assertFalse(configuration1 == configuration2)
     }
 
     @Test
     fun shouldNotBeEqualIfAuthorizationEndpointDifferent() {
-        val configuration1 = OpenIdConfiguration(ISSUER, AUTHORIZATION_ENDPOINT, MCC_MNC)
-        val configuration2 = OpenIdConfiguration(ISSUER, "any", MCC_MNC)
+        val configuration1 = OpenIdConfiguration(ISSUER, AUTHORIZATION_ENDPOINT, MCC_MNC, BRANDING)
+        val configuration2 = OpenIdConfiguration(ISSUER, "any", MCC_MNC, BRANDING)
         assertFalse(configuration1 == configuration2)
     }
 
@@ -84,21 +84,21 @@ class OpenIdConfigurationTest {
         val calendar2 = Calendar.getInstance()
         calendar2.add(Calendar.MINUTE, 1)
 
-        val configuration1 = OpenIdConfiguration(ISSUER, AUTHORIZATION_ENDPOINT, MCC_MNC, calendar1)
-        val configuration2 = OpenIdConfiguration(ISSUER, AUTHORIZATION_ENDPOINT, MCC_MNC, calendar2)
+        val configuration1 = OpenIdConfiguration(ISSUER, AUTHORIZATION_ENDPOINT, MCC_MNC, BRANDING, calendar1)
+        val configuration2 = OpenIdConfiguration(ISSUER, AUTHORIZATION_ENDPOINT, MCC_MNC, BRANDING ,calendar2)
         assertFalse(configuration1 == configuration2)
     }
 
     @Test
     fun shouldNotBeEqualIfMCCMNCDifferent() {
-        val configuration1 = OpenIdConfiguration(ISSUER, AUTHORIZATION_ENDPOINT, "first")
-        val configuration2 = OpenIdConfiguration(ISSUER, AUTHORIZATION_ENDPOINT, "second")
+        val configuration1 = OpenIdConfiguration(ISSUER, AUTHORIZATION_ENDPOINT, "first", BRANDING)
+        val configuration2 = OpenIdConfiguration(ISSUER, AUTHORIZATION_ENDPOINT, "second", BRANDING)
         assertFalse(configuration1 == configuration2)
     }
 
     @Test
     fun shouldNotBeEqualIfTypeDifferent() {
-        assertFalse(OpenIdConfiguration(ISSUER, AUTHORIZATION_ENDPOINT, MCC_MNC) == Any())
+        assertFalse(OpenIdConfiguration(ISSUER, AUTHORIZATION_ENDPOINT, MCC_MNC, BRANDING) == Any())
     }
 
     @Test
@@ -109,8 +109,11 @@ class OpenIdConfigurationTest {
     }
 
     companion object {
+        private const val CARRIER_TEXT = "CARRIER_TEXT"
+        private const val CARRIER_LOGO = "CARRIER_LOGO"
         private const val ISSUER = "ISSUER"
         private const val MCC_MNC = "MCC_MNC"
         private const val AUTHORIZATION_ENDPOINT = "AUTHORIZATION_ENDPOINT"
+        private val BRANDING = Branding(CARRIER_TEXT, CARRIER_LOGO)
     }
 }
