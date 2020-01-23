@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package com.xci.zenkey.sdk.internal.network.call.discovery
 
 import android.net.Uri
-import android.support.annotation.VisibleForTesting
 
 import com.xci.zenkey.sdk.BuildConfig
 import com.xci.zenkey.sdk.internal.Json
@@ -53,7 +52,6 @@ internal class DiscoveryCallFactory(
      * @param mcc_mnc the MCC/MNC to use for the request.
      * @return the [HttpRequest]
      */
-    @VisibleForTesting
     private fun buildDiscoveryRequestInternal(mcc_mnc: String?, prompt: Boolean): HttpRequest? {
         return buildDiscoveryRequest(BuildConfig.DISCOVERY_ENDPOINT, mcc_mnc, prompt)
     }
@@ -64,7 +62,6 @@ internal class DiscoveryCallFactory(
      * @param mcc_mnc the MCC/MNC of the SIM card.
      * @return a [HttpRequest] to perform discovery.
      */
-    @VisibleForTesting
     internal fun buildDiscoveryRequest(endpoint: String,
                                        mcc_mnc: String?,
                                        prompt: Boolean): HttpRequest? {
@@ -92,9 +89,7 @@ internal class DiscoveryCallFactory(
 
     companion object {
 
-        @VisibleForTesting
         internal val WELL_KNOW_PATH = ".well-known"
-        @VisibleForTesting
         internal val OPEN_ID_CONFIG_PATH = "openid_configuration"
     }
 }

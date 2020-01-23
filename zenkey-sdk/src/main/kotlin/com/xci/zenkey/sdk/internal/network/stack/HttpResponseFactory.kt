@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 package com.xci.zenkey.sdk.internal.network.stack
-
-import android.support.annotation.VisibleForTesting
 
 import org.json.JSONException
 
@@ -36,7 +34,6 @@ internal class HttpResponseFactory<T>
      * @param inputStream the [InputStream]
      * @return the associated [InputStreamReader]
      */
-    @VisibleForTesting
     internal fun getInputStreamReader(inputStream: InputStream): InputStreamReader {
         return InputStreamReader(inputStream)
     }
@@ -46,7 +43,6 @@ internal class HttpResponseFactory<T>
      * @param streamReader the [InputStreamReader]
      * @return a [BufferedReader]
      */
-    @VisibleForTesting
     internal fun getBufferedReader(streamReader: InputStreamReader): BufferedReader {
         return BufferedReader(streamReader)
     }
@@ -70,7 +66,6 @@ internal class HttpResponseFactory<T>
      * @return the Json String
      * @throws IOException if it happen on the [java.io.InputStream]
      */
-    @VisibleForTesting
     @Throws(IOException::class)
     internal fun readBody(reader: BufferedReader): String {
         val stringBuilder = StringBuilder()

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,22 +24,14 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.PorterDuff
 import android.net.Uri
-import android.os.Build
-import android.support.annotation.Keep
-import android.support.annotation.NonNull
-import android.support.annotation.RequiresApi
-import android.support.annotation.VisibleForTesting
 import android.util.AttributeSet
 import android.view.View
 import android.widget.Button
 import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.TextView
 import com.xci.zenkey.sdk.AuthorizeIntentBuilder
 import com.xci.zenkey.sdk.R
 import com.xci.zenkey.sdk.internal.BaseContentProvider
 import com.xci.zenkey.sdk.internal.DefaultContentProvider
-import com.xci.zenkey.sdk.internal.DiscoveryService
 import com.xci.zenkey.sdk.internal.ktx.activity
 import com.xci.zenkey.sdk.internal.ktx.getColor
 import com.xci.zenkey.sdk.internal.ktx.getDrawable
@@ -57,32 +49,22 @@ import java.lang.ref.WeakReference
  * When the button is clicked, this class will start the authorization request [Intent] automatically.
  */
 @Suppress("unused", "MemberVisibilityCanBePrivate")
-@Keep
 class ZenKeyButton
     : FrameLayout {
 
-    @VisibleForTesting
     internal var requestCode = DEFAULT_REQUEST_CODE
-    @VisibleForTesting
     internal lateinit var intentBuilder: AuthorizeIntentBuilder
-    @VisibleForTesting
     internal lateinit var button: Button
-    @VisibleForTesting
     internal var fragment: WeakReference<Fragment>? = null
-    @VisibleForTesting
     internal var mode: Mode = Mode.DARK
-    @VisibleForTesting
     internal var text: Text = Text.SIGN_IN
-    @VisibleForTesting
     internal var enablePoweredBy: Boolean = false
 
-    @Keep
     enum class Mode constructor(internal val contentColor: Int, internal val backgroundDrawable: Int) {
         DARK(android.R.color.white, R.drawable.ripple_dark),
         LIGHT(R.color.zenkey_green, R.drawable.ripple_light)
     }
 
-    @Keep
     enum class Text constructor(internal val stringResId: Int) {
         CONTINUE(R.string.continue_with_zenkey),
         SIGN_IN(R.string.sign_in_with_zenkey)
@@ -119,19 +101,6 @@ class ZenKeyButton
     }
 
     /**
-     * Constructor for [ZenKeyButton]
-     * @param context the [Context] used to create this view.
-     * @param attrs the attributes set inside the XML
-     * @param defStyleAttr the default style attributes
-     * @param defStyleRes the default style resources.
-     */
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes) {
-        inflate()
-        init(attrs)
-    }
-
-    /**
      * Inflate the XML associated with this custom component.
      * @param context the context to use for the inflation.
      */
@@ -143,7 +112,6 @@ class ZenKeyButton
      * Init the child views and apply style from XML attributes.
      * @param attrs the XML attributes.
      */
-    @VisibleForTesting
     internal fun init(attrs: AttributeSet?) {
         if (!isInEditMode) {
             this.intentBuilder = BaseContentProvider.identityProvider().authorizeIntent()
@@ -153,18 +121,17 @@ class ZenKeyButton
         setBackgroundColor(getColor(android.R.color.transparent))
 
         extractAttributes(attrs)
-        applyPoweredBy()
+        //applyPoweredBy()
         applyMode()
         applyText()
     }
 
-    @VisibleForTesting
     internal fun extractAttributes(attrs: AttributeSet?) {
         attrs?.let {
             val arr = context.obtainStyledAttributes(attrs, R.styleable.ZenKeyButton)
-            mode = Mode.values()[arr.getInt(R.styleable.ZenKeyButton_mode, mode.ordinal)]
-            text = Text.values()[arr.getInt(R.styleable.ZenKeyButton_text, text.ordinal)]
-            enablePoweredBy = arr.getBoolean(R.styleable.ZenKeyButton_enablePoweredBy, enablePoweredBy)
+            mode = Mode.values()[arr.getInt(R.styleable.ZenKeyButton_ZenKeyButtonMode, mode.ordinal)]
+            text = Text.values()[arr.getInt(R.styleable.ZenKeyButton_ZenKeyButtonText, text.ordinal)]
+            //enablePoweredBy = arr.getBoolean(R.styleable.ZenKeyButton_enablePoweredBy, enablePoweredBy)
             arr.recycle()
         }
     }
@@ -173,7 +140,7 @@ class ZenKeyButton
      * Set the text of the Button.
      * @param text a {@Text} enum value.
      */
-    fun setText(@NonNull text: Text) {
+    fun setText(text: Text) {
         this.text = text
         applyText()
     }
@@ -306,7 +273,6 @@ class ZenKeyButton
     /**
      * Called when the button is clicked.
      */
-    @VisibleForTesting
     internal fun onClick(activity: Activity?) {
         startRequest(activity, buildAuthorizationIntent())
     }
@@ -316,7 +282,6 @@ class ZenKeyButton
      * @param view the clicked button.
      * @param intent the intent to start.
      */
-    @VisibleForTesting
     internal fun startRequest(activity: Activity?, intent: Intent) {
         if (fragment != null) {
             fragment!!.get()?.startActivityForResult(intent, requestCode)
@@ -329,12 +294,10 @@ class ZenKeyButton
      * Build the authorization [Intent]
      * @return the authorization [Intent]
      */
-    @VisibleForTesting
     internal fun buildAuthorizationIntent(): Intent {
         return this.intentBuilder.build()
     }
 
-    @VisibleForTesting
     internal fun applyMode() {
         val icon = getDrawable(R.drawable.ic_zenkey_white)
         this.button.setTextColor(getColor(mode.contentColor))
@@ -343,13 +306,11 @@ class ZenKeyButton
         this.button.background = getDrawable(mode.backgroundDrawable)
     }
 
-    @VisibleForTesting
     internal fun applyText() {
         this.button.setText(text.stringResId)
         this.button.contentDescription = context.getString(text.stringResId)
     }
 
-    @VisibleForTesting
     internal fun applyPoweredBy() {
         if (enablePoweredBy) {
             val carrierEndorsementView = findViewById<CarrierEndorsementView>(R.id.carrierEndorsementView)

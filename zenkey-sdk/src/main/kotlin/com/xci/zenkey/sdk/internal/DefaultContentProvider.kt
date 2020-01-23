@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,11 @@
 package com.xci.zenkey.sdk.internal
 
 import android.content.Context
-import android.support.annotation.VisibleForTesting
-
 import com.xci.zenkey.sdk.internal.contract.AuthorizationService
 import com.xci.zenkey.sdk.internal.contract.SimDataProvider
 import com.xci.zenkey.sdk.internal.model.AndroidMessageDigestAlgorithm
-import com.xci.zenkey.sdk.internal.security.FingerprintFactory
 import com.xci.zenkey.sdk.internal.security.DefaultFingerprintFactory
-
 import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
-import java.security.cert.CertificateException
 import java.security.cert.CertificateFactory
 
 internal class DefaultContentProvider
@@ -44,7 +38,6 @@ internal class DefaultContentProvider
         authorizationService = DefaultAuthorizationService(
                 discoveryService,
                 DefaultAuthorizationIntentFactory(
-                        DefaultNativeIntentFactory(),
                         DefaultWebIntentFactory(context),
                         AndroidPackageManager(
                                 context.packageManager,
@@ -54,9 +47,7 @@ internal class DefaultContentProvider
     }
 
     companion object {
-
-        @VisibleForTesting
-        internal val CERTIFICATE_FACTORY_TYPE = "X509"
+        internal const val CERTIFICATE_FACTORY_TYPE = "X509"
 
         @Volatile
         internal lateinit var authorizationService: AuthorizationService

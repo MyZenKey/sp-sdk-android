@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package com.xci.zenkey.sdk.internal.network.call.assetlinks
 
 import android.net.Uri
-import android.support.annotation.VisibleForTesting
 
 import com.xci.zenkey.sdk.IdentityProvider
 import com.xci.zenkey.sdk.internal.model.Package
@@ -71,15 +70,10 @@ internal class AssetLinksCallFactory
 
     companion object {
 
-        @VisibleForTesting
         internal val TARGET_KEY = "target"
-        @VisibleForTesting
         internal val PACKAGE_NAME_KEY = "package_name"
-        @VisibleForTesting
         internal val FINGERPRINTS_KEY = "sha256_cert_fingerprints"
-        @VisibleForTesting
         internal val WELL_KNOW_PATH = ".well-known"
-        @VisibleForTesting
         internal val ASSET_LINKS_PATH = "assetlinks.json"
     }
 }

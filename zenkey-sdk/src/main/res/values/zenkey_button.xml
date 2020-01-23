@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-Copyright 2019 XCI JV, LLC.
+Copyright 2019 ZenKey, LLC.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@ limitations under the License.
 -->
 <resources>
     <declare-styleable name="ZenKeyButton">
-        <attr name="mode" format="enum">
+        <attr name="ZenKeyButtonMode" format="enum">
             <enum name="DARK" value="0" />
             <enum name="LIGHT" value="1" />
         </attr>
-        <attr name="text" format="enum">
+        <attr name="ZenKeyButtonText" format="enum">
             <enum name="CONTINUE" value="0" />
             <enum name="SIGN_IN" value="1" />
         </attr>
-        <attr name="enablePoweredBy" format="boolean"/>
+        <!--<attr name="enablePoweredBy" format="boolean"/>-->
     </declare-styleable>
 </resources>

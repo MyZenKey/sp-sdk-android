@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,19 @@
  */
 package com.xci.zenkey.sdk.internal.contract
 
-import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import com.xci.zenkey.sdk.internal.browser.NoBrowserException
 
 import com.xci.zenkey.sdk.internal.model.Package
 
 internal interface AuthorizationIntentFactory {
 
-    @Throws(ActivityNotFoundException::class)
+    @Throws(NoBrowserException::class)
     fun createAuthorizeIntent(uri: Uri, packages: List<Package>): Intent
 
-    @Throws(ActivityNotFoundException::class)
+    @Throws(NoBrowserException::class)
     fun createDiscoverUIIntent(uri: Uri): Intent
 
     fun bindWebSession(context: Context)

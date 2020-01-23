@@ -25,7 +25,6 @@ ext.libs = [
         ],
         'android'    : [
                 'support': [
-                        'annotations'     : "com.android.support:support-annotations:${versions.supportLib}",
                         'customTabs'      : "com.android.support:customtabs:${versions.supportLib}",
                 ],
                 'test'   : [

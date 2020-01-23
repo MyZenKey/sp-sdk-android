@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package com.xci.zenkey.sdk.internal
 
 import android.content.Intent
 import android.net.Uri
-import android.support.annotation.VisibleForTesting
 
 import com.xci.zenkey.sdk.internal.contract.PackageManager
 import com.xci.zenkey.sdk.internal.ktx.getPackageInfoCompat
@@ -60,7 +59,6 @@ internal class AndroidPackageManager internal constructor(
      * @param uri the Uri to use.
      * @return the [List] of package name responding to the Uri
      */
-    @VisibleForTesting
     internal fun getAvailablePackages(uri: Uri): List<String> {
         val intent = Intent(Intent.ACTION_VIEW)
         intent.addCategory(Intent.CATEGORY_DEFAULT)
@@ -80,7 +78,6 @@ internal class AndroidPackageManager internal constructor(
      * @param packageName the package name to use.
      * @return the [List] of certificates fingerprints for a package name.
      */
-    @VisibleForTesting
     internal fun getCertificateFingerprints(packageName: String): List<String> {
         val signatures = ArrayList<String>()
         if (fingerprintFactory != null) {
@@ -108,7 +105,6 @@ internal class AndroidPackageManager internal constructor(
      * @return true if all the actual fingerprints are contained in the expected fingerprints,
      * false else.
      */
-    @VisibleForTesting
     internal fun allFingerprintsAreValid(expectedFingerprints: List<String>, actualFingerprints: List<String>): Boolean {
 
         if (actualFingerprints.isEmpty())

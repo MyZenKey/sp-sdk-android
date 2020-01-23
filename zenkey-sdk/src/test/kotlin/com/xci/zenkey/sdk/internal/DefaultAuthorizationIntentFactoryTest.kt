@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
-import com.xci.zenkey.sdk.internal.contract.NativeIntentFactory
 import com.xci.zenkey.sdk.internal.contract.PackageManager
 import com.xci.zenkey.sdk.internal.contract.WebIntentFactory
 import com.xci.zenkey.sdk.internal.model.AuthorizationRequest
@@ -42,7 +41,6 @@ import java.util.*
 class DefaultAuthorizationIntentFactoryTest {
 
     private val mockWebIntentFactory = mock<WebIntentFactory>()
-    private val mockNativeIntentFactory = mock<NativeIntentFactory>()
     private val mockPackageManager = mock<PackageManager>()
     private val mockConfiguration = mock<OpenIdConfiguration>()
     private val mockRequest = mock<AuthorizationRequest>()
@@ -53,7 +51,7 @@ class DefaultAuthorizationIntentFactoryTest {
     @Before
     fun setUp() {
         whenever(mockConfiguration.authorizationEndpoint).thenReturn(AUTHORIZE_ENDPOINT)
-        factory = DefaultAuthorizationIntentFactory(mockNativeIntentFactory, mockWebIntentFactory, mockPackageManager)
+        factory = DefaultAuthorizationIntentFactory(mockWebIntentFactory, mockPackageManager)
     }
 
     @Test
@@ -83,17 +81,16 @@ class DefaultAuthorizationIntentFactoryTest {
 
     @Test
     fun shouldCreateNativeIntentIfNativeAppAvailable() {
-        val nativeIntent = Intent()
-        whenever(mockRequest.toAuthorizationUri(anyString())).thenReturn(mockUri)
-        whenever(mockNativeIntentFactory.create(mockUri)).thenReturn(nativeIntent)
+        val uri = Uri.parse("https://test.xci.com/authorize")
+        whenever(mockRequest.toAuthorizationUri(anyString())).thenReturn(uri)
 
         whenever(mockPackageManager.anyValidPackageFor(any(), ArgumentMatchers.anyList())).thenReturn(true)
 
-        val intent = factory.createAuthorizeIntent(mockUri, ArrayList())
+        val intent = factory.createAuthorizeIntent(uri, ArrayList())
 
         verify(mockPackageManager).anyValidPackageFor(any(), ArgumentMatchers.anyList())
 
-        assertEquals(nativeIntent, intent)
+        assertEquals(uri, intent.data)
     }
 
     @Test

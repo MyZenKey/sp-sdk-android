@@ -5,7 +5,7 @@ All releases before 1.0.0 may contain breaking changes.
 After 1.0.0 this project will adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Versions
-[0.10.2 - 2019-11-21](#0102---2019-11-21)
+[0.10.9 - 2020-01-23](#0109---2020-01-23)
 
 ## Updating
 When the Unreleased section becomes a new version, duplicate the Template to create a new Unreleased section.
@@ -30,6 +30,35 @@ When the Unreleased section becomes a new version, duplicate the Template to cre
 ### Fixed
 - Force Android Security Provider Update.
 ### Security
+
+## [0.10.9] - 2020-01-23
+### Changed
+- Improve internal code base (native intent creation).
+
+## [0.10.8] - 2020-01-23
+### Fixed
+- Fix crash when no Browser available on the device.
+
+## [0.10.7] - 2020-01-23
+### Changed
+- Update Changelog missing entries.
+
+## [0.10.6] - 2020-01-22
+### Removed
+- Disable Carrier endorsement view until full feature is complete.
+
+## [0.10.5] - 2020-01-22
+### Removed
+- Remove internal usage of transitive dependency from customTabs dependency 
+(annotations support library).
+
+## [0.10.4] - 2019-12-31
+### Changed
+- Update Copyright.
+
+## [0.10.3] - 2019-12-10
+### Changed
+- Change ZenKeyButton parameters names.
 
 ## [0.10.2] - 2019-11-21
 ### Changed

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 package com.xci.zenkey.sdk.internal.security
-
-import android.support.annotation.VisibleForTesting
 
 import java.io.ByteArrayInputStream
 import java.security.MessageDigest
@@ -50,7 +48,6 @@ internal class DefaultPublicKeyFactory internal constructor(
      * @return a [Certificate] corresponding to the provided signature.
      * @throws CertificateException when failing to convert the [Certificate]
      */
-    @VisibleForTesting
     @Throws(CertificateException::class)
     internal fun generateCertificate(signature: ByteArray): X509Certificate {
         return certificateFactory.generateCertificate(getByteArrayInputStream(signature)) as X509Certificate
@@ -61,7 +58,6 @@ internal class DefaultPublicKeyFactory internal constructor(
      * @param bytes the bytes to use in the [java.io.InputStream]
      * @return a [ByteArrayInputStream] from the provided bytes.
      */
-    @VisibleForTesting
     internal fun getByteArrayInputStream(bytes: ByteArray): ByteArrayInputStream {
         return ByteArrayInputStream(bytes)
     }

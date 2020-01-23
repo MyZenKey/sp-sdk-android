@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
-import android.support.annotation.VisibleForTesting
 import android.support.customtabs.CustomTabsService
 import com.xci.zenkey.sdk.internal.ktx.getPackageInfoCompat
 import java.util.*
@@ -45,7 +44,6 @@ internal object BrowserSelector {
     /**
      * The service we expect to find on a web browser that indicates it supports custom tabs.
      */
-    @VisibleForTesting
     internal val ACTION_CUSTOM_TABS_CONNECTION = CustomTabsService.ACTION_CUSTOM_TABS_CONNECTION
 
     /**
@@ -53,7 +51,6 @@ internal object BrowserSelector {
      * [IANA rules](https://www.iana.org/domains/reserved)) web intent used to query
      * for installed web browsers on the system.
      */
-    @VisibleForTesting
     internal val BROWSER_INTENT = Intent(
             Intent.ACTION_VIEW,
             Uri.parse("http://www.example.com"))

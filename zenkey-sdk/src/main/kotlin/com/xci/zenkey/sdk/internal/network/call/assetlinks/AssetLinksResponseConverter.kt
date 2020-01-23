@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 package com.xci.zenkey.sdk.internal.network.call.assetlinks
-
-import android.support.annotation.VisibleForTesting
 
 import com.xci.zenkey.sdk.internal.model.Package
 import com.xci.zenkey.sdk.internal.network.stack.JsonConverter
@@ -46,11 +44,8 @@ internal class AssetLinksResponseConverter
     }
 
     companion object {
-        @VisibleForTesting
         internal val TARGET_KEY = "target"
-        @VisibleForTesting
         internal val FINGERPRINTS_KEY = "sha256_cert_fingerprints"
-        @VisibleForTesting
         internal val PACKAGE_NAME_KEY = "package_name"
     }
 }

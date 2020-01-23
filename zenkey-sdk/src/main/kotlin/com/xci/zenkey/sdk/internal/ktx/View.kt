@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,19 +17,16 @@
 package com.xci.zenkey.sdk.internal.ktx
 
 import android.graphics.drawable.Drawable
-import android.support.annotation.ColorRes
-import android.support.annotation.DrawableRes
-import android.support.annotation.LayoutRes
 import android.view.View
 import android.view.ViewGroup
 
 internal fun View.inflate(
-        @LayoutRes layoutRes: Int,
+        layoutRes: Int,
         viewGroup: ViewGroup?
 ): View = View.inflate(context, layoutRes, viewGroup)
 
-internal fun View.getColor(@ColorRes id: Int)
+internal fun View.getColor(id: Int)
         : Int = context.getColorCompat(id)
 
-internal fun View.getDrawable(@DrawableRes id: Int)
+internal fun View.getDrawable(id: Int)
         : Drawable = context.getDrawableCompat(id)

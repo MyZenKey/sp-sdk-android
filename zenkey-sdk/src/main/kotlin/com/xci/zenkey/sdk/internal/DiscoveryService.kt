@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package com.xci.zenkey.sdk.internal
 
 import android.net.Uri
-import android.support.annotation.VisibleForTesting
 import com.xci.zenkey.sdk.IdentityProvider
 import com.xci.zenkey.sdk.internal.contract.ICache
 import com.xci.zenkey.sdk.internal.contract.IDiscoveryService
@@ -33,8 +32,6 @@ import com.xci.zenkey.sdk.internal.network.call.discovery.IDiscoveryCallFactory
 import com.xci.zenkey.sdk.internal.network.stack.HttpException
 import com.xci.zenkey.sdk.internal.network.stack.HttpResponse
 import java.net.HttpURLConnection
-import java.net.SocketTimeoutException
-import java.net.UnknownHostException
 
 /**
  * A [IDiscoveryService] implementation.
@@ -89,7 +86,6 @@ internal class DiscoveryService internal constructor(
      * wasn't able to match an [OpenIdConfiguration] for the provided MCC/MNC tuple.
      * @param cachedOIDC a Nullable cached [OpenIdConfiguration]
      */
-    @VisibleForTesting
     internal fun getOIDCInternal(mccMnc: String?,
                                  prompt: Boolean,
                                  onSuccess: (OpenIdConfiguration) -> Unit,
@@ -110,7 +106,6 @@ internal class DiscoveryService internal constructor(
                 })
     }
 
-    @VisibleForTesting
     internal fun onReceiveOpenIdConfigurationResponse(mccMnc: String?,
                                                       response: HttpResponse<DiscoveryResponse>,
                                                       onSuccess: (OpenIdConfiguration) -> Unit,
@@ -135,7 +130,6 @@ internal class DiscoveryService internal constructor(
         }
     }
 
-    @VisibleForTesting
     internal fun onOpenIdConfigurationHttpFailure(response: HttpResponse<DiscoveryResponse>,
                                                   onError: (Throwable) -> Unit) {
         if (response.code == HttpURLConnection.HTTP_NOT_FOUND) {
@@ -145,7 +139,6 @@ internal class DiscoveryService internal constructor(
         }
     }
 
-    @VisibleForTesting
     internal fun onReceiveOpenIdConfigurationFailure(throwable: Throwable,
                                                      cachedOIDC: OpenIdConfiguration?,
                                                      onSuccess: (OpenIdConfiguration) -> Unit,

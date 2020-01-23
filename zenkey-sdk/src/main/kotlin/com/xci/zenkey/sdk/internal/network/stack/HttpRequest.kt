@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import android.net.Uri
 import java.net.MalformedURLException
 import java.net.URL
 import java.util.HashMap
-import android.support.annotation.VisibleForTesting
 
 /**
  * A model class representing a generic Http request.
@@ -34,35 +33,31 @@ internal class HttpRequest internal constructor(
      *
      * @return the [HttpMethod] to use
      */
-    @get:VisibleForTesting(otherwise = VisibleForTesting.PACKAGE_PRIVATE)
     internal val method: HttpMethod
     /**
      * Get the [URL] to use.
      *
      * @return the [URL] to use.
      */
-    @get:VisibleForTesting(otherwise = VisibleForTesting.PACKAGE_PRIVATE)
-    val baseUrl: String
-    val url: URL
+    internal val baseUrl: String
+    internal val url: URL
     /**
      * Get the buildConnectionFor timeout to use.
      *
      * @return the buildConnectionFor timeout to use.
      */
-    @get:VisibleForTesting(otherwise = VisibleForTesting.PACKAGE_PRIVATE)
-    val connectTimeout: Int
+    internal val connectTimeout: Int
     /**
      * Get the read timeout to use.
      *
      * @return the read timeout to use.
      */
-    @get:VisibleForTesting(otherwise = VisibleForTesting.PACKAGE_PRIVATE)
-    val readTimeout: Int
+    internal val readTimeout: Int
     /**
      * Get the headers for this request.
      * @return a [HashMap] representing the headers of this request.
      */
-    val headers: HashMap<String, String>
+    internal val headers: HashMap<String, String>
     private val params: HashMap<String, String>
     private val useCaches: Boolean
 
@@ -177,10 +172,8 @@ internal class HttpRequest internal constructor(
 
     companion object {
 
-        @VisibleForTesting
-        val DEFAULT_CONNECT_TIMEOUT = 1500
-        @VisibleForTesting
-        val DEFAULT_READ_TIMEOUT = 1500
+        const val DEFAULT_CONNECT_TIMEOUT = 1500
+        const val DEFAULT_READ_TIMEOUT = 1500
 
         fun get(baseUrl: String): Builder {
             return Builder(HttpMethod.GET, baseUrl)

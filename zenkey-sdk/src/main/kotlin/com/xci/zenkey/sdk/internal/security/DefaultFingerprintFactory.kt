@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package com.xci.zenkey.sdk.internal.security
 
-import android.support.annotation.VisibleForTesting
 import com.xci.zenkey.sdk.internal.ktx.hash
 import java.security.MessageDigest
 import java.security.cert.CertificateException
@@ -25,7 +24,7 @@ import java.security.cert.CertificateFactory
  * Implementation of [FingerprintFactory]
  * This class is responsible to create fingerprint of certificate signature.
  */
-internal class DefaultFingerprintFactory @VisibleForTesting internal constructor(
+internal class DefaultFingerprintFactory internal constructor(
         private val publicKeyFactory: PublicKeyFactory
 ) : FingerprintFactory {
 

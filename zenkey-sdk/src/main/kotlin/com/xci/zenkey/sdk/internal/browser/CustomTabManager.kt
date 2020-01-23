@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.xci.zenkey.sdk.internal.browser
 import android.content.ComponentName
 import android.content.Context
 import android.net.Uri
-import android.support.annotation.WorkerThread
 import android.support.customtabs.CustomTabsClient
 import android.support.customtabs.CustomTabsIntent.Builder
 import android.support.customtabs.CustomTabsServiceConnection
@@ -91,7 +90,6 @@ internal class CustomTabManager {
      * should be ordered such that the most likely URI to be requested is first. If the selected
      * browser does not support custom tabs, then the URI list has no effect.
      */
-    @WorkerThread
     fun createTabBuilder(vararg possibleUris: Uri): Builder {
         return Builder(
                 sessionFactory.create(clientManager.get(), null, *possibleUris))

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,15 @@
  */
 package com.xci.zenkey.sdk.internal
 
-import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.support.annotation.VisibleForTesting
 import android.support.customtabs.CustomTabsIntent
-
 import com.xci.zenkey.sdk.internal.browser.BrowserBlacklist
 import com.xci.zenkey.sdk.internal.browser.BrowserDescriptor
 import com.xci.zenkey.sdk.internal.browser.BrowserSelector
 import com.xci.zenkey.sdk.internal.browser.CustomTabManager
+import com.xci.zenkey.sdk.internal.browser.NoBrowserException
 import com.xci.zenkey.sdk.internal.browser.VersionedBrowserMatcher
 import com.xci.zenkey.sdk.internal.contract.Logger
 import com.xci.zenkey.sdk.internal.contract.WebIntentFactory
@@ -55,7 +53,7 @@ internal class DefaultWebIntentFactory internal constructor(
         mCustomTabManager.unbind(context)
     }
 
-    @Throws(ActivityNotFoundException::class)
+    @Throws(NoBrowserException::class)
     override fun create(requestUri: Uri): Intent {
         return prepareAuthorizationRequestIntent(requestUri, createCustomTabsIntentBuilder().build())
     }
@@ -73,7 +71,7 @@ internal class DefaultWebIntentFactory internal constructor(
             customTabsIntent: CustomTabsIntent): Intent {
 
         if (mBrowser == null) {
-            throw ActivityNotFoundException()
+            throw NoBrowserException()
         }
 
         val intent: Intent = if (mBrowser.useCustomTab) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,4 @@
  */
 package com.xci.zenkey.sdk.internal.network.stack
 
-import android.support.annotation.Keep
-
-@Keep
 internal class HttpException(val code: Int, val body: String) : Exception()

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
  */
 package com.xci.zenkey.sdk.internal.network.stack
 
-import android.support.annotation.VisibleForTesting
-
 import org.json.JSONException
 
 import java.io.BufferedReader
@@ -25,7 +23,7 @@ import java.io.InputStreamReader
 
 import javax.net.ssl.HttpsURLConnection
 
-internal class HttpCallExecutor<T> @VisibleForTesting constructor(
+internal class HttpCallExecutor<T> constructor(
         private val responseFactory: HttpResponse.Factory<T>
 ) : HttpCall.Executor<T> {
 
@@ -49,7 +47,6 @@ internal class HttpCallExecutor<T> @VisibleForTesting constructor(
      * @return an Opened [java.net.URLConnection] setup with the [HttpRequest] parameters.
      * @throws IOException if it happen when connecting the [java.net.URLConnection]
      */
-    @VisibleForTesting
     @Throws(IOException::class)
     fun buildConnectionFor(request: HttpRequest): HttpsURLConnection {
         val connection = request.url.openConnection() as HttpsURLConnection
@@ -68,7 +65,6 @@ internal class HttpCallExecutor<T> @VisibleForTesting constructor(
      * @return the Json String
      * @throws IOException if it happen on the [java.io.InputStream]
      */
-    @VisibleForTesting
     @Throws(IOException::class)
     fun readResponse(reader: BufferedReader, stringBuilder: StringBuilder): String {
         var inputLine: String? = null

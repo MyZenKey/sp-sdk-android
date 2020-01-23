@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ internal fun DefaultAuthorizationService.finishWithNoBrowserAvailable(
 ){
     val message = "No browser available"
     Logger.get().e(message)
-    finishWithAuthorizationError(activity, UNKNOWN.withDescription(message))
+    finishWithAuthorizationError(activity, DISCOVERY_STATE.withDescription(message))
 }
 
 internal fun DefaultAuthorizationService.finishWithStateMissMatchError(

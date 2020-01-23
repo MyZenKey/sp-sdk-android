@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package com.xci.zenkey.sdk.internal.ktx
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.customtabs.CustomTabsService
@@ -95,6 +96,14 @@ internal val Uri.nonce: String?
 
 internal val Uri.isUserNotFoundError: Boolean
     get() = error?.let { it == USER_NOT_FOUND.error } ?: false
+
+internal val Uri.intent: Intent
+    get() {
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.addCategory(Intent.CATEGORY_DEFAULT)
+        intent.data = this
+        return intent
+    }
 
 internal fun Uri.isNotMatchingStateIn(authorizationRequest: AuthorizationRequest): Boolean {
     return (authorizationRequest.state == null) and (state != null) ||

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
-import android.support.annotation.VisibleForTesting
 import com.xci.zenkey.sdk.internal.model.AuthorizationRequest
 
 /**
@@ -257,7 +256,6 @@ class AuthorizationResponse : Parcelable {
 
         private const val NULL_VALUE = 0
         private const val NON_NULL_VALUE = 1
-        @VisibleForTesting
         internal val EXTRA_AUTH_RESPONSE = "EXTRA_AUTH_RESPONSE"
 
         /**

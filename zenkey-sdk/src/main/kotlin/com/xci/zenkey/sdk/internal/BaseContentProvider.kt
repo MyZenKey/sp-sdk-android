@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
-import android.support.annotation.VisibleForTesting
 import com.xci.zenkey.sdk.IdentityProvider
 import com.xci.zenkey.sdk.R
 import com.xci.zenkey.sdk.internal.model.AndroidMessageDigestAlgorithm
@@ -82,12 +81,10 @@ internal abstract class BaseContentProvider
         return 0
     }
 
-    @VisibleForTesting
     internal fun getApplicationContext(context: Context): Context {
         return context as? Application ?: context.applicationContext
     }
 
-    @VisibleForTesting
     internal fun getClientIdKey(context: Context): String {
         return context.getString(R.string.zenkey_client_id)
     }
@@ -114,13 +111,10 @@ internal abstract class BaseContentProvider
     companion object Config {
 
         @Volatile
-        @VisibleForTesting
         internal lateinit var firstSimIdentityProvider: IdentityProvider
         @Volatile
-        @VisibleForTesting
         internal lateinit var clientId: String
         @Volatile
-        @VisibleForTesting
         internal var isLogsEnabled = false
 
         fun logs(enable: Boolean) {

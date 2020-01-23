@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import com.xci.zenkey.sdk.AuthorizationResponse
+import com.xci.zenkey.sdk.internal.browser.NoBrowserException
 import com.xci.zenkey.sdk.internal.contract.*
 import com.xci.zenkey.sdk.internal.ktx.*
 import com.xci.zenkey.sdk.internal.model.AuthorizationRequest
@@ -197,18 +198,26 @@ internal class DefaultAuthorizationService internal constructor(
                                 loginHintToken: String?) {
         val authUri = request.withLoginHintToken(loginHintToken).toAuthorizationUri(openIdConfiguration.authorizationEndpoint)
         Logger.get().request(authUri)
-        activity.startAuthorizationFlowActivity(
-                intentFactory.createAuthorizeIntent(authUri, openIdConfiguration.packages)
-        ){
+        val intent = try {
+            intentFactory.createAuthorizeIntent(authUri, openIdConfiguration.packages)
+        } catch (e: NoBrowserException){
+            finishWithNoBrowserAvailable(activity)
+            return
+        }
+        activity.startAuthorizationFlowActivity(intent){
             finishWithNoBrowserAvailable(activity)
         }
     }
 
     internal fun startDiscoverUI(activity: Activity,
                                  discoverUIEndpoint: String) {
-        activity.startAuthorizationFlowActivity(
-                intentFactory.createDiscoverUIIntent(request.toDiscoverUiUri(discoverUIEndpoint))
-        ) {
+        val intent = try {
+            intentFactory.createDiscoverUIIntent(request.toDiscoverUiUri(discoverUIEndpoint))
+        } catch (e: NoBrowserException){
+            finishWithNoBrowserAvailable(activity)
+            return
+        }
+        activity.startAuthorizationFlowActivity(intent){
             finishWithNoBrowserAvailable(activity)
         }
     }

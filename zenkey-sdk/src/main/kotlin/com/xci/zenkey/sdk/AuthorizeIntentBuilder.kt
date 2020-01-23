@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.xci.zenkey.sdk
 import android.app.PendingIntent
 import android.content.Intent
 import android.net.Uri
-import android.support.annotation.VisibleForTesting
 import android.util.Base64
 import com.xci.zenkey.sdk.internal.AuthorizationRequestActivity
 import com.xci.zenkey.sdk.internal.ktx.proofKeyForCodeExchange
@@ -44,7 +43,6 @@ class AuthorizeIntentBuilder(
 ) {
 
     private var scopes: List<Scope> = listOf(Scopes.OPEN_ID)
-    @VisibleForTesting
     internal var state: String? = null
     private var acrValues: List<ACR>? = null
     private var nonce: String? = null
@@ -220,7 +218,6 @@ class AuthorizeIntentBuilder(
      *
      * @return the prompt parameter [String]
      */
-    @VisibleForTesting
     internal fun prompt(): String? {
         return prompt?.let { prompts ->
             if (prompts.isEmpty()) null
@@ -233,7 +230,6 @@ class AuthorizeIntentBuilder(
      *
      * @return the ACR parameter [String]
      */
-    @VisibleForTesting
     internal fun acr(): String? {
         return acrValues?.let { ACR ->
             if (ACR.isEmpty()) null

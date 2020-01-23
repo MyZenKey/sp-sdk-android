@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package com.xci.zenkey.sdk.internal.network.stack
 
 import android.os.AsyncTask
-import android.support.annotation.VisibleForTesting
 import com.xci.zenkey.sdk.internal.contract.Logger
 import java.util.concurrent.CancellationException
 
@@ -25,7 +24,7 @@ import java.util.concurrent.CancellationException
  * This class is responsible to perform [HttpRequest]
  * in a background Thread using a [HttpCall.Executor] implementation.
  */
-internal class HttpTask<T> @VisibleForTesting internal constructor(
+internal class HttpTask<T> internal constructor(
         private val request: HttpRequest,
         private val converter: JsonConverter<T>,
         private val executor: HttpCall.Executor<T>

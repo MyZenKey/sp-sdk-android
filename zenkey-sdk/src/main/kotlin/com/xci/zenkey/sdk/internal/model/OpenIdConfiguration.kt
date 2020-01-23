@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 package com.xci.zenkey.sdk.internal.model
-
-import android.support.annotation.VisibleForTesting
 
 import java.util.ArrayList
 import java.util.Calendar
@@ -83,7 +81,6 @@ internal class OpenIdConfiguration {
      * @param receiveAt             a [Calendar] object reflecting the time
      * this [OpenIdConfiguration] has be received.
      */
-    @VisibleForTesting
     internal constructor(issuer: String,
                          authorizationEndpoint: String,
                          mcc_mnc: String?,
@@ -102,7 +99,6 @@ internal class OpenIdConfiguration {
      *
      * @param configuration the configuration to clone.
      */
-    @VisibleForTesting
     internal constructor(configuration: OpenIdConfiguration) {
         this.issuer = configuration.issuer
         this.authorizationEndpoint = configuration.authorizationEndpoint

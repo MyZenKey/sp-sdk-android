@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 package com.xci.zenkey.sdk.internal.model.error
-
-import android.support.annotation.VisibleForTesting
 
 import com.xci.zenkey.sdk.AuthorizationError
 import com.xci.zenkey.sdk.AuthorizationError.*
@@ -95,7 +93,6 @@ internal enum class ZenKeyError(
             return null
         }
 
-        @VisibleForTesting
         internal fun createExposed(error: ZenKeyError): AuthorizationError {
             return when(error){
                 USER_NOT_FOUND -> DISCOVERY_STATE.withDescription(error.error)

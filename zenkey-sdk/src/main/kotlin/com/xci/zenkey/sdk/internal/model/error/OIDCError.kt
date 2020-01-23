@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 package com.xci.zenkey.sdk.internal.model.error
-
-import android.support.annotation.VisibleForTesting
 
 import com.xci.zenkey.sdk.AuthorizationError
 
@@ -87,7 +85,6 @@ internal enum class OIDCError(
             return null
         }
 
-        @VisibleForTesting
         internal fun createExposedError(oidcError: OIDCError): AuthorizationError {
             return if (oidcError == INVALID_REQUEST_OBJECT) {
                 INVALID_REQUEST.withDescription(oidcError.description)

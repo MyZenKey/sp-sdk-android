@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package com.xci.zenkey.sdk.internal
 
 import android.net.Uri
-import android.support.annotation.VisibleForTesting
 import com.xci.zenkey.sdk.AuthorizationError
 import com.xci.zenkey.sdk.AuthorizationError.*
 import com.xci.zenkey.sdk.AuthorizationResponse
@@ -27,7 +26,6 @@ import com.xci.zenkey.sdk.internal.model.error.OAuth2Error
 import com.xci.zenkey.sdk.internal.model.error.OIDCError
 import com.xci.zenkey.sdk.internal.model.error.ZenKeyError
 import com.xci.zenkey.sdk.internal.model.exception.AssetsNotFoundException
-import com.xci.zenkey.sdk.internal.model.exception.ProviderNotFoundException
 import com.xci.zenkey.sdk.internal.network.stack.HttpException
 import org.json.JSONException
 import org.json.JSONObject
@@ -64,7 +62,6 @@ internal class AuthorizationResponseFactory
         return AuthorizationResponse(mcc_mnc, redirectUri, error)
     }
 
-    @VisibleForTesting
     internal fun createError(exception: HttpException)
             : AuthorizationError {
         Logger.get().exception(exception)
@@ -85,7 +82,6 @@ internal class AuthorizationResponseFactory
         }
     }
 
-    @VisibleForTesting
     internal fun createError(error: String?, description: String?)
             : AuthorizationError {
         Logger.get().e("AuthorizationError: $error $description")

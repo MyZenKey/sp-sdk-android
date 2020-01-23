@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,14 @@
 
 package com.xci.zenkey.sdk.internal.ktx
 
+import android.content.Intent
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import com.xci.zenkey.sdk.AuthorizationError
 import com.xci.zenkey.sdk.internal.Json
 import com.xci.zenkey.sdk.internal.model.AuthorizationRequest
-import com.xci.zenkey.sdk.internal.model.error.OIDCError
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -292,6 +291,17 @@ class UriTest {
                 .buildUpon()
                 .appendQueryParameter(Json.KEY_STATE, "value2")
                 .build().isNotMatchingStateIn(mockRequest))
+    }
+
+    @Test
+    fun shouldCreateDefaultIntentWithUri() {
+        val uri = Uri.parse("https://test.xci.com/authorize")
+        val intent = uri.intent
+        assertNotNull(intent)
+        assertTrue(intent.categories.contains(Intent.CATEGORY_DEFAULT))
+        assertEquals(1, intent.categories.size.toLong())
+        assertEquals(Intent.ACTION_VIEW, intent.action)
+        assertEquals(uri, intent.data)
     }
 
     companion object {

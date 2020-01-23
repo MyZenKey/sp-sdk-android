@@ -3,7 +3,6 @@ package com.xci.zenkey.sdk.internal.model
 import android.net.Uri
 import android.os.Parcel
 import android.os.Parcelable
-import android.support.annotation.VisibleForTesting
 import com.xci.zenkey.sdk.BuildConfig
 
 import com.xci.zenkey.sdk.internal.Json
@@ -13,27 +12,16 @@ import com.xci.zenkey.sdk.param.ResponseType
 class AuthorizationRequest
     : Parcelable {
 
-    @VisibleForTesting
     internal val clientId: String?
-    @VisibleForTesting
     internal val redirectUri: Uri
-    @VisibleForTesting
     internal val scope: String?
-    @VisibleForTesting
     internal val state: String?
-    @VisibleForTesting
     internal val acr: String?
-    @VisibleForTesting
     internal val nonce: String?
-    @VisibleForTesting
     internal val prompt: String?
-    @VisibleForTesting
     internal val correlationId: String?
-    @VisibleForTesting
     internal val context: String?
-    @VisibleForTesting
     internal val proofKeyForCodeExchange: ProofKeyForCodeExchange
-    @VisibleForTesting
     internal var loginHintToken: String? = null
         private set
 

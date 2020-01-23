@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,7 +87,6 @@ class ZenKeyButtonTest {
         ZenKeyButton(ApplicationProvider.getApplicationContext())
         ZenKeyButton(ApplicationProvider.getApplicationContext(), mockAttributeSet)
         ZenKeyButton(ApplicationProvider.getApplicationContext<Context>(), mockAttributeSet, 0)
-        ZenKeyButton(ApplicationProvider.getApplicationContext<Context>(), mockAttributeSet, 0, 0)
     }
 
     @Test
@@ -104,7 +103,7 @@ class ZenKeyButtonTest {
 
     @Test
     fun shouldInitDarkModeByDefault() {
-        whenever(mockTypedArray.getInt(eq(R.styleable.ZenKeyButton_mode), anyInt())).thenReturn(0)
+        whenever(mockTypedArray.getInt(eq(R.styleable.ZenKeyButton_ZenKeyButtonMode), anyInt())).thenReturn(0)
 
 
         zenKeyButton.init(mockAttributeSet)
@@ -116,7 +115,7 @@ class ZenKeyButtonTest {
 
     @Test
     fun shouldInitLightModeFromAttributeSet() {
-        whenever(mockTypedArray.getInt(eq(R.styleable.ZenKeyButton_mode), anyInt())).thenReturn(ZenKeyButton.Mode.LIGHT.ordinal)
+        whenever(mockTypedArray.getInt(eq(R.styleable.ZenKeyButton_ZenKeyButtonText), anyInt())).thenReturn(ZenKeyButton.Mode.LIGHT.ordinal)
 
         zenKeyButton.init(mockAttributeSet)
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,8 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.graphics.drawable.Drawable
 import android.os.Build
-import android.support.annotation.ColorInt
-import android.support.annotation.ColorRes
-import android.support.annotation.DrawableRes
 
-@ColorInt
-internal fun Context.getColorCompat(@ColorRes id: Int)
+internal fun Context.getColorCompat(id: Int)
         : Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
     getColor(id)
 } else {
@@ -34,7 +30,7 @@ internal fun Context.getColorCompat(@ColorRes id: Int)
     resources.getColor(id)
 }
 
-internal fun Context.getDrawableCompat(@DrawableRes id: Int)
+internal fun Context.getDrawableCompat(id: Int)
         : Drawable = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
     getDrawable(id)!!
 } else {

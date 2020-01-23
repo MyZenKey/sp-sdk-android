@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 XCI JV, LLC.
+ * Copyright 2019 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,38 +15,36 @@
  */
 package com.xci.zenkey.sdk.internal
 
-import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-
+import com.xci.zenkey.sdk.internal.browser.NoBrowserException
 import com.xci.zenkey.sdk.internal.contract.AuthorizationIntentFactory
-import com.xci.zenkey.sdk.internal.contract.NativeIntentFactory
 import com.xci.zenkey.sdk.internal.contract.PackageManager
 import com.xci.zenkey.sdk.internal.contract.WebIntentFactory
+import com.xci.zenkey.sdk.internal.ktx.intent
 import com.xci.zenkey.sdk.internal.model.Package
 
 internal class DefaultAuthorizationIntentFactory internal constructor(
-        private val nativeIntentFactory: NativeIntentFactory,
         private val webIntentFactory: WebIntentFactory,
         private val packageManager: PackageManager
 ) : AuthorizationIntentFactory {
 
-    @Throws(ActivityNotFoundException::class)
+    @Throws(NoBrowserException::class)
     override fun createAuthorizeIntent(uri: Uri, packages: List<Package>): Intent {
         return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             webIntentFactory.create(uri)
         } else {
             if (anyValidPackageFor(uri, packages)) {
-                nativeIntentFactory.create(uri)
+                uri.intent
             } else {
                 webIntentFactory.create(uri)
             }
         }
     }
 
-    @Throws(ActivityNotFoundException::class)
+    @Throws(NoBrowserException::class)
     override fun createDiscoverUIIntent(uri: Uri): Intent {
         return webIntentFactory.create(uri)
     }
