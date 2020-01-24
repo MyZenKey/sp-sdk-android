@@ -32,10 +32,10 @@ internal val MessageDigest.proofKeyForCodeExchange: ProofKeyForCodeExchange
         val codeChallengeMethod: CodeChallengeMethod
         if(algorithm == AndroidMessageDigestAlgorithm.SHA_256.value){
             update(codeVerifier.toByteArray())
-            codeChallenge = digest().hash().encodeToString(flags = Base64.URL_SAFE or Base64.NO_WRAP)
+            codeChallenge = digest().encodeToString(flags = Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
             codeChallengeMethod = CodeChallengeMethod.SHA_256
         } else {
-            codeChallenge = codeVerifier.encodeToString(flags = Base64.URL_SAFE or Base64.NO_WRAP)
+            codeChallenge = codeVerifier.encodeToString(flags = Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
             codeChallengeMethod = CodeChallengeMethod.PLAIN
         }
         return ProofKeyForCodeExchange(codeVerifier, codeChallenge, codeChallengeMethod)
