@@ -5,7 +5,7 @@ All releases before 1.0.0 may contain breaking changes.
 After 1.0.0 this project will adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Versions
-[0.10.9 - 2020-01-23](#0109---2020-01-23)
+[0.10.10 - 2020-01-23](#01010---2020-01-23)
 
 ## Updating
 When the Unreleased section becomes a new version, duplicate the Template to create a new Unreleased section.
@@ -30,6 +30,10 @@ When the Unreleased section becomes a new version, duplicate the Template to cre
 ### Fixed
 - Force Android Security Provider Update.
 ### Security
+
+## [0.10.10] - 2020-01-23
+### Fixed
+- Fix PKCE challenge hashing issue.
 
 ## [0.10.9] - 2020-01-23
 ### Changed
