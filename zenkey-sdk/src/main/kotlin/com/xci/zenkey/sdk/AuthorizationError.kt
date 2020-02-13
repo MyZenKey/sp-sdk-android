@@ -53,28 +53,39 @@ enum class AuthorizationError {
      */
     UNKNOWN;
 
-    private var description: String? = null
+    internal var description: String? = null
 
     /**
      * Set the error description.
      * @param description the error description.
      * @return this [AuthorizationError] instance.
      */
-    fun withDescription(description: String?): AuthorizationError {
+    internal fun withDescription(description: String?): AuthorizationError {
         this.description = description
         return this
     }
 
-    /**
-     * Get the error description.
-     * @return the error description.
-     */
     fun description(): String? {
         return description
     }
 
     override fun toString(): String {
         return "AuthorizationError($name - description=$description)"
+    }
+
+    companion object {
+
+        internal val STATE_MISMATCHED =
+                INVALID_REQUEST.withDescription("state mismatched")
+
+        internal val TOO_MANY_REDIRECT =
+                DISCOVERY_STATE.withDescription("too many discoverUi redirects")
+
+        internal val UNEXPECTED_DISCOVERY_RESPONSE =
+                DISCOVERY_STATE.withDescription("Received OIDC with prompt=true")
+
+        internal val MISSING_DISCOVER_UI_ENDPOINT =
+                DISCOVERY_STATE.withDescription("Provider Not Found : Missing DiscoverUI endpoint")
     }
 }
 

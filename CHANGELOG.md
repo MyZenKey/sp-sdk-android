@@ -5,7 +5,7 @@ All releases before 1.0.0 may contain breaking changes.
 After 1.0.0 this project will adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Versions
-[0.10.10 - 2020-01-23](#01010---2020-01-23)
+[0.10.17 - 2020-02-11](#01017---2020-02-11)
 
 ## Updating
 When the Unreleased section becomes a new version, duplicate the Template to create a new Unreleased section.
@@ -22,7 +22,6 @@ When the Unreleased section becomes a new version, duplicate the Template to cre
 ### Added
 - Create a dedicated Android TV SDK module.
 ### Changed
-- Improve usage of TelephonyManager using kotlin language features.
 - Improve ZenKey Application validation layer using kotlin language features.
 - Split SDK in multiple modules.
 ### Removed
@@ -31,9 +30,37 @@ When the Unreleased section becomes a new version, duplicate the Template to cre
 - Force Android Security Provider Update.
 ### Security
 
+## [0.10.17] - 2020-02-11
+### Changed
+- Change versioning to allow major bump.
+
+## [0.10.16] - 2020-02-11
+### Changed
+- Expose Nonce, ACR, Context and CorrelationId in authorization response.
+
+## [0.10.15] - 2020-02-06
+### Changed
+- Improve usage of TelephonyManager using kotlin language features.
+
+## [0.10.14] - 2020-02-06
+### Changed
+- Expose Interface instead of implementation. Improve internal code base.
+
+## [0.10.13] - 2020-02-03
+### Fixed
+- Fix race condition on Android 9.
+
+## [0.10.12] - 2020-01-28
+### Added
+- Catch SSLException and return meaningful error message.
+
+## [0.10.11] - 2020-01-27
+### Fixed
+- Remove PKCE plain Base64 encoding.
+
 ## [0.10.10] - 2020-01-23
 ### Fixed
-- Fix PKCE challenge hashing issue.
+- Fix PKCE code_challenge double hashing.
 
 ## [0.10.9] - 2020-01-23
 ### Changed

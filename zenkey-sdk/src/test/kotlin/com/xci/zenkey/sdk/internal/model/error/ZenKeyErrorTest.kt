@@ -102,7 +102,7 @@ class ZenKeyErrorTest {
         val userNotFound = ZenKeyError.USER_NOT_FOUND.asExposed()
 
         assertEquals(AuthorizationError.DISCOVERY_STATE, userNotFound)
-        assertEquals(ZenKeyError.USER_NOT_FOUND.error, userNotFound.description())
+        assertEquals(ZenKeyError.USER_NOT_FOUND.error, userNotFound.description)
 
 
         assertEquals(AuthorizationError.DISCOVERY_STATE, ZenKeyError.INVALID_LOGIN_HINT_TOKEN.asExposed())

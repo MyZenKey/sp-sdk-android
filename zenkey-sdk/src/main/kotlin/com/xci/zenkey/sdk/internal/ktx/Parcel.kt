@@ -13,18 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.xci.zenkey.sdk.internal.contract;
 
-/**
- * A contract for the SIM data provider.
- */
-internal interface SimDataProvider {
+package com.xci.zenkey.sdk.internal.ktx
 
-    /**
-     * Get the MCC/MNC of the SIM in the first slot
-     *
-     * @return the MCC/MNC of the SIM in the first slot
-     * or null if the SIM Card isn't Ready.
-     */
-    val simOperator: String?
+import android.os.Parcel
+
+private const val NULL_VALUE = 0
+private const val NON_NULL_VALUE = 1
+
+internal fun Parcel.readNullableString(
+): String? {
+    return if (readInt() == NON_NULL_VALUE) {
+        readString()
+    } else {
+        null
+    }
+}
+
+internal fun Parcel.writeNullableString(
+        value: String?
+){
+    if (value != null) {
+        writeInt(NON_NULL_VALUE)
+        writeString(value)
+    } else {
+        writeInt(NULL_VALUE)
+    }
 }

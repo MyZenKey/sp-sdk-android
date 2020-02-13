@@ -35,7 +35,7 @@ internal val MessageDigest.proofKeyForCodeExchange: ProofKeyForCodeExchange
             codeChallenge = digest().encodeToString(flags = Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
             codeChallengeMethod = CodeChallengeMethod.SHA_256
         } else {
-            codeChallenge = codeVerifier.encodeToString(flags = Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
+            codeChallenge = codeVerifier
             codeChallengeMethod = CodeChallengeMethod.PLAIN
         }
         return ProofKeyForCodeExchange(codeVerifier, codeChallenge, codeChallengeMethod)

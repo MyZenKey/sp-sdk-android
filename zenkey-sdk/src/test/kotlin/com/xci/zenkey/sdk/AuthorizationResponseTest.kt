@@ -47,6 +47,11 @@ class AuthorizationResponseTest {
         whenever(mockPKCEChallenge.codeVerifier).thenReturn(CODE_VERIFIER)
         whenever(mockRequest.proofKeyForCodeExchange).thenReturn(mockPKCEChallenge)
         whenever(mockRequest.redirectUri).thenReturn(REDIRECT_URI)
+        whenever(mockRequest.acr).thenReturn(ACR)
+        whenever(mockRequest.nonce).thenReturn(NONCE)
+        whenever(mockRequest.context).thenReturn(CONTEXT)
+        whenever(mockRequest.correlationId).thenReturn(CORRELATION_ID)
+
         successResponse = AuthorizationResponse(MCC_MNC, mockRequest, AUTHORIZATION_CODE)
         failedResponse = AuthorizationResponse(MCC_MNC, REDIRECT_URI, error)
     }
@@ -64,6 +69,10 @@ class AuthorizationResponseTest {
         assertEquals(AUTHORIZATION_CODE, createdFromParcel.authorizationCode)
         assertEquals(REDIRECT_URI, createdFromParcel.redirectUri)
         assertEquals(CODE_VERIFIER, createdFromParcel.codeVerifier)
+        assertEquals(NONCE, createdFromParcel.nonce)
+        assertEquals(ACR, createdFromParcel.acrValues)
+        assertEquals(CONTEXT, createdFromParcel.context)
+        assertEquals(CORRELATION_ID, createdFromParcel.correlationId)
         assertNull(createdFromParcel.error)
 
         val array = AuthorizationResponse.CREATOR.newArray(2)
@@ -102,6 +111,11 @@ class AuthorizationResponseTest {
         assertEquals(MCC_MNC, fromIntent.mccMnc)
         assertEquals(AUTHORIZATION_CODE, fromIntent.authorizationCode)
         assertEquals(CODE_VERIFIER, fromIntent.codeVerifier)
+        assertEquals(NONCE, fromIntent.nonce)
+        assertEquals(ACR, fromIntent.acrValues)
+        assertEquals(CONTEXT, fromIntent.context)
+        assertEquals(CORRELATION_ID, fromIntent.correlationId)
+
         assertNull(fromIntent.error)
     }
 
@@ -159,19 +173,12 @@ class AuthorizationResponseTest {
         private const val MCC_MNC = "MCCMNC"
         private const val AUTHORIZATION_CODE = "1234"
         private const val CODE_VERIFIER = "qwertyuiopasdfghjklzxcvbnm"
+        private const val NONCE = "nonce"
+        private const val ACR = "acr"
+        private const val CONTEXT = "context"
+        private const val CORRELATION_ID = "correlation"
         private val REDIRECT_URI = Uri.EMPTY
     }
-
-    /*@Test
-    public void shouldGetResponseFromError() {
-
-        AuthorizationResponse authorizationResponse = AuthorizationResponse.fromError(MCC_MNC, AuthorizationError.UNKNOWN);
-
-        assertNotNull(authorizationResponse);
-        assertFalse(authorizationResponse.isSuccessful());
-        assertNotNull(authorizationResponse.getError());
-        assertEquals(AuthorizationError.UNKNOWN, authorizationResponse.getError());
-    }*/
 }
 
 

@@ -40,6 +40,13 @@ internal data class ProofKeyForCodeExchange(
         return 0
     }
 
+    override fun toString(): String {
+        return "ProofKeyForCodeExchange(" +
+                "codeVerifier='$codeVerifier', " +
+                "codeChallenge='$codeChallenge', " +
+                "codeChallengeMethod=$codeChallengeMethod)"
+    }
+
     companion object CREATOR : Parcelable.Creator<ProofKeyForCodeExchange> {
         override fun createFromParcel(parcel: Parcel): ProofKeyForCodeExchange {
             return ProofKeyForCodeExchange(parcel)
@@ -49,4 +56,6 @@ internal data class ProofKeyForCodeExchange(
             return arrayOfNulls(size)
         }
     }
+
+
 }

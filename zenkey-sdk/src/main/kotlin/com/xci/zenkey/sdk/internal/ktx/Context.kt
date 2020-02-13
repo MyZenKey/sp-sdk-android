@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.graphics.drawable.Drawable
 import android.os.Build
+import android.telephony.TelephonyManager
 
 internal fun Context.getColorCompat(id: Int)
         : Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -42,3 +43,8 @@ tailrec fun Context?.activity(): Activity? = when (this) {
     is Activity -> this
     else -> (this as? ContextWrapper)?.baseContext?.activity()
 }
+
+internal val Context.telephonyManager: TelephonyManager
+    get() {
+        return getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+    }

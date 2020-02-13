@@ -40,8 +40,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyInt
-import org.mockito.ArgumentMatchers.anyString
-import org.powermock.api.mockito.PowerMockito
 import org.robolectric.Robolectric.setupContentProvider
 
 @RunWith(AndroidJUnit4::class)
@@ -54,7 +52,7 @@ class ZenKeyButtonTest {
     private val mockTypedArray = mock<TypedArray>()
     private val mockButton = mock<Button>()
     private val mockValidRedirectUri = mock<Uri>()
-    private val mockIntentBuilder = PowerMockito.mock(AuthorizeIntentBuilder::class.java)
+    private val mockIntentBuilder = mock<AuthorizeIntentBuilder>()
     private val mockFragment = mock<Fragment>()
     private val mockActivity = mock<Activity>()
     private val mockIntent = mock<Intent>()
@@ -66,17 +64,9 @@ class ZenKeyButtonTest {
         COLOR_GREEN = context.getColorCompat(R.color.zenkey_green)
         COLOR_WHITE = context.getColorCompat(android.R.color.white)
         COLOR_TRANSPARENT = context.getColorCompat(android.R.color.transparent)
-        PowerMockito.`when`(mockContext.obtainStyledAttributes(mockAttributeSet, R.styleable.ZenKeyButton)).thenReturn(mockTypedArray)
+        whenever(mockContext.obtainStyledAttributes(mockAttributeSet, R.styleable.ZenKeyButton)).thenReturn(mockTypedArray)
         whenever(mockValidRedirectUri.toString()).thenReturn("test://test")
 
-        doCallRealMethod().whenever(mockIntentBuilder).withScopes(any())
-        doCallRealMethod().whenever(mockIntentBuilder).withRedirectUri(any())
-        doCallRealMethod().whenever(mockIntentBuilder).withAcrValues(any())
-        doCallRealMethod().whenever(mockIntentBuilder).withNonce(anyString())
-        doCallRealMethod().whenever(mockIntentBuilder).withState(anyString())
-        doCallRealMethod().whenever(mockIntentBuilder).withCorrelationId(anyString())
-        doCallRealMethod().whenever(mockIntentBuilder).withPrompt(any())
-        doCallRealMethod().whenever(mockIntentBuilder).withContext(anyString())
         whenever(mockIntentBuilder.build()).thenReturn(mockIntent)
 
         zenKeyButton = ZenKeyButton(context)

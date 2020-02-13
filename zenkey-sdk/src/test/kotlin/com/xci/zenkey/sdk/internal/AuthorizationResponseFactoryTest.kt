@@ -84,7 +84,6 @@ class AuthorizationResponseFactoryTest {
         whenever(mockUri.queryParameterNames).thenReturn(setOf(Json.KEY_CODE, Json.KEY_STATE))
         whenever(mockUri.code).thenReturn(code)
         whenever(mockUri.state).thenReturn(state)
-        whenever(mockRequest.isNotMatching(state)).thenReturn(true)
 
         val response = factory.create(MCC_MNC, mockRequest, mockUri)
 
@@ -104,7 +103,6 @@ class AuthorizationResponseFactoryTest {
         whenever(mockUri.code).thenReturn(code)
         whenever(mockUri.state).thenReturn(stateResult)
         whenever(mockRequest.state).thenReturn(stateRequest)
-        whenever(mockRequest.isNotMatching(stateResult)).thenReturn(true)
 
         val response = factory.create(MCC_MNC, mockRequest, mockUri)
 
@@ -172,7 +170,7 @@ class AuthorizationResponseFactoryTest {
     fun shouldGetAuthorizationErrorErrorFromHttpExceptionWithoutDescription() {
         val error = factory.createError(HttpException(0, "{\"error\":\"invalid_request\"}"))
         assertEquals(AuthorizationError.INVALID_CONFIGURATION, error)
-        assertNull(error.description())
+        assertNull(error.description)
     }
 
     @Test
@@ -180,7 +178,7 @@ class AuthorizationResponseFactoryTest {
         val description = "description"
         val error = factory.createError(HttpException(0, "{\"error\":\"invalid_request\",\"error_description\":\"$description\"}"))
         assertEquals(AuthorizationError.INVALID_CONFIGURATION, error)
-        assertEquals(description, error.description())
+        assertEquals(description, error.description)
     }
 
     @Test

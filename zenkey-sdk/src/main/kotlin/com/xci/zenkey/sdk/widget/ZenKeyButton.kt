@@ -32,7 +32,7 @@ import com.xci.zenkey.sdk.AuthorizeIntentBuilder
 import com.xci.zenkey.sdk.R
 import com.xci.zenkey.sdk.internal.BaseContentProvider
 import com.xci.zenkey.sdk.internal.DefaultContentProvider
-import com.xci.zenkey.sdk.internal.ktx.activity
+import com.xci.zenkey.sdk.internal.ktx.*
 import com.xci.zenkey.sdk.internal.ktx.getColor
 import com.xci.zenkey.sdk.internal.ktx.getDrawable
 import com.xci.zenkey.sdk.internal.ktx.inflate
@@ -317,7 +317,7 @@ class ZenKeyButton
             carrierEndorsementView.visibility = View.VISIBLE
             if(!isInEditMode) {
                 DefaultContentProvider.discoveryService.discoverConfiguration(
-                        DefaultContentProvider.simDataProvider.simOperator,
+                        context.telephonyManager.simOperatorReady,
                         false,
                         {
                             carrierEndorsementView.setCarrier(it.branding.carrierText, null, mode)

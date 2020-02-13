@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.xci.zenkey.sdk
+package com.xci.zenkey.sdk.internal
 
 import android.net.Uri
 import android.util.Base64
-import com.xci.zenkey.sdk.internal.DefaultAuthorizationService
 import com.xci.zenkey.sdk.internal.ktx.encodeToString
 import com.xci.zenkey.sdk.internal.model.AuthorizationRequest
 import com.xci.zenkey.sdk.param.ACR
@@ -35,30 +34,33 @@ import java.security.MessageDigest
 
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest = Config.NONE)
-class AuthorizeIntentBuilderTest {
+class DefaultAuthorizeIntentBuilderTest {
 
-    private lateinit var intentBuilder: AuthorizeIntentBuilder
+    private lateinit var intentBuilder: DefaultAuthorizeIntentBuilder
 
     private val mockMessageDigest = Mockito.mock(MessageDigest::class.java)
 
     @Before
     fun setUp() {
-        intentBuilder = AuthorizeIntentBuilder(PACKAGE_NAME, CLIENT_ID, mockMessageDigest, REDIRECT_URI)
+        intentBuilder = DefaultAuthorizeIntentBuilder(PACKAGE_NAME, CLIENT_ID, mockMessageDigest, REDIRECT_URI)
     }
 
     @Test
     fun shouldRemoveDuplicateScopes() {
-        assertEquals("email openid", intentBuilder.withScopes(Scopes.EMAIL, Scopes.EMAIL, Scopes.OPEN_ID).scope())
+        intentBuilder.withScopes(Scopes.EMAIL, Scopes.EMAIL, Scopes.OPEN_ID)
+        assertEquals("email openid",intentBuilder.scope())
     }
 
     @Test
     fun shouldBuildScopeString() {
-        assertEquals("email name openid", intentBuilder.withScopes(Scopes.EMAIL, Scopes.NAME, Scopes.OPEN_ID).scope())
+        intentBuilder.withScopes(Scopes.EMAIL, Scopes.NAME, Scopes.OPEN_ID)
+        assertEquals("email name openid", intentBuilder.scope())
     }
 
     @Test
     fun shouldHaveNullScope() {
-        assertNull(intentBuilder.withScopes().scope())
+        intentBuilder.withScopes()
+        assertNull(intentBuilder.scope())
 
     }
 
@@ -69,7 +71,8 @@ class AuthorizeIntentBuilderTest {
 
     @Test
     fun shouldUseSpecifiedScope() {
-        assertEquals("email name", intentBuilder.withScopes(Scopes.EMAIL, Scopes.NAME).scope())
+        intentBuilder.withScopes(Scopes.EMAIL, Scopes.NAME)
+        assertEquals("email name", intentBuilder.scope())
     }
 
     @Test

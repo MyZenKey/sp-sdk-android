@@ -18,6 +18,7 @@ package com.xci.zenkey.sdk.internal
 import android.net.Uri
 import com.xci.zenkey.sdk.AuthorizationError
 import com.xci.zenkey.sdk.AuthorizationError.*
+import com.xci.zenkey.sdk.AuthorizationError.Companion.STATE_MISMATCHED
 import com.xci.zenkey.sdk.AuthorizationResponse
 import com.xci.zenkey.sdk.internal.contract.Logger
 import com.xci.zenkey.sdk.internal.ktx.*
@@ -29,6 +30,7 @@ import com.xci.zenkey.sdk.internal.model.exception.AssetsNotFoundException
 import com.xci.zenkey.sdk.internal.network.stack.HttpException
 import org.json.JSONException
 import org.json.JSONObject
+import javax.net.ssl.SSLException
 
 internal class AuthorizationResponseFactory
     : AuthorizationResponse.Factory {
@@ -38,8 +40,8 @@ internal class AuthorizationResponseFactory
         return if (uri.containError) {
             create(mcc_mnc, request.redirectUri, createError(uri.error, uri.errorDescription))
         } else if (uri.containCode) {
-            if (request.isNotMatching(uri.state)) {
-                create(mcc_mnc, request.redirectUri, INVALID_REQUEST.withDescription("state miss-match"))
+            if (!request.state.isMatching(uri.state)) {
+                create(mcc_mnc, request.redirectUri, STATE_MISMATCHED)
             } else {
                 AuthorizationResponse(mcc_mnc, request, uri.code!!)
             }
@@ -53,6 +55,12 @@ internal class AuthorizationResponseFactory
         return when (throwable) {
             is AssetsNotFoundException -> create(mcc_mnc, redirectUri, DISCOVERY_STATE.withDescription(throwable.message))
             is HttpException -> create(mcc_mnc, redirectUri, createError(throwable))
+            is SSLException -> create(mcc_mnc, redirectUri, DISCOVERY_STATE
+                    .withDescription(
+                            "Your device doesn't support TLS 1.2 " +
+                                    "which is required for ZenKey to work." +
+                                    " Please make sure the Play Services are available " +
+                                    "and the Play Services updates are installed."))
             else -> create(mcc_mnc, redirectUri, UNKNOWN.withDescription(throwable.message))
         }
     }

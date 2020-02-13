@@ -17,6 +17,7 @@ package com.xci.zenkey.sdk.internal
 
 import android.app.Activity
 import android.app.PendingIntent
+import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -52,6 +53,33 @@ class AuthorizationRequestActivity
     override fun onDestroy() {
         authorizationService.onDestroy(this)
         super.onDestroy()
+    }
+
+    internal fun startDiscoverUi(
+            intentToStart: Intent,
+            onActivityNotFound: () -> Unit
+    ){
+        startAuthorizationFlowActivity(intentToStart, onActivityNotFound,
+                { intent, activity ->  activity.startActivity(intent) })
+    }
+
+    internal fun startAuthorize(
+            intentToStart: Intent,
+            onActivityNotFound: () -> Unit
+    ){
+        startAuthorizationFlowActivity(intentToStart, onActivityNotFound,
+                { intent, activity ->  activity.startActivityForResult(intent, 0) })
+    }
+
+    private fun startAuthorizationFlowActivity(intentToStart: Intent,
+                                                         onActivityNotFound: () -> Unit,
+                                                         startActivity: (Intent, Activity) -> Unit){
+        intent = intent.setData(null)
+        try {
+            startActivity.invoke(intentToStart, this)
+        } catch (e: ActivityNotFoundException) {
+            onActivityNotFound.invoke()
+        }
     }
 
     companion object IntentFactory {

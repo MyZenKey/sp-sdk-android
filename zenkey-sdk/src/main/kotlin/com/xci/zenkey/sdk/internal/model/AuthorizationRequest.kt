@@ -7,6 +7,8 @@ import com.xci.zenkey.sdk.BuildConfig
 
 import com.xci.zenkey.sdk.internal.Json
 import com.xci.zenkey.sdk.internal.ktx.appendQueryParameterIfNotNull
+import com.xci.zenkey.sdk.internal.ktx.readNullableString
+import com.xci.zenkey.sdk.internal.ktx.writeNullableString
 import com.xci.zenkey.sdk.param.ResponseType
 
 class AuthorizationRequest
@@ -22,8 +24,7 @@ class AuthorizationRequest
     internal val correlationId: String?
     internal val context: String?
     internal val proofKeyForCodeExchange: ProofKeyForCodeExchange
-    internal var loginHintToken: String? = null
-        private set
+    private var loginHintToken: String? = null
 
     internal constructor(clientId: String,
                          redirectUri: Uri,
@@ -47,120 +48,32 @@ class AuthorizationRequest
         this.proofKeyForCodeExchange = proofKeyForCodeExchange
     }
 
-    private constructor(`in`: Parcel) {
-        clientId = `in`.readString()!!
-        proofKeyForCodeExchange = `in`.readParcelable(javaClass.classLoader)!!
-        redirectUri = `in`.readParcelable(javaClass.classLoader)!!
-
-        scope = if (`in`.readInt() == NON_NULL_VALUE) {
-            `in`.readString()
-        } else {
-            null
-        }
-
-        state = if (`in`.readInt() == NON_NULL_VALUE) {
-            `in`.readString()
-        } else {
-            null
-        }
-
-        acr = if (`in`.readInt() == NON_NULL_VALUE) {
-            `in`.readString()
-        } else {
-            null
-        }
-
-        nonce = if (`in`.readInt() == NON_NULL_VALUE) {
-            `in`.readString()
-        } else {
-            null
-        }
-
-        prompt = if (`in`.readInt() == NON_NULL_VALUE) {
-            `in`.readString()
-        } else {
-            null
-        }
-
-        correlationId = if (`in`.readInt() == NON_NULL_VALUE) {
-            `in`.readString()
-        } else {
-            null
-        }
-
-        context = if (`in`.readInt() == NON_NULL_VALUE) {
-            `in`.readString()
-        } else {
-            null
-        }
-
-        loginHintToken = if (`in`.readInt() == NON_NULL_VALUE) {
-            `in`.readString()
-        } else {
-            null
-        }
+    private constructor(parcel: Parcel) {
+        clientId = parcel.readString()!!
+        proofKeyForCodeExchange = parcel.readParcelable(javaClass.classLoader)!!
+        redirectUri = parcel.readParcelable(javaClass.classLoader)!!
+        scope = parcel.readNullableString()
+        state = parcel.readNullableString()
+        acr = parcel.readNullableString()
+        nonce = parcel.readNullableString()
+        prompt = parcel.readNullableString()
+        correlationId = parcel.readNullableString()
+        context = parcel.readNullableString()
+        loginHintToken = parcel.readNullableString()
     }
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
         dest.writeString(clientId)
         dest.writeParcelable(proofKeyForCodeExchange, flags)
         dest.writeParcelable(redirectUri, flags)
-
-        if (scope != null) {
-            dest.writeInt(NON_NULL_VALUE)
-            dest.writeString(scope)
-        } else {
-            dest.writeInt(NULL_VALUE)
-        }
-
-        if (state != null) {
-            dest.writeInt(NON_NULL_VALUE)
-            dest.writeString(state)
-        } else {
-            dest.writeInt(NULL_VALUE)
-        }
-
-        if (acr != null) {
-            dest.writeInt(NON_NULL_VALUE)
-            dest.writeString(acr)
-        } else {
-            dest.writeInt(NULL_VALUE)
-        }
-
-        if (nonce != null) {
-            dest.writeInt(NON_NULL_VALUE)
-            dest.writeString(nonce)
-        } else {
-            dest.writeInt(NULL_VALUE)
-        }
-
-        if (prompt != null) {
-            dest.writeInt(NON_NULL_VALUE)
-            dest.writeString(prompt)
-        } else {
-            dest.writeInt(NULL_VALUE)
-        }
-
-        if (correlationId != null) {
-            dest.writeInt(NON_NULL_VALUE)
-            dest.writeString(correlationId)
-        } else {
-            dest.writeInt(NULL_VALUE)
-        }
-
-        if (context != null) {
-            dest.writeInt(NON_NULL_VALUE)
-            dest.writeString(context)
-        } else {
-            dest.writeInt(NULL_VALUE)
-        }
-
-        if (loginHintToken != null) {
-            dest.writeInt(NON_NULL_VALUE)
-            dest.writeString(loginHintToken)
-        } else {
-            dest.writeInt(NULL_VALUE)
-        }
+        dest.writeNullableString(scope)
+        dest.writeNullableString(state)
+        dest.writeNullableString(acr)
+        dest.writeNullableString(nonce)
+        dest.writeNullableString(prompt)
+        dest.writeNullableString(correlationId)
+        dest.writeNullableString(context)
+        dest.writeNullableString(loginHintToken)
     }
 
     override fun describeContents(): Int {
@@ -170,10 +83,6 @@ class AuthorizationRequest
     internal fun withLoginHintToken(loginHintToken: String?): AuthorizationRequest {
         this.loginHintToken = loginHintToken
         return this
-    }
-
-    internal fun isNotMatching(responseState: String?): Boolean {
-        return (state == null) and (responseState != null) || state != null && state != responseState
     }
 
     internal fun toDiscoverUiUri(endpoint: String)
@@ -205,26 +114,23 @@ class AuthorizationRequest
             .appendQueryParameterIfNotNull(Json.KEY_LOGIN_HINT_TOKEN, loginHintToken)
             .build()
 
-
     override fun toString(): String {
-        return "AuthorizationRequest{" +
-                "clientId='" + clientId + '\'' +
-                ", redirectUri=" + redirectUri +
-                ", scope='" + scope + '\'' +
-                ", state='" + state + '\'' +
-                ", acr='" + acr + '\'' +
-                ", nonce='" + nonce + '\'' +
-                ", prompt='" + prompt + '\'' +
-                ", correlationId='" + correlationId + '\'' +
-                ", context='" + context + '\'' +
-                '}'
+        return "AuthorizationRequest(" +
+                "clientId=$clientId, " +
+                "redirectUri=$redirectUri, " +
+                "scope=$scope, " +
+                "state=$state, " +
+                "acr=$acr, " +
+                "nonce=$nonce," +
+                " prompt=$prompt, " +
+                "correlationId=$correlationId, " +
+                "context=$context, " +
+                "proofKeyForCodeExchange=$proofKeyForCodeExchange, " +
+                "loginHintToken=$loginHintToken)"
     }
 
+
     internal companion object {
-
-        private const val NULL_VALUE = 0
-        private const val NON_NULL_VALUE = 1
-
         @JvmField
         val CREATOR: Parcelable.Creator<AuthorizationRequest> = object : Parcelable.Creator<AuthorizationRequest> {
             override fun createFromParcel(`in`: Parcel): AuthorizationRequest {

@@ -16,15 +16,16 @@
 
 package com.xci.zenkey.sdk.internal.ktx
 
-import android.app.Activity
-import android.content.ActivityNotFoundException
-import android.content.Intent
+import android.telephony.TelephonyManager
 
-internal fun Activity.startAuthorizationFlowActivity(intentToStart: Intent, onActivityNotFound: () -> Unit){
-    intent = intent.setData(null)
-    try {
-        startActivity(intentToStart)
-    } catch (e: ActivityNotFoundException) {
-        onActivityNotFound.invoke()
+internal val TelephonyManager.isSimReady: Boolean
+    get() {
+        return simState == TelephonyManager.SIM_STATE_READY
     }
-}
+
+internal val TelephonyManager.simOperatorReady: String?
+    get() {
+        return if (isSimReady) simOperator
+        else null
+    }
+

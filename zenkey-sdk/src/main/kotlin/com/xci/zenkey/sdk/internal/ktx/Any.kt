@@ -13,24 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.xci.zenkey.sdk
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.SmallTest
+package com.xci.zenkey.sdk.internal.ktx
 
-import org.junit.Assert
-import org.junit.Test
-import org.junit.runner.RunWith
-
-@SmallTest
-@RunWith(AndroidJUnit4::class)
-class AuthorizationErrorTest {
-
-    @Test
-    fun shouldGetSetDescription() {
-        val description = "description"
-        val error = AuthorizationError.UNKNOWN.withDescription(description)
-        Assert.assertEquals(AuthorizationError.UNKNOWN, error)
-        Assert.assertEquals(description, error.description)
-    }
-}
+internal fun <T> T.isMatching(
+        value: T,
+        comparator: (T,T) -> Boolean = { expected, actual ->
+            ((expected == null) and (actual == null)) or (expected != null && expected == actual)
+        }
+): Boolean = comparator.invoke(this, value)
