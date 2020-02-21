@@ -18,9 +18,9 @@ package com.xci.zenkey.sdk.internal.browser
 import android.content.ComponentName
 import android.content.Context
 import android.net.Uri
-import android.support.customtabs.CustomTabsClient
-import android.support.customtabs.CustomTabsIntent.Builder
-import android.support.customtabs.CustomTabsServiceConnection
+import androidx.browser.customtabs.CustomTabsClient
+import androidx.browser.customtabs.CustomTabsIntent.Builder
+import androidx.browser.customtabs.CustomTabsServiceConnection
 import com.xci.zenkey.sdk.internal.contract.Logger
 
 /**

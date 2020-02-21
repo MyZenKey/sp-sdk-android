@@ -16,9 +16,9 @@
 package com.xci.zenkey.sdk.internal.browser
 
 import android.net.Uri
-import android.support.customtabs.CustomTabsCallback
-import android.support.customtabs.CustomTabsClient
-import android.support.customtabs.CustomTabsSession
+import androidx.browser.customtabs.CustomTabsCallback
+import androidx.browser.customtabs.CustomTabsClient
+import androidx.browser.customtabs.CustomTabsSession
 
 internal interface CustomTabSessionFactory {
 

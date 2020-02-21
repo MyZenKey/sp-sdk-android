@@ -1,2 +1,2 @@
-include ':zenkey-sdk'
+include ':zenkey-sdk', ':sampleapp'
 

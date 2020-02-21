@@ -15,7 +15,7 @@ android {
         versionName SEMANTIC_VERSION.name
         versionCode SEMANTIC_VERSION.code
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {

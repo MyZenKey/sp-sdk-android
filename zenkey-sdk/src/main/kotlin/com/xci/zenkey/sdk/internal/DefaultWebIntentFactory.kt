@@ -18,7 +18,7 @@ package com.xci.zenkey.sdk.internal
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.support.customtabs.CustomTabsIntent
+import androidx.browser.customtabs.CustomTabsIntent
 import com.xci.zenkey.sdk.internal.browser.BrowserBlacklist
 import com.xci.zenkey.sdk.internal.browser.BrowserDescriptor
 import com.xci.zenkey.sdk.internal.browser.BrowserSelector
