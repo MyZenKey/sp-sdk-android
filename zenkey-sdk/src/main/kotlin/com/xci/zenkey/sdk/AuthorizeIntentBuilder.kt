@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import android.net.Uri
 import com.xci.zenkey.sdk.param.ACR
 import com.xci.zenkey.sdk.param.Prompt
 import com.xci.zenkey.sdk.param.Scope
+import com.xci.zenkey.sdk.param.Theme
 
 /**
  * This class is a contract for an [Intent] builder for authorization request.
@@ -88,6 +89,14 @@ interface AuthorizeIntentBuilder {
      * @return this [AuthorizeIntentBuilder] instance
      */
     fun withContext(context: String): AuthorizeIntentBuilder
+
+    /**
+     * Set the theme (dark or light) for CCID app to use when displaying
+     * the request.
+     * @param theme the Theme value to use for the request (dark or light).
+     * @return this [AuthorizeIntentBuilder] instance
+     */
+    fun withTheme(theme: Theme?): AuthorizeIntentBuilder
 
     /**
      * Set a pending intent to start in case of success.

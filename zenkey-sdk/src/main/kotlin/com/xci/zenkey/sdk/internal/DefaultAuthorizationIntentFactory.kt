@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import com.xci.zenkey.sdk.internal.contract.AuthorizationIntentFactory
 import com.xci.zenkey.sdk.internal.contract.PackageManager
 import com.xci.zenkey.sdk.internal.contract.WebIntentFactory
 import com.xci.zenkey.sdk.internal.ktx.intent
-import com.xci.zenkey.sdk.internal.model.Package
 
 internal class DefaultAuthorizationIntentFactory internal constructor(
         private val webIntentFactory: WebIntentFactory,
@@ -32,14 +31,14 @@ internal class DefaultAuthorizationIntentFactory internal constructor(
 ) : AuthorizationIntentFactory {
 
     @Throws(NoBrowserException::class)
-    override fun createAuthorizeIntent(uri: Uri, packages: List<Package>): Intent {
+    override fun createAuthorizeIntent(authorizationUri: Uri, packages: Map<String, List<String>>): Intent {
         return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            webIntentFactory.create(uri)
+            webIntentFactory.create(authorizationUri)
         } else {
-            if (anyValidPackageFor(uri, packages)) {
-                uri.intent
+            if (packageManager.anyValidPackageFor(authorizationUri, packages)) {
+                authorizationUri.intent
             } else {
-                webIntentFactory.create(uri)
+                webIntentFactory.create(authorizationUri)
             }
         }
     }
@@ -55,9 +54,5 @@ internal class DefaultAuthorizationIntentFactory internal constructor(
 
     override fun unbindWebSession(context: Context) {
         webIntentFactory.unbind(context)
-    }
-
-    private fun anyValidPackageFor(uri: Uri, packages: List<Package>): Boolean {
-        return packageManager.anyValidPackageFor(uri, packages)
     }
 }

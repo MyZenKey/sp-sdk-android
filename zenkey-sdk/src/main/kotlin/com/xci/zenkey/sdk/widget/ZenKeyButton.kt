@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 @file:Suppress("DEPRECATION")
-
 package com.xci.zenkey.sdk.widget
 
 import android.app.Activity
@@ -39,6 +38,7 @@ import com.xci.zenkey.sdk.internal.ktx.inflate
 import com.xci.zenkey.sdk.param.ACR
 import com.xci.zenkey.sdk.param.Prompt
 import com.xci.zenkey.sdk.param.Scope
+import com.xci.zenkey.sdk.param.Theme
 import java.lang.ref.WeakReference
 
 /**
@@ -49,68 +49,43 @@ import java.lang.ref.WeakReference
  * When the button is clicked, this class will start the authorization request [Intent] automatically.
  */
 @Suppress("unused", "MemberVisibilityCanBePrivate")
-class ZenKeyButton
-    : FrameLayout {
+class ZenKeyButton @JvmOverloads constructor(
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = 0
+) : FrameLayout(context, attrs, defStyleAttr) {
+
+    enum class Mode constructor(
+            internal val contentColor: Int,
+            internal val backgroundDrawable: Int
+    ) {
+        DARK(android.R.color.white, R.drawable.ripple_dark),
+        LIGHT(R.color.zenkey_green, R.drawable.ripple_light)
+    }
+
+    enum class Text constructor(
+            internal val stringResId: Int
+    ) {
+        CONTINUE(R.string.continue_with_zenkey),
+        SIGN_IN(R.string.sign_in_with_zenkey)
+    }
 
     internal var requestCode = DEFAULT_REQUEST_CODE
     internal lateinit var intentBuilder: AuthorizeIntentBuilder
     internal lateinit var button: Button
     internal var fragment: WeakReference<Fragment>? = null
+    internal var enablePoweredBy: Boolean = false
     internal var mode: Mode = Mode.DARK
     internal var text: Text = Text.SIGN_IN
-    internal var enablePoweredBy: Boolean = false
+    internal var clickListener: OnClickListener? = null
 
-    enum class Mode constructor(internal val contentColor: Int, internal val backgroundDrawable: Int) {
-        DARK(android.R.color.white, R.drawable.ripple_dark),
-        LIGHT(R.color.zenkey_green, R.drawable.ripple_light)
-    }
-
-    enum class Text constructor(internal val stringResId: Int) {
-        CONTINUE(R.string.continue_with_zenkey),
-        SIGN_IN(R.string.sign_in_with_zenkey)
-    }
-
-    /**
-     * Constructor for [ZenKeyButton]
-     * @param context the [Context] used to create this view.
-     */
-    constructor(context: Context) : super(context) {
-        inflate()
-        init(null)
-    }
-
-    /**
-     * Constructor for [ZenKeyButton]
-     * @param context the [Context] used to create this view.
-     * @param attrs the attributes set inside the XML
-     */
-    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
-        inflate()
-        init(attrs)
-    }
-
-    /**
-     * Constructor for [ZenKeyButton]
-     * @param context the [Context] used to create this view.
-     * @param attrs the attributes set inside the XML
-     * @param defStyleAttr the default style attributes
-     */
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-        inflate()
-        init(attrs)
-    }
-
-    /**
-     * Inflate the XML associated with this custom component.
-     * @param context the context to use for the inflation.
-     */
-    private fun inflate() {
+    init {
         inflate(R.layout.zenkey_button)
+        init(attrs)
     }
 
     /**
      * Init the child views and apply style from XML attributes.
-     * @param attrs the XML attributes.
      */
     internal fun init(attrs: AttributeSet?) {
         if (!isInEditMode) {
@@ -218,6 +193,14 @@ class ZenKeyButton
     }
 
     /**
+     * Set the visual Theme (DARK or LIGHT) to be used when the user consents to the request
+     * @param theme the Theme to use when asking the user for consent
+     */
+    fun setTheme(theme: Theme?) {
+        this.intentBuilder.withTheme(theme)
+    }
+
+    /**
      * Set the requesting [Fragment].
      * @param fragment the requesting [Fragment]
      */
@@ -274,12 +257,12 @@ class ZenKeyButton
      * Called when the button is clicked.
      */
     internal fun onClick(activity: Activity?) {
+        clickListener?.onClick(this)
         startRequest(activity, buildAuthorizationIntent())
     }
 
     /**
      * Start the authorization request.
-     * @param view the clicked button.
      * @param intent the intent to start.
      */
     internal fun startRequest(activity: Activity?, intent: Intent) {
@@ -299,11 +282,26 @@ class ZenKeyButton
     }
 
     internal fun applyMode() {
-        val icon = getDrawable(R.drawable.ic_zenkey_white)
+        applyTextColor()
+        applyIcon()
+        applyBackGround()
+    }
+
+    private fun applyTextColor(){
         this.button.setTextColor(getColor(mode.contentColor))
-        icon.setColorFilter(getColor(mode.contentColor), PorterDuff.Mode.SRC_ATOP)
-        this.button.setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null)
-        this.button.background = getDrawable(mode.backgroundDrawable)
+    }
+
+    private fun applyIcon(){
+        getDrawable(R.drawable.ic_zenkey_white)?.let {
+            it.setColorFilter(getColor(mode.contentColor), PorterDuff.Mode.SRC_ATOP)
+            this.button.setCompoundDrawablesWithIntrinsicBounds(it, null, null, null)
+        }
+    }
+
+    private fun applyBackGround(){
+        getDrawable(mode.backgroundDrawable)?.let {
+            this.button.background = it
+        }
     }
 
     internal fun applyText() {
@@ -328,6 +326,10 @@ class ZenKeyButton
                 carrierEndorsementView.setCarrier("Powered By MNO", null, mode)
             }
         }
+    }
+
+    override fun setOnClickListener(l: OnClickListener?) {
+        clickListener = l
     }
 
     companion object {

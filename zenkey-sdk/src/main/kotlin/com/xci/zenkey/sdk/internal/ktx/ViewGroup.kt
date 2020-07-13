@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,8 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package com.xci.zenkey.sdk.internal.ktx
 
 import android.view.View
@@ -23,6 +21,4 @@ import android.view.ViewGroup
 internal fun ViewGroup.inflate(
         layoutRes: Int,
         asRoot: Boolean = true
-): View {
-    return inflate(layoutRes, if (asRoot) this else null)
-}
+): View = inflate(layoutRes, if (asRoot) this else null)

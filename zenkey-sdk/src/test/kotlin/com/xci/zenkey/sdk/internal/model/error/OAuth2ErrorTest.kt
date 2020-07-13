@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,7 +91,7 @@ class OAuth2ErrorTest {
 
     @Test
     fun shouldGetErrorAsExposed() {
-        assertEquals(AuthorizationError.INVALID_CONFIGURATION, OAuth2Error.INVALID_REQUEST.asExposed())
+        assertEquals(AuthorizationError.INVALID_REQUEST, OAuth2Error.INVALID_REQUEST.asExposed())
         assertEquals(AuthorizationError.INVALID_CONFIGURATION, OAuth2Error.UNAUTHORIZED_CLIENT.asExposed())
         assertEquals(AuthorizationError.UNKNOWN, OAuth2Error.UNSUPPORTED_RESPONSE_TYPE.asExposed())
         assertEquals(AuthorizationError.INVALID_REQUEST, OAuth2Error.INVALID_SCOPE.asExposed())
@@ -100,7 +100,6 @@ class OAuth2ErrorTest {
     }
 
     companion object {
-
         private const val INVALID_REQUEST = "invalid_request"
         private const val UNAUTHORIZED_CLIENT = "unauthorized_client"
         private const val UNSUPPORTED_RESPONSE_TYPE = "unsupported_response_type"

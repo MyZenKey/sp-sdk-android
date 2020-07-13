@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,10 @@ import android.content.Intent
 import android.net.Uri
 import com.xci.zenkey.sdk.internal.browser.NoBrowserException
 
-import com.xci.zenkey.sdk.internal.model.Package
-
 internal interface AuthorizationIntentFactory {
 
     @Throws(NoBrowserException::class)
-    fun createAuthorizeIntent(uri: Uri, packages: List<Package>): Intent
+    fun createAuthorizeIntent(authorizationUri: Uri, packages: Map<String, List<String>>): Intent
 
     @Throws(NoBrowserException::class)
     fun createDiscoverUIIntent(uri: Uri): Intent

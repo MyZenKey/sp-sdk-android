@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package com.xci.zenkey.sdk.internal.ktx
 
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import java.util.concurrent.TimeoutException
 
 internal val Throwable.isNetworkFailure: Boolean
-    get() = this is UnknownHostException || this is SocketTimeoutException
+    get() = this is UnknownHostException
+
+internal val Throwable.isTimeout: Boolean
+    get() = this is TimeoutException || this is SocketTimeoutException

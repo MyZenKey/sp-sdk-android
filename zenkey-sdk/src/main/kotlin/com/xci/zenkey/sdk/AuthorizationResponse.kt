@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,13 @@ class AuthorizationResponse : Parcelable {
      * @return the MCC/MNC used for the discovery.
      */
     val mccMnc: String?
+
+    /**
+     * Get the clientId used for the request.
+     *
+     * @return the clientId used for the request.
+     */
+    val clientId: String
 
     /**
      * Get the [AuthorizationError]
@@ -111,12 +118,15 @@ class AuthorizationResponse : Parcelable {
      * @param error   the [AuthorizationError]
      * @param mcc_mnc the MCC/MNC used for the request.
      */
-    constructor(mcc_mnc: String?,
-                redirectUri: Uri,
-                error: AuthorizationError) {
+    private constructor(
+            mcc_mnc: String?,
+            request: AuthorizationRequest,
+            error: AuthorizationError
+    ) {
         this.authorizationCode = null
         this.mccMnc = mcc_mnc
-        this.redirectUri = redirectUri
+        this.redirectUri = request.redirectUri
+        this.clientId = request.clientId
         this.error = error
         this.codeVerifier = null
         this.acrValues = null
@@ -131,12 +141,15 @@ class AuthorizationResponse : Parcelable {
      * @param authorizationCode the authorization code
      * @param mcc_mnc           the MCC/MNC used for the request.
      */
-    constructor(mcc_mnc: String,
-                request: AuthorizationRequest,
-                authorizationCode: String) {
+    private constructor(
+            mcc_mnc: String,
+            request: AuthorizationRequest,
+            authorizationCode: String
+    ) {
         this.authorizationCode = authorizationCode
         this.mccMnc = mcc_mnc
         this.redirectUri = request.redirectUri
+        this.clientId = request.clientId
         this.error = null
         this.codeVerifier = request.proofKeyForCodeExchange.codeVerifier
         this.nonce = request.nonce
@@ -152,6 +165,7 @@ class AuthorizationResponse : Parcelable {
      */
     private constructor(parcel: Parcel) {
         redirectUri = parcel.readParcelable(javaClass.classLoader)
+        clientId = parcel.readString()!!
         mccMnc = parcel.readNullableString()
         authorizationCode = parcel.readNullableString()
         codeVerifier = parcel.readNullableString()
@@ -186,6 +200,7 @@ class AuthorizationResponse : Parcelable {
      */
     override fun writeToParcel(dest: Parcel, flags: Int) {
         dest.writeParcelable(redirectUri, 0)
+        dest.writeString(clientId)
         dest.writeNullableString(mccMnc)
         dest.writeNullableString(authorizationCode)
         dest.writeNullableString(codeVerifier)
@@ -196,8 +211,6 @@ class AuthorizationResponse : Parcelable {
         dest.writeNullableString(error?.name)
         dest.writeNullableString(error?.description)
     }
-
-
 
     /**
      * Create an [Intent] containing this response.
@@ -214,6 +227,7 @@ class AuthorizationResponse : Parcelable {
     override fun toString(): String {
         return "AuthorizationResponse(" +
                 "authorizationCode=$authorizationCode, " +
+                "clientId=$clientId, " +
                 "mccMnc=$mccMnc, " +
                 "error=$error, " +
                 "redirectUri=$redirectUri, " +
@@ -228,7 +242,7 @@ class AuthorizationResponse : Parcelable {
     /**
      * Factory Contract for [AuthorizationResponse]
      */
-    interface Factory {
+    internal interface Factory {
 
         /**
          * Create a successful response from a [Uri].
@@ -237,31 +251,37 @@ class AuthorizationResponse : Parcelable {
          * @param uri the result [Uri] from this request.
          * @return a successful [AuthorizationResponse]
          */
-        fun create(mcc_mnc: String,
-                   request: AuthorizationRequest,
-                   uri: Uri): AuthorizationResponse
+        fun uri(
+                mcc_mnc: String,
+                request: AuthorizationRequest,
+                uri: Uri
+        ): AuthorizationResponse
 
         /**
          * Create a failure response from a [Throwable].
          * @param mcc_mnc the MCC/MNC tuple use for the request.
-         * @param redirectUri the redirect [Uri] used for the request.
+         * @param request the [AuthorizationRequest]
          * @param throwable the [Throwable]
          * @return an unsuccessful [AuthorizationResponse]
          */
-        fun create(mcc_mnc: String?,
-                   redirectUri: Uri,
-                   throwable: Throwable): AuthorizationResponse
+        fun throwable(
+                mcc_mnc: String?,
+                request: AuthorizationRequest,
+                throwable: Throwable
+        ): AuthorizationResponse
 
         /**
          * Create a failure response from an [AuthorizationError].
          * @param mcc_mnc the MCC/MNC tuple use for the request.
-         * @param redirectUri the redirect [Uri] used for the request.
+         * @param request the [AuthorizationRequest]
          * @param error the [AuthorizationError]
          * @return an unsuccessful [AuthorizationResponse]
          */
-        fun create(mcc_mnc: String?,
-                   redirectUri: Uri,
-                   error: AuthorizationError): AuthorizationResponse
+        fun error(
+                mcc_mnc: String?,
+                request: AuthorizationRequest,
+                error: AuthorizationError
+        ): AuthorizationResponse
     }
 
     companion object {
@@ -299,5 +319,25 @@ class AuthorizationResponse : Parcelable {
             }
             return null
         }
+
+        /**
+         * Create a successful [AuthorizationResponse]
+         * @return a successful [AuthorizationResponse]
+         */
+        internal fun success(
+                mcc_mnc: String,
+                request: AuthorizationRequest,
+                authorizationCode: String
+        ): AuthorizationResponse = AuthorizationResponse(mcc_mnc, request, authorizationCode)
+
+        /**
+         * Create a failing [AuthorizationResponse]
+         * @return a failing [AuthorizationResponse]
+         */
+        internal fun failure(
+                mcc_mnc: String?,
+                request: AuthorizationRequest,
+                error: AuthorizationError
+        ): AuthorizationResponse = AuthorizationResponse(mcc_mnc, request, error)
     }
 }

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2019-2020 ZenKey, LLC.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.xci.zenkey.sdk.internal.model
 
 import android.net.Uri
@@ -11,10 +26,10 @@ import com.xci.zenkey.sdk.internal.ktx.readNullableString
 import com.xci.zenkey.sdk.internal.ktx.writeNullableString
 import com.xci.zenkey.sdk.param.ResponseType
 
-class AuthorizationRequest
+internal open class AuthorizationRequest
     : Parcelable {
 
-    internal val clientId: String?
+    internal val clientId: String
     internal val redirectUri: Uri
     internal val scope: String?
     internal val state: String?
@@ -24,6 +39,7 @@ class AuthorizationRequest
     internal val correlationId: String?
     internal val context: String?
     internal val proofKeyForCodeExchange: ProofKeyForCodeExchange
+    internal val options: String?
     private var loginHintToken: String? = null
 
     internal constructor(clientId: String,
@@ -35,7 +51,8 @@ class AuthorizationRequest
                          prompt: String?,
                          correlationId: String?,
                          context: String?,
-                         proofKeyForCodeExchange: ProofKeyForCodeExchange) {
+                         proofKeyForCodeExchange: ProofKeyForCodeExchange,
+                         options: String?) {
         this.clientId = clientId
         this.scope = scope
         this.state = state
@@ -46,6 +63,7 @@ class AuthorizationRequest
         this.correlationId = correlationId
         this.context = context
         this.proofKeyForCodeExchange = proofKeyForCodeExchange
+        this.options = options
     }
 
     private constructor(parcel: Parcel) {
@@ -60,6 +78,7 @@ class AuthorizationRequest
         correlationId = parcel.readNullableString()
         context = parcel.readNullableString()
         loginHintToken = parcel.readNullableString()
+        options = parcel.readNullableString()
     }
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
@@ -74,6 +93,7 @@ class AuthorizationRequest
         dest.writeNullableString(correlationId)
         dest.writeNullableString(context)
         dest.writeNullableString(loginHintToken)
+        dest.writeNullableString(options)
     }
 
     override fun describeContents(): Int {
@@ -103,7 +123,7 @@ class AuthorizationRequest
             .appendQueryParameter(Json.KEY_RESPONSE_TYPE, ResponseType.CODE.type)
             .appendQueryParameter(Json.KEY_REDIRECT_URI, redirectUri.toString())
             .appendQueryParameter(Json.KEY_CODE_CHALLENGE, proofKeyForCodeExchange.codeChallenge)
-            .appendQueryParameter(Json.KEY_CODE_CHALLENGE_METHOD, proofKeyForCodeExchange.codeChallengeMethod.value)
+            .appendQueryParameter(Json.KEY_CODE_CHALLENGE_METHOD, proofKeyForCodeExchange.codeChallengeMethod)
             .appendQueryParameterIfNotNull(Json.KEY_SCOPE, scope)
             .appendQueryParameterIfNotNull(Json.KEY_STATE, state)
             .appendQueryParameterIfNotNull(Json.KEY_PROMPT, prompt)
@@ -112,6 +132,7 @@ class AuthorizationRequest
             .appendQueryParameterIfNotNull(Json.KEY_CORRELATION_ID, correlationId)
             .appendQueryParameterIfNotNull(Json.KEY_CONTEXT, context)
             .appendQueryParameterIfNotNull(Json.KEY_LOGIN_HINT_TOKEN, loginHintToken)
+            .appendQueryParameterIfNotNull(Json.KEY_OPTIONS,options)
             .build()
 
     override fun toString(): String {
@@ -126,7 +147,8 @@ class AuthorizationRequest
                 "correlationId=$correlationId, " +
                 "context=$context, " +
                 "proofKeyForCodeExchange=$proofKeyForCodeExchange, " +
-                "loginHintToken=$loginHintToken)"
+                "loginHintToken=$loginHintToken" +
+                "options=$options)"
     }
 
 

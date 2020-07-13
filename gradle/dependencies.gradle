@@ -5,8 +5,13 @@ buildConfig.compileSdk = 28
 ext.buildConfig = buildConfig
 
 def versions = [:]
-versions.kotlin = '1.3.50'
+versions.kotlin = '1.3.72'
 versions.supportLib = '27.1.1'
+versions.constraint = '1.1.3'
+versions.retrofit2 = '2.7.2'
+versions.okhttp = '3.9.0'
+versions.moshi = '1.9.2'
+
 versions.espresso = '3.1.0'
 versions.atsl = '1.1.0'
 versions.ext = '1.0.0'
@@ -20,38 +25,49 @@ ext.versions = versions
 
 ext.libs = [
         'kotlin'     : [
-                'stdlib' : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${versions.kotlin}",
-                'reflect': "org.jetbrains.kotlin:kotlin-reflect:${versions.kotlin}",
+                'stdlib' : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin",
+                'reflect': "org.jetbrains.kotlin:kotlin-reflect:$versions.kotlin",
         ],
         'android'    : [
                 'support': [
-                        'customTabs'      : "com.android.support:customtabs:${versions.supportLib}",
+                        'customTabs'      : "com.android.support:customtabs:$versions.supportLib",
+                        'appCompat'       : "com.android.support:appcompat-v7:$versions.supportLib",
+                        'cardview'        : "com.android.support:cardview-v7:$versions.supportLib",
+                        'constraintlayout': "com.android.support.constraint:constraint-layout:$versions.constraint"
                 ],
                 'test'   : [
                         'espresso'   : [
-                                'core'   : "androidx.test.espresso:espresso-core:${versions.espresso}",
-                                'contrib': "androidx.test.espresso:espresso-contrib:${versions.espresso}",
-                                'intent' : "androidx.test.espresso:espresso-intents:${versions.espresso}"
+                                'core'   : "androidx.test.espresso:espresso-core:$versions.espresso",
+                                'contrib': "androidx.test.espresso:espresso-contrib:$versions.espresso",
+                                'intent' : "androidx.test.espresso:espresso-intents:$versions.espresso"
                         ],
                         'mockito'    : [
                                 'core': "org.mockito:mockito-core:${versions.mockito}",
-                                'kotlin': "com.nhaarman.mockitokotlin2:mockito-kotlin:${versions.mockitoKotlin}"
+                                'kotlin': "com.nhaarman.mockitokotlin2:mockito-kotlin:$versions.mockitoKotlin"
                         ],
                         'powermock'  : [
-                                'junit'       : "org.powermock:powermock-module-junit4:${versions.powermockito}",
-                                'rules'       : "org.powermock:powermock-module-junit4-rule:${versions.powermockito}",
-                                'mockito2'    : "org.powermock:powermock-api-mockito2:${versions.powermockito}",
-                                'classloading': "org.powermock:powermock-classloading-xstream:${versions.powermockito}",
+                                'junit'       : "org.powermock:powermock-module-junit4:$versions.powermockito",
+                                'rules'       : "org.powermock:powermock-module-junit4-rule:$versions.powermockito",
+                                'mockito2'    : "org.powermock:powermock-api-mockito2:$versions.powermockito",
+                                'classloading': "org.powermock:powermock-classloading-xstream:$versions.powermockito",
                         ],
-                        'core'       : "androidx.test:core:${versions.atsl}",
-                        'runner'     : "androidx.test:runner:${versions.atsl}",
-                        'rules'      : "androidx.test:rules:${versions.atsl}",
+                        'core'       : "androidx.test:core:$versions.atsl",
+                        'runner'     : "androidx.test:runner:$versions.atsl",
+                        'rules'      : "androidx.test:rules:$versions.atsl",
                         'ext'        : [
-                                'junit': "androidx.test.ext:junit:${versions.ext}",
-                                'truth': "androidx.test.ext:truth:${versions.ext}"
+                                'junit': "androidx.test.ext:junit:$versions.ext",
+                                'truth': "androidx.test.ext:truth:$versions.ext"
                         ],
-                        'robolectric': "org.robolectric:robolectric:${versions.robolectric}",
-                        'uiautomator': "androidx.test.uiautomator:uiautomator:${versions.uiautomator}"
+                        'robolectric': "org.robolectric:robolectric:$versions.robolectric",
+                        'uiautomator': "androidx.test.uiautomator:uiautomator:$versions.uiautomator"
                 ]
+        ], retrofit2 : [
+                'retrofit': "com.squareup.retrofit2:retrofit:$versions.retrofit2",
+                'converterMoshi': "com.squareup.retrofit2:converter-moshi:$versions.retrofit2",
+        ], okhttp : [
+                'loggingInterceptor': "com.squareup.okhttp3:logging-interceptor:$versions.okhttp"
+        ], moshi : [
+                'kotlin': "com.squareup.moshi:moshi-kotlin:$versions.moshi",
+                'adapters': "com.squareup.moshi:moshi-adapters:$versions.moshi",
         ]
 ]

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,8 @@ internal class DefaultFingerprintFactory internal constructor(
         private val publicKeyFactory: PublicKeyFactory
 ) : FingerprintFactory {
 
-    constructor(certificateFactory: CertificateFactory,
-                messageDigest: MessageDigest) : this(DefaultPublicKeyFactory(certificateFactory, messageDigest)) {
-    }
+    constructor(certificateFactory: CertificateFactory, messageDigest: MessageDigest?)
+            : this(DefaultPublicKeyFactory(certificateFactory, messageDigest))
 
     /**
      * Create a fingerprints from a certificate signature.

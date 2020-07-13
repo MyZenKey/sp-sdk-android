@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,5 +31,7 @@ class ScopesTest {
         assertEquals("phone", Scopes.PHONE.value)
         assertEquals("openid", Scopes.OPEN_ID.value)
         assertEquals("postal_code", Scopes.POSTAL_CODE.value)
+        assertEquals("address", Scopes.ADDRESS.value)
+        assertEquals("birthdate", Scopes.BIRTH_DATE.value)
     }
 }

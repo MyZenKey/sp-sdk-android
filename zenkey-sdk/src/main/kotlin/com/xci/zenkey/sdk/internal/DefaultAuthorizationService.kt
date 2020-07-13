@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,11 @@ import android.net.Uri
 import android.os.Bundle
 import android.telephony.TelephonyManager
 import com.xci.zenkey.sdk.AuthorizationError
+import com.xci.zenkey.sdk.AuthorizationError.*
 import com.xci.zenkey.sdk.AuthorizationError.Companion.MISSING_DISCOVER_UI_ENDPOINT
 import com.xci.zenkey.sdk.AuthorizationError.Companion.STATE_MISMATCHED
 import com.xci.zenkey.sdk.AuthorizationError.Companion.TOO_MANY_REDIRECT
 import com.xci.zenkey.sdk.AuthorizationError.Companion.UNEXPECTED_DISCOVERY_RESPONSE
-import com.xci.zenkey.sdk.AuthorizationError.DISCOVERY_STATE
-import com.xci.zenkey.sdk.AuthorizationError.NETWORK_FAILURE
 import com.xci.zenkey.sdk.AuthorizationResponse
 import com.xci.zenkey.sdk.internal.browser.NoBrowserException
 import com.xci.zenkey.sdk.internal.contract.*
@@ -237,6 +236,8 @@ internal class DefaultAuthorizationService internal constructor(
             throwable is ProviderNotFoundException -> onProviderNotFound.invoke(throwable.discoverUiEndpoint)
             throwable.isNetworkFailure ->
                 finishWithAuthorizationError(activity, NETWORK_FAILURE.withDescription(throwable.message))
+            throwable.isTimeout ->
+                finishWithAuthorizationError(activity, SERVER_ERROR.withDescription(throwable.message))
             else -> finishWithThrowableError(activity, throwable)
         }
     }
@@ -282,21 +283,21 @@ internal class DefaultAuthorizationService internal constructor(
             activity: Activity,
             authorizationError: AuthorizationError
     ){
-        setResultOKAndFinish(activity, responseFactory.create(mccMnc, request.redirectUri, authorizationError))
+        setResultOKAndFinish(activity, responseFactory.error(mccMnc, request, authorizationError))
     }
 
     private fun finishWithThrowableError(
             activity: Activity,
             throwable: Throwable
     ){
-        setResultOKAndFinish(activity, responseFactory.create(mccMnc, request.redirectUri, throwable))
+        setResultOKAndFinish(activity, responseFactory.throwable(mccMnc, request, throwable))
     }
 
     private fun finishWithAuthorizationSuccess(
             activity: Activity,
             resultUri: Uri
     ){
-        setResultOKAndFinish(activity, responseFactory.create(mccMnc!!, request, resultUri))
+        setResultOKAndFinish(activity, responseFactory.uri(mccMnc!!, request, resultUri))
     }
 
     internal fun setResultOKAndFinish(

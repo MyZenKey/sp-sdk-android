@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,12 +91,14 @@ class AuthorizationRequestActivity
             return intent
         }
 
-        fun createStartForResultIntent(packageName: String,
-                                       request: AuthorizationRequest,
-                                       successIntent: PendingIntent?,
-                                       failureIntent: PendingIntent?,
-                                       completionIntent: PendingIntent?,
-                                       cancellationIntent: PendingIntent?): Intent {
+        internal fun createStartForResultIntent(
+                packageName: String,
+                request: AuthorizationRequest,
+                successIntent: PendingIntent?,
+                failureIntent: PendingIntent?,
+                completionIntent: PendingIntent?,
+                cancellationIntent: PendingIntent?
+        ): Intent {
             val intent = Intent()
             intent.component = ComponentName(packageName, AuthorizationRequestActivity::class.java.name)
             intent.putExtra(DefaultAuthorizationService.EXTRA_KEY_REQUEST, request)

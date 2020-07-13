@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.xci.zenkey.sdk.internal.ktx
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -22,12 +21,18 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import java.util.concurrent.TimeoutException
 
 @RunWith(AndroidJUnit4::class)
 class ThrowableTest {
     @Test
-    fun socketTimeoutExceptionShouldBeANetworkError() {
-        Assert.assertTrue(SocketTimeoutException().isNetworkFailure)
+    fun socketTimeoutExceptionShouldBeTimeout() {
+        Assert.assertTrue(SocketTimeoutException().isTimeout)
+    }
+
+    @Test
+    fun timeoutExceptionShouldBeTimeout() {
+        Assert.assertTrue(TimeoutException().isTimeout)
     }
 
     @Test

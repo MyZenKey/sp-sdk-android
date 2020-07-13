@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.xci.zenkey.sdk.internal
 
 import android.net.Uri
@@ -23,6 +22,7 @@ import com.xci.zenkey.sdk.internal.model.AuthorizationRequest
 import com.xci.zenkey.sdk.param.ACR
 import com.xci.zenkey.sdk.param.Prompt
 import com.xci.zenkey.sdk.param.Scopes
+import com.xci.zenkey.sdk.param.Theme
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -109,6 +109,29 @@ class DefaultAuthorizeIntentBuilderTest {
     }
 
     @Test
+    fun shouldHaveNullOptionsByDefault() {
+        assertNull(intentBuilder.options())
+    }
+
+    @Test
+    fun shouldSetDarkThemeOption() {
+        intentBuilder.withTheme(Theme.DARK)
+        assertEquals("dark", intentBuilder.options())
+    }
+
+    @Test
+    fun shouldSetLightThemeOption() {
+        intentBuilder.withTheme(Theme.LIGHT)
+        assertEquals("light", intentBuilder.options())
+    }
+
+    @Test
+    fun shouldNotSetThemeOption() {
+        intentBuilder.withTheme(null)
+        assertNull(intentBuilder.options())
+    }
+
+    @Test
     fun shouldBuildIntentWithExpectedValues() {
 
         val context = "context"
@@ -118,6 +141,7 @@ class DefaultAuthorizeIntentBuilderTest {
         val nonce = "nonce"
         val correlationId = "correlationId"
         val prompt = Prompt.CONSENT
+        val theme = Theme.DARK
 
         val intent = intentBuilder
                 .withScopes(scope)
@@ -127,6 +151,7 @@ class DefaultAuthorizeIntentBuilderTest {
                 .withPrompt(prompt)
                 .withCorrelationId(correlationId)
                 .withContext(context)
+                .withTheme(theme)
                 .build()
 
         assertNotNull(intent)
@@ -144,6 +169,7 @@ class DefaultAuthorizeIntentBuilderTest {
         assertEquals(prompt.value, request.prompt)
         assertEquals(correlationId, request.correlationId)
         assertEquals(context, request.context)
+        assertEquals(theme.value, request.options)
     }
 
     companion object {

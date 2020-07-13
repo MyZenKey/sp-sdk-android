@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,7 +78,7 @@ internal enum class OAuth2Error(
 
         internal fun createExposed(error: OAuth2Error): AuthorizationError {
             return when (error) {
-                INVALID_REQUEST -> AuthorizationError.INVALID_CONFIGURATION.withDescription(error.description)
+                INVALID_REQUEST -> AuthorizationError.INVALID_REQUEST.withDescription(error.description)
                 UNAUTHORIZED_CLIENT -> AuthorizationError.INVALID_CONFIGURATION.withDescription(error.description)
                 UNSUPPORTED_RESPONSE_TYPE -> AuthorizationError.UNKNOWN.withDescription(error.description)
                 INVALID_SCOPE -> AuthorizationError.INVALID_REQUEST.withDescription(error.description)

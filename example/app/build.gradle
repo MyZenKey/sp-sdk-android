@@ -1,0 +1,71 @@
+import com.android.builder.core.BuilderConstants
+
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply from: "$projectDir/gradle/environment.gradle"
+apply from: "$projectDir/gradle/version.gradle"
+apply from: "$projectDir/gradle/publication.gradle"
+
+android {
+    compileSdkVersion buildConfig.compileSdk
+
+    defaultConfig {
+        applicationId "com.xci.zenkey.sample"
+        minSdkVersion buildConfig.minSdk
+        targetSdkVersion buildConfig.targetSdk
+        versionCode VERSION_CODE
+        versionName VERSION_NAME
+
+        //Replace "clientId" with your actual client id
+        manifestPlaceholders = [zenKeyClientId : clientId]
+
+        //Replace "baseUrl" with your example api endpoint
+        buildConfigField "String", "SAMPLE_API_ENDPOINT", "\"$baseUrl\""
+
+        // A default API key matching to the ZenKey backend sample code,
+        // but it can be replaced with a custom value.
+        def apiKey = "4dNHzHgxLGGtj8KoaVcDs8c9"
+        buildConfigField "String", "SAMPLE_API_KEY", "\"$apiKey\""
+    }
+
+    buildTypes {
+        qa {
+            minifyEnabled false
+            debuggable true
+            applicationIdSuffix  ".qa"
+            resValue "string", "app_name", "ZenKey Sample (QA)"
+            signingConfig signingConfigs.debug
+        }
+        prod {
+            minifyEnabled false
+            debuggable true
+            resValue "string", "app_name", "ZenKey Sample"
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            consumerProguardFiles 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    variantFilter { variant ->
+        def build = variant.buildType.name
+        if (build == BuilderConstants.DEBUG || build == BuilderConstants.RELEASE) {
+            variant.setIgnore(true)
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation project(':zenkey-sdk')
+    implementation project(':example:client')
+
+    implementation libs.kotlin.stdlib
+    implementation libs.android.support.appCompat
+    implementation libs.android.support.cardview
+    implementation libs.android.support.constraintlayout
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,18 @@ class AuthorizationRequestTest {
 
     @Before
     fun setUp() {
-        request = AuthorizationRequest(CLIENT_ID, REDIRECT, SCOPE, STATE, ACR, NONCE, PROMPT, CORRELATION_ID, CONTEXT, PKCE_CHALLENGE)
+        request = AuthorizationRequest(
+                CLIENT_ID,
+                REDIRECT,
+                SCOPE,
+                STATE,
+                ACR,
+                NONCE,
+                PROMPT,
+                CORRELATION_ID,
+                CONTEXT,
+                CODE_VERIFIER.plainProofKeyForCodeExchange,
+                OPTIONS)
     }
 
     @Test
@@ -51,9 +62,9 @@ class AuthorizationRequestTest {
 
         assertEquals(CLIENT_ID, createdFromParcel.clientId)
         assertEquals(REDIRECT, createdFromParcel.redirectUri)
-        assertEquals(CODE_CHALLENGE, createdFromParcel.proofKeyForCodeExchange.codeChallenge)
-        assertEquals(CODE_CHALLENGE_METHOD, createdFromParcel.proofKeyForCodeExchange.codeChallengeMethod)
         assertEquals(CODE_VERIFIER, createdFromParcel.proofKeyForCodeExchange.codeVerifier)
+        assertEquals(CODE_VERIFIER, createdFromParcel.proofKeyForCodeExchange.codeChallenge)
+        assertEquals(CODE_CHALLENGE_METHOD_PLAIN, createdFromParcel.proofKeyForCodeExchange.codeChallengeMethod)
         assertEquals(SCOPE, createdFromParcel.scope)
         assertEquals(STATE, createdFromParcel.state)
         assertEquals(ACR, createdFromParcel.acr)
@@ -61,6 +72,7 @@ class AuthorizationRequestTest {
         assertEquals(PROMPT, createdFromParcel.prompt)
         assertEquals(CORRELATION_ID, createdFromParcel.correlationId)
         assertEquals(CONTEXT, createdFromParcel.context)
+        assertEquals(OPTIONS, createdFromParcel.options)
 
         val array = AuthorizationRequest.CREATOR.newArray(2)
         assertEquals(2, array.size.toLong())
@@ -68,8 +80,18 @@ class AuthorizationRequestTest {
 
     @Test
     fun shouldReadRequestFromParcelWithoutOptionalValues() {
-        request = AuthorizationRequest(CLIENT_ID,
-                REDIRECT, null, null, null, null, null, null, null, PKCE_CHALLENGE)
+        request = AuthorizationRequest(
+                CLIENT_ID,
+                REDIRECT,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                CODE_VERIFIER.plainProofKeyForCodeExchange,
+                null)
         val parcel = Parcel.obtain()
         request.writeToParcel(parcel, request.describeContents())
 
@@ -79,9 +101,9 @@ class AuthorizationRequestTest {
 
         assertEquals(CLIENT_ID, createdFromParcel.clientId)
         assertEquals(REDIRECT, createdFromParcel.redirectUri)
-        assertEquals(CODE_CHALLENGE, createdFromParcel.proofKeyForCodeExchange.codeChallenge)
-        assertEquals(CODE_CHALLENGE_METHOD, createdFromParcel.proofKeyForCodeExchange.codeChallengeMethod)
         assertEquals(CODE_VERIFIER, createdFromParcel.proofKeyForCodeExchange.codeVerifier)
+        assertEquals(CODE_VERIFIER, createdFromParcel.proofKeyForCodeExchange.codeChallenge)
+        assertEquals(CODE_CHALLENGE_METHOD_PLAIN, createdFromParcel.proofKeyForCodeExchange.codeChallengeMethod)
         assertNull(createdFromParcel.scope)
         assertNull(createdFromParcel.state)
         assertNull(createdFromParcel.acr)
@@ -89,6 +111,7 @@ class AuthorizationRequestTest {
         assertNull(createdFromParcel.prompt)
         assertNull(createdFromParcel.correlationId)
         assertNull(createdFromParcel.context)
+        assertNull(createdFromParcel.options)
 
         val array = AuthorizationRequest.CREATOR.newArray(2)
         assertEquals(2, array.size.toLong())
@@ -96,7 +119,18 @@ class AuthorizationRequestTest {
 
     @Test
     fun shouldCreateUriFromRequest() {
-        val uri = AuthorizationRequest(CLIENT_ID, REDIRECT, SCOPE, STATE, ACR, NONCE, PROMPT, CORRELATION_ID, CONTEXT, PKCE_CHALLENGE)
+        val uri = AuthorizationRequest(
+                CLIENT_ID,
+                REDIRECT,
+                SCOPE,
+                STATE,
+                ACR,
+                NONCE,
+                PROMPT,
+                CORRELATION_ID,
+                CONTEXT,
+                CODE_VERIFIER.plainProofKeyForCodeExchange,
+                OPTIONS)
                 .toAuthorizationUri(ENDPOINT)
 
         assertEquals(SCHEME, uri.scheme)
@@ -104,8 +138,8 @@ class AuthorizationRequestTest {
         assertEquals(PATH, uri.pathSegments[0])
         assertEquals(CLIENT_ID, uri.clientId)
         assertEquals(REDIRECT.toString(), uri.redirectUri)
-        assertEquals(CODE_CHALLENGE, uri.codeChallenge)
-        assertEquals(CODE_CHALLENGE_METHOD.value, uri.codeChallengeMethod)
+        assertEquals(CODE_VERIFIER, uri.codeChallenge)
+        assertEquals(CODE_CHALLENGE_METHOD_PLAIN, uri.codeChallengeMethod)
         assertEquals(SCOPE, uri.scope)
         assertEquals(STATE, uri.state)
         assertEquals(ACR, uri.acr)
@@ -113,6 +147,7 @@ class AuthorizationRequestTest {
         assertEquals(PROMPT, uri.prompt)
         assertEquals(CORRELATION_ID, uri.correlationId)
         assertEquals(CONTEXT, uri.context)
+        assertEquals(OPTIONS,uri.options)
     }
 
     companion object {
@@ -127,11 +162,9 @@ class AuthorizationRequestTest {
         private const val SCHEME = "https"
         private const val AUTHORITY = "example.com"
         private const val PATH = "test"
-        private const val CODE_CHALLENGE = "codeChallenge"
         private const val CODE_VERIFIER = "codeVerifier"
         private const val ENDPOINT = "${SCHEME}://${AUTHORITY}/${PATH}"
-        private val CODE_CHALLENGE_METHOD = CodeChallengeMethod.PLAIN
+        private const val OPTIONS = "light"
         private val REDIRECT = Uri.parse("app://redirect")
-        private val PKCE_CHALLENGE: ProofKeyForCodeExchange = ProofKeyForCodeExchange(CODE_VERIFIER, CODE_CHALLENGE, CODE_CHALLENGE_METHOD)
     }
 }

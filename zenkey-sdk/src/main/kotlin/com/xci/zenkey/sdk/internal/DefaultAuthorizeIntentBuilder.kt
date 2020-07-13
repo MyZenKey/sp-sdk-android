@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import com.xci.zenkey.sdk.param.ACR
 import com.xci.zenkey.sdk.param.Prompt
 import com.xci.zenkey.sdk.param.Scope
 import com.xci.zenkey.sdk.param.Scopes
+import com.xci.zenkey.sdk.param.Theme
 import java.security.MessageDigest
 import java.util.*
 
@@ -38,7 +39,7 @@ import java.util.*
 class DefaultAuthorizeIntentBuilder(
         private val packageName: String,
         private val clientId: String,
-        private val messageDigest: MessageDigest,
+        private val messageDigest: MessageDigest?,
         private var redirectUri: Uri
 ) : AuthorizeIntentBuilder {
 
@@ -53,6 +54,7 @@ class DefaultAuthorizeIntentBuilder(
     private var canceledIntent: PendingIntent? = null
     private var successIntent: PendingIntent? = null
     private var failureIntent: PendingIntent? = null
+    private var theme: Theme? = null
 
     init {
         this.state = random().encodeToString(Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE)
@@ -147,6 +149,18 @@ class DefaultAuthorizeIntentBuilder(
         return this
     }
 
+
+    /**
+     * Set the theme (dark or light) for CCID app to use when displaying
+     * the request.
+     * @param theme the Theme value to use for the request (dark or light).
+     * @return this [AuthorizeIntentBuilder] instance
+     */
+    override fun withTheme(theme: Theme?): AuthorizeIntentBuilder {
+        this.theme = theme
+        return this
+    }
+
     /**
      * Set a pending intent to start in case of success.
      * @param successIntent the pending intent to start in case of success.
@@ -197,7 +211,7 @@ class DefaultAuthorizeIntentBuilder(
     override fun build(): Intent {
         return AuthorizationRequestActivity.createStartForResultIntent(packageName,
                 AuthorizationRequest(clientId, redirectUri,
-                        scope(), state, acr(), nonce, prompt(), correlationId, context, messageDigest.proofKeyForCodeExchange),
+                        scope(), state, acr(), nonce, prompt(), correlationId, context, messageDigest.proofKeyForCodeExchange, options()),
                 successIntent, failureIntent, completedIntent, canceledIntent)
     }
 
@@ -235,5 +249,15 @@ class DefaultAuthorizeIntentBuilder(
             if (ACR.isEmpty()) null
             else ACR.joinToString(separator = " ") { it.value }
         }
+    }
+
+    /**
+     * Build the options parameter.
+     * This parameter covers the theme and will be expanded for more in the future
+     *
+     * @return the options parameter [String]
+     */
+    internal fun options(): String? {
+        return theme?.value
     }
 }

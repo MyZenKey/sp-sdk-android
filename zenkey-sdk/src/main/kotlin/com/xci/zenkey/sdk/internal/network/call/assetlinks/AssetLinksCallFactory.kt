@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,10 @@
 package com.xci.zenkey.sdk.internal.network.call.assetlinks
 
 import android.net.Uri
-
 import com.xci.zenkey.sdk.IdentityProvider
-import com.xci.zenkey.sdk.internal.model.Package
 import com.xci.zenkey.sdk.internal.network.stack.HttpCall
 import com.xci.zenkey.sdk.internal.network.stack.HttpCallFactory
 import com.xci.zenkey.sdk.internal.network.stack.HttpRequest
-
 import java.net.MalformedURLException
 
 /**
@@ -34,11 +31,11 @@ internal class AssetLinksCallFactory
     : HttpCallFactory(), IAssetLinksCallFactory {
 
     /**
-     * Get the list of [Package] associated with an [IdentityProvider]
+     * Get the packages associated with an [IdentityProvider]
      *
      * @param authorizationUri the authorization [Uri] of the [IdentityProvider]
      */
-    override fun create(authorizationUri: Uri): HttpCall<List<Package>> {
+    override fun create(authorizationUri: Uri): HttpCall<Map<String, List<String>>> {
         return create(buildPackageRequest(
                 authorizationUri.scheme,
                 authorizationUri.authority)!!,
@@ -69,11 +66,10 @@ internal class AssetLinksCallFactory
     }
 
     companion object {
-
-        internal val TARGET_KEY = "target"
-        internal val PACKAGE_NAME_KEY = "package_name"
-        internal val FINGERPRINTS_KEY = "sha256_cert_fingerprints"
-        internal val WELL_KNOW_PATH = ".well-known"
-        internal val ASSET_LINKS_PATH = "assetlinks.json"
+        internal const val TARGET_KEY = "target"
+        internal const val PACKAGE_NAME_KEY = "package_name"
+        internal const val FINGERPRINTS_KEY = "sha256_cert_fingerprints"
+        internal const val WELL_KNOW_PATH = ".well-known"
+        internal const val ASSET_LINKS_PATH = "assetlinks.json"
     }
 }

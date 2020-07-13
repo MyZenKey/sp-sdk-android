@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ internal class DefaultIdentityProvider internal constructor(
         private val packageName: String,
         private val clientId: String,
         private val defaultRedirectUri: Uri,
-        private val messageDigest: MessageDigest
+        private val messageDigest: MessageDigest?
 ) : IdentityProvider {
 
     override fun authorizeIntent(): AuthorizeIntentBuilder {

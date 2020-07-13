@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="error_message_discovery_state">There is an inconsistency with the user\'s state. Retry discovery.</string>
+    <string name="error_message_invalid_configuration">There is an error configuring the SDK. Confirm your configuration locally and with the service provider portal.</string>
+    <string name="error_message_invalid_request">The request made is invalid. Check the parameters passed to the authorization call.</string>
+    <string name="error_message_request_denied">The request was denied by the user or carrier.</string>
+    <string name="error_message_request_timeout">The request has timed out.</string>
+    <string name="error_message_server_error">There was an error on the server. Please try again later.</string>
+    <string name="error_message_network_failure">There was a problem communicating over the network. Check your connection and try again.</string>
+    <string name="error_message_unknown">An unknown error has occurred. If the problem persists, contact support.</string>
+    <string name="zenkey_authorization_error">ZenKey Authorization Error</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="you_have_successfully_signed_in_using_zenkey">You have successfully signed in using ZenKey</string>
+    <string name="authorizing">Authorizing …</string>
+    <string name="sign_in">Sign In</string>
+    <string name="liva">liva</string>
+    <string name="user_id">User ID</string>
+    <string name="or">Or</string>
+    <string name="this_app_is_for_demo_purpose_only">This app is for demo purpose only</string>
+    <string name="find_activities">Find Activities</string>
+    <string name="welcome">Welcome,</string>
+</resources>

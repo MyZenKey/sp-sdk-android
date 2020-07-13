@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,14 +80,7 @@ class DefaultContentProviderTest {
         Assert.assertNotNull(BaseContentProvider.identityProvider())
         Assert.assertNotNull(DefaultContentProvider.authorizationService())
     }
-
-    @Test
-    fun shouldGetApplicationContext() {
-        provider = setupContentProvider(DefaultContentProvider::class.java)
-        assertEquals(provider!!.getApplicationContext(mockContext), mockApplication)
-        assertEquals(provider!!.getApplicationContext(mockApplication), mockApplication)
-    }
-
+    
     @Test
     fun shouldReturnZeroOnDelete() {
         provider = DefaultContentProvider()

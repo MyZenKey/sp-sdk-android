@@ -18,7 +18,8 @@ scmVersion {
             'master' : { c ->
                 if(isLastMergedBranchNamePrefix("major")) {
                     c.currentVersion.incrementMajorVersion()
-                } else if(isLastMergedBranchNamePrefix("minor")) {
+                } else if(isLastMergedBranchNamePrefix("minor")
+                        || isLastMergedBranchNamePrefix("feature")) {
                     c.currentVersion.incrementMinorVersion()
                 } else {
                     c.currentVersion.incrementPatchVersion()

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,9 +51,10 @@ class AuthorizationResponseTest {
         whenever(mockRequest.nonce).thenReturn(NONCE)
         whenever(mockRequest.context).thenReturn(CONTEXT)
         whenever(mockRequest.correlationId).thenReturn(CORRELATION_ID)
+        whenever(mockRequest.clientId).thenReturn(CLIENT_ID)
 
-        successResponse = AuthorizationResponse(MCC_MNC, mockRequest, AUTHORIZATION_CODE)
-        failedResponse = AuthorizationResponse(MCC_MNC, REDIRECT_URI, error)
+        successResponse = AuthorizationResponse.success(MCC_MNC, mockRequest, AUTHORIZATION_CODE)
+        failedResponse = AuthorizationResponse.failure(MCC_MNC, mockRequest, error)
     }
 
     @Test
@@ -146,7 +147,7 @@ class AuthorizationResponseTest {
 
     @Test
     fun shouldGetIntentContainingResponse() {
-        val authorizationResponse = AuthorizationResponse(MCC_MNC, mockRequest, AUTHORIZATION_CODE)
+        val authorizationResponse = AuthorizationResponse.success(MCC_MNC, mockRequest, AUTHORIZATION_CODE)
         val intent = authorizationResponse.toIntent()
         assertNotNull(intent)
         val extra = intent.extras!!
@@ -159,13 +160,13 @@ class AuthorizationResponseTest {
 
     @Test
     fun shouldBeSuccessful() {
-        val authorizationResponse = AuthorizationResponse(MCC_MNC, mockRequest, AUTHORIZATION_CODE)
+        val authorizationResponse = AuthorizationResponse.success(MCC_MNC, mockRequest, AUTHORIZATION_CODE)
         assertTrue(authorizationResponse.isSuccessful)
     }
 
     @Test
     fun shouldNotBeSuccessful() {
-        val authorizationResponse = AuthorizationResponse(MCC_MNC, REDIRECT_URI, error)
+        val authorizationResponse = AuthorizationResponse.failure(MCC_MNC, mockRequest, error)
         assertFalse(authorizationResponse.isSuccessful)
     }
 
@@ -177,6 +178,7 @@ class AuthorizationResponseTest {
         private const val ACR = "acr"
         private const val CONTEXT = "context"
         private const val CORRELATION_ID = "correlation"
+        private const val CLIENT_ID = "CLIENT_ID"
         private val REDIRECT_URI = Uri.EMPTY
     }
 }

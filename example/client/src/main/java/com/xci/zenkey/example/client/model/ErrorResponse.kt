@@ -1,5 +1,5 @@
-/*
- * Copyright 2019 ZenKey, LLC.
+/**
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,25 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.xci.zenkey.example.client.model
 
-package com.xci.zenkey.sdk.internal.model
+import com.squareup.moshi.Json
 
-import java.lang.Exception
-
-internal enum class CodeChallengeMethod(
-        val value: String
-) {
-    SHA_256("S256"), PLAIN("plain");
-
-
-    internal companion object {
-
-        fun fromValue(v: String): CodeChallengeMethod {
-            for (value in values()){
-                if(value.value == v)
-                    return value
-            }
-            throw Exception("invalid CodeChallengeMethod key")
-        }
-    }
-}
+data class ErrorResponse (
+    @Json(name = "error")
+    val error: String? = null,
+    @Json(name = "error_description")
+    val errorDescription: String? = null
+)

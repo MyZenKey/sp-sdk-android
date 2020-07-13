@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import android.os.Build
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
-import com.xci.zenkey.sdk.internal.model.Package
 import com.xci.zenkey.sdk.internal.security.FingerprintFactory
 import org.junit.Assert.*
 import org.junit.Before
@@ -210,9 +209,7 @@ class AndroidPackageManagerTest {
     @Config(sdk = [Build.VERSION_CODES.O])
     fun shouldFoundAValidPackageBelowAndroidP() {
 
-        val expectedPackage = Package(PACKAGE_NAME1, EXPECTED_FINGERPRINTS)
-        val expectedPackages = ArrayList<Package>()
-        expectedPackages.add(expectedPackage)
+        val packages = mapOf(PACKAGE_NAME1 to EXPECTED_FINGERPRINTS)
 
         mockResolveInfo.activityInfo = mockActivityInfo
         mockActivityInfo.packageName = PACKAGE_NAME1
@@ -229,7 +226,7 @@ class AndroidPackageManagerTest {
 
         whenever(mockFingerprintFactory.create(PUBLIC_KEY_1)).thenReturn(EXPECTED_FINGERPRINT)
 
-        assertTrue(packageManager.anyValidPackageFor(Uri.EMPTY, expectedPackages))
+        assertTrue(packageManager.anyValidPackageFor(Uri.EMPTY, packages))
 
         verify(mockPackageManager).queryIntentActivities(any(Intent::class.java), eq(MATCH_DEFAULT_ONLY))
         verify(mockPackageManager).getPackageInfo(eq(PACKAGE_NAME1), eq(GET_SIGNATURES))
@@ -241,9 +238,7 @@ class AndroidPackageManagerTest {
     @Config(sdk = [Build.VERSION_CODES.P])
     fun shouldFoundAValidPackageAboveAndroidPWithMultipleSigners() {
 
-        val expectedPackage = Package(PACKAGE_NAME1, EXPECTED_FINGERPRINTS)
-        val expectedPackages = ArrayList<Package>()
-        expectedPackages.add(expectedPackage)
+        val packages = mapOf(PACKAGE_NAME1 to EXPECTED_FINGERPRINTS)
 
         mockResolveInfo.activityInfo = mockActivityInfo
         mockActivityInfo.packageName = PACKAGE_NAME1
@@ -264,7 +259,7 @@ class AndroidPackageManagerTest {
 
         whenever(mockFingerprintFactory.create(PUBLIC_KEY_1)).thenReturn(EXPECTED_FINGERPRINT)
 
-        assertTrue(packageManager.anyValidPackageFor(Uri.EMPTY, expectedPackages))
+        assertTrue(packageManager.anyValidPackageFor(Uri.EMPTY, packages))
 
         verify(mockSigningInfo).hasMultipleSigners()
         verify(mockSigningInfo).apkContentsSigners
@@ -278,9 +273,7 @@ class AndroidPackageManagerTest {
     @Config(sdk = [Build.VERSION_CODES.P])
     fun shouldFoundAValidPackageAboveAndroidPWithSingleSigner() {
 
-        val expectedPackage = Package(PACKAGE_NAME1, EXPECTED_FINGERPRINTS)
-        val expectedPackages = ArrayList<Package>()
-        expectedPackages.add(expectedPackage)
+        val packages = mapOf(PACKAGE_NAME1 to EXPECTED_FINGERPRINTS)
 
         mockResolveInfo.activityInfo = mockActivityInfo
         mockActivityInfo.packageName = PACKAGE_NAME1
@@ -301,7 +294,7 @@ class AndroidPackageManagerTest {
 
         whenever(mockFingerprintFactory.create(PUBLIC_KEY_1)).thenReturn(EXPECTED_FINGERPRINT)
 
-        assertTrue(packageManager.anyValidPackageFor(Uri.EMPTY, expectedPackages))
+        assertTrue(packageManager.anyValidPackageFor(Uri.EMPTY, packages))
 
         verify(mockSigningInfo).hasMultipleSigners()
         verify(mockSigningInfo).signingCertificateHistory
@@ -312,14 +305,12 @@ class AndroidPackageManagerTest {
     @Test
     fun shouldNotFoundAnyValidPackageIfNoActivityHandlingUri() {
 
-        val expectedPackage = Package(PACKAGE_NAME1, ArrayList())
-        val expectedPackages = ArrayList<Package>()
-        expectedPackages.add(expectedPackage)
+        val packages = mapOf(PACKAGE_NAME1 to arrayListOf<String>())
 
         whenever(mockPackageManager.queryIntentActivities(any(Intent::class.java), eq(MATCH_DEFAULT_ONLY)))
                 .thenReturn(ArrayList())
 
-        assertFalse(packageManager.anyValidPackageFor(Uri.EMPTY, expectedPackages))
+        assertFalse(packageManager.anyValidPackageFor(Uri.EMPTY, packages))
 
         verify(mockPackageManager).queryIntentActivities(any(Intent::class.java), eq(MATCH_DEFAULT_ONLY))
     }
@@ -327,9 +318,7 @@ class AndroidPackageManagerTest {
     @Test
     fun shouldNotFoundAnyValidPackageIfActivityHandlingUriNotMatchingPackageName() {
 
-        val expectedPackage = Package(PACKAGE_NAME1, ArrayList())
-        val expectedPackages = ArrayList<Package>()
-        expectedPackages.add(expectedPackage)
+        val packages = mapOf(PACKAGE_NAME1 to arrayListOf<String>())
 
         mockResolveInfo.activityInfo = mockActivityInfo
         mockActivityInfo.packageName = PACKAGE_NAME2
@@ -338,7 +327,7 @@ class AndroidPackageManagerTest {
         whenever(mockPackageManager.queryIntentActivities(any(Intent::class.java), eq(MATCH_DEFAULT_ONLY)))
                 .thenReturn(info)
 
-        assertFalse(packageManager.anyValidPackageFor(Uri.EMPTY, expectedPackages))
+        assertFalse(packageManager.anyValidPackageFor(Uri.EMPTY, packages))
 
         verify(mockPackageManager).queryIntentActivities(any(Intent::class.java), eq(MATCH_DEFAULT_ONLY))
     }
@@ -352,9 +341,7 @@ class AndroidPackageManagerTest {
         val expectedFingerprint = "EXPECTED_PACKAGE_FINGERPRINT"
         val expectedFingerprints = ArrayList<String>()
         expectedFingerprints.add(expectedFingerprint)
-        val expectedPackage = Package(PACKAGE_NAME1, expectedFingerprints)
-        val expectedPackages = ArrayList<Package>()
-        expectedPackages.add(expectedPackage)
+        val packages = mapOf(PACKAGE_NAME1 to expectedFingerprints)
 
         mockResolveInfo.activityInfo = mockActivityInfo
         mockActivityInfo.packageName = PACKAGE_NAME1
@@ -375,7 +362,7 @@ class AndroidPackageManagerTest {
         whenever(mockFingerprintFactory.create(PUBLIC_KEY_1)).thenReturn(expectedFingerprint)
         whenever(mockFingerprintFactory.create(PUBLIC_KEY_2)).thenReturn("ANY")
 
-        assertFalse(packageManager.anyValidPackageFor(Uri.EMPTY, expectedPackages))
+        assertFalse(packageManager.anyValidPackageFor(Uri.EMPTY, packages))
 
         verify(mockPackageManager).queryIntentActivities(any(Intent::class.java), eq(MATCH_DEFAULT_ONLY))
         verify(mockPackageManager).getPackageInfo(eq(PACKAGE_NAME1), eq(GET_SIGNATURES))
@@ -389,9 +376,7 @@ class AndroidPackageManagerTest {
         val expectedFingerprint = "EXPECTED_PACKAGE_FINGERPRINT"
         val expectedFingerprints = ArrayList<String>()
         expectedFingerprints.add(expectedFingerprint)
-        val expectedPackage = Package(PACKAGE_NAME1, expectedFingerprints)
-        val expectedPackages = ArrayList<Package>()
-        expectedPackages.add(expectedPackage)
+        val packages = mapOf(PACKAGE_NAME1 to expectedFingerprints)
 
         mockResolveInfo.activityInfo = mockActivityInfo
         mockActivityInfo.packageName = PACKAGE_NAME1
@@ -415,7 +400,7 @@ class AndroidPackageManagerTest {
         whenever(mockFingerprintFactory.create(PUBLIC_KEY_1)).thenReturn(expectedFingerprint)
         whenever(mockFingerprintFactory.create(PUBLIC_KEY_2)).thenReturn("ANY")
 
-        assertFalse(packageManager.anyValidPackageFor(Uri.EMPTY, expectedPackages))
+        assertFalse(packageManager.anyValidPackageFor(Uri.EMPTY, packages))
 
         verify(mockPackageManager).queryIntentActivities(any(Intent::class.java), eq(MATCH_DEFAULT_ONLY))
         verify(mockPackageManager).getPackageInfo(eq(PACKAGE_NAME1), eq(GET_SIGNING_CERTIFICATES))
@@ -431,9 +416,7 @@ class AndroidPackageManagerTest {
         val expectedFingerprint = "EXPECTED_PACKAGE_FINGERPRINT"
         val expectedFingerprints = ArrayList<String>()
         expectedFingerprints.add(expectedFingerprint)
-        val expectedPackage = Package(PACKAGE_NAME1, expectedFingerprints)
-        val expectedPackages = ArrayList<Package>()
-        expectedPackages.add(expectedPackage)
+        val packages = mapOf(PACKAGE_NAME1 to expectedFingerprints)
 
         mockResolveInfo.activityInfo = mockActivityInfo
         mockActivityInfo.packageName = PACKAGE_NAME1
@@ -457,7 +440,7 @@ class AndroidPackageManagerTest {
         whenever(mockFingerprintFactory.create(PUBLIC_KEY_1)).thenReturn(expectedFingerprint)
         whenever(mockFingerprintFactory.create(PUBLIC_KEY_2)).thenReturn("ANY")
 
-        assertFalse(packageManager.anyValidPackageFor(Uri.EMPTY, expectedPackages))
+        assertFalse(packageManager.anyValidPackageFor(Uri.EMPTY, packages))
 
         verify(mockPackageManager).queryIntentActivities(any(Intent::class.java), eq(MATCH_DEFAULT_ONLY))
         verify(mockPackageManager).getPackageInfo(eq(PACKAGE_NAME1), eq(GET_SIGNING_CERTIFICATES))
