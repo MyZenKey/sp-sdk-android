@@ -23,13 +23,13 @@ internal enum class OAuth2Error(
 
     /**
      * The RP has constructed a bad request. This may be due to any of the
-     * parameters submitted. The RP should visit the service portal to confirm
+     * parameters submitted. The RP should visit the developer portal to confirm
      * the parameters they should use.
      */
     INVALID_REQUEST("invalid_request"),
     /**
      * The RP has constructed a bad request. This may be due to any of the
-     * parameters submitted. The RP should visit the service portal to confirm
+     * parameters submitted. The RP should visit the developer portal to confirm
      * the parameters they should use.
      */
     UNAUTHORIZED_CLIENT("unauthorized_client"),

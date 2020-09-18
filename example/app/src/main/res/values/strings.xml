@@ -5,7 +5,7 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="error_message_discovery_state">There is an inconsistency with the user\'s state. Retry discovery.</string>
-    <string name="error_message_invalid_configuration">There is an error configuring the SDK. Confirm your configuration locally and with the service provider portal.</string>
+    <string name="error_message_invalid_configuration">There is an error configuring the SDK. Confirm your configuration locally and with the developer portal.</string>
     <string name="error_message_invalid_request">The request made is invalid. Check the parameters passed to the authorization call.</string>
     <string name="error_message_request_denied">The request was denied by the user or carrier.</string>
     <string name="error_message_request_timeout">The request has timed out.</string>

@@ -5,7 +5,7 @@ All releases before 1.0.0 may contain breaking changes.
 After 1.0.0 this project will adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Versions
-[0.14.2 - 2020-07-10](#0142---2020-07-10)
+[1.0.0 - 2020-09-21](#100---2020-09-21)
 
 ## Updating
 When the Unreleased section becomes a new version, duplicate the Template to create a new Unreleased section.
@@ -26,6 +26,14 @@ When the Unreleased section becomes a new version, duplicate the Template to cre
 ### Deprecated
 ### Fixed
 ### Security
+
+## [1.0.0] - 2020-09-21
+### Added
+- Example for user carrier migration
+### Changed
+- Update support library to 28.0.0
+- Update README.md with minor edits
+- Update the name of the Developer Portal throughout the docs
 
 ## [0.14.2] - 2020-07-10
 ### Changed

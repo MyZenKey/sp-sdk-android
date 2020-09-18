@@ -3,52 +3,8 @@ apply plugin: 'pl.allegro.tech.build.axion-release'
 scmVersion {
     tag {
         prefix = project.name
-        initialVersion = {config, position -> "0.3.0"}
     }
-
     versionCreator 'simple'
-
-    branchVersionIncrementer = [
-            'feature/.*' : 'incrementMinor',
-            'hotfix/.*' : 'incrementPatch',
-            'release/.*' : 'incrementPrerelease',
-            'major/.*' : 'incrementMajor',
-            'minor/.*' : 'incrementMinor',
-            'develop' : 'incrementMinor',
-            'master' : { c ->
-                if(isLastMergedBranchNamePrefix("major")) {
-                    c.currentVersion.incrementMajorVersion()
-                } else if(isLastMergedBranchNamePrefix("minor")
-                        || isLastMergedBranchNamePrefix("feature")) {
-                    c.currentVersion.incrementMinorVersion()
-                } else {
-                    c.currentVersion.incrementPatchVersion()
-                }
-            }
-    ]
-}
-
-static boolean isLastMergedBranchNamePrefix(String value){
-    String lastMergedBranchPrefix = getLastMergedBranchPrefix()
-    return  lastMergedBranchPrefix != null && lastMergedBranchPrefix == "/$value/"
-}
-
-static String getLastMergedBranchPrefix() {
-    String lastMerge = executeCommand("git log --first-parent --merges -1 --oneline")
-    def finder = (lastMerge =~ /\/[A-Za-z]+\//)
-    if(finder.size() > 0){
-        return finder[0]
-    } else {
-        return null
-    }
-}
-
-static String executeCommand(String command) {
-    if (System.getProperty('os.name').toLowerCase().contains('windows')) {
-        return ["cmd", "/c", command].execute().text.trim()
-    } else {
-        return ["sh", "-c", command].execute().text.trim()
-    }
 }
 
 ext {
