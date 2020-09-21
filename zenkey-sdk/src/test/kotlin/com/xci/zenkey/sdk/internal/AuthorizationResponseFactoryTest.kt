@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import com.xci.zenkey.sdk.internal.model.error.OIDCError
 import com.xci.zenkey.sdk.internal.model.exception.AssetsNotFoundException
 import com.xci.zenkey.sdk.internal.network.stack.HttpException
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -41,6 +42,12 @@ class AuthorizationResponseFactoryTest {
     private val mockPKCEChallenge = mock<ProofKeyForCodeExchange>()
     private val factory = AuthorizationResponseFactory()
 
+    @Before
+    fun setUp() {
+        whenever(mockRequest.clientId).thenReturn(CLIENT_ID)
+        whenever(mockRequest.redirectUri).thenReturn(mockRedirectUri)
+    }
+
     @Test
     fun shouldGetSuccessfulResponse() {
         val code = "code"
@@ -49,14 +56,14 @@ class AuthorizationResponseFactoryTest {
         whenever(mockUri.code).thenReturn(code)
         whenever(mockUri.state).thenReturn(state)
         whenever(mockRequest.state).thenReturn(state)
-        whenever(mockRequest.redirectUri).thenReturn(mockRedirectUri)
         whenever(mockPKCEChallenge.codeVerifier).thenReturn(CODE_VERIFIER)
         whenever(mockRequest.proofKeyForCodeExchange).thenReturn(mockPKCEChallenge)
 
-        val response = factory.create(MCC_MNC, mockRequest, mockUri)
+        val response = factory.uri(MCC_MNC, mockRequest, mockUri)
 
         assertNotNull(response)
         assertEquals(MCC_MNC, response.mccMnc)
+        assertEquals(CLIENT_ID, response.clientId)
         assertTrue(response.isSuccessful)
         assertEquals(code, response.authorizationCode)
         assertEquals(CODE_VERIFIER, response.codeVerifier)
@@ -64,14 +71,14 @@ class AuthorizationResponseFactoryTest {
 
     @Test
     fun shouldGetInvalidRequestErrorResponse() {
-        whenever(mockRequest.redirectUri).thenReturn(mockRedirectUri)
         whenever(mockUri.queryParameterNames).thenReturn(setOf(Json.KEY_ERROR))
         whenever(mockUri.error).thenReturn(OIDCError.INVALID_REQUEST_OBJECT.error)
 
-        val response = factory.create(MCC_MNC, mockRequest, mockUri)
+        val response = factory.uri(MCC_MNC, mockRequest, mockUri)
 
         assertNotNull(response)
         assertEquals(MCC_MNC, response.mccMnc)
+        assertEquals(CLIENT_ID, response.clientId)
         assertFalse(response.isSuccessful)
         assertEquals(AuthorizationError.INVALID_REQUEST, response.error)
     }
@@ -80,16 +87,15 @@ class AuthorizationResponseFactoryTest {
     fun shouldGetInvalidRequestErrorResponseIfUnexpectedState() {
         val code = "code"
         val state = "state"
-        whenever(mockRequest.redirectUri).thenReturn(mockRedirectUri)
         whenever(mockUri.queryParameterNames).thenReturn(setOf(Json.KEY_CODE, Json.KEY_STATE))
         whenever(mockUri.code).thenReturn(code)
         whenever(mockUri.state).thenReturn(state)
-        whenever(mockRequest.isNotMatching(state)).thenReturn(true)
 
-        val response = factory.create(MCC_MNC, mockRequest, mockUri)
+        val response = factory.uri(MCC_MNC, mockRequest, mockUri)
 
         assertNotNull(response)
         assertEquals(MCC_MNC, response.mccMnc)
+        assertEquals(CLIENT_ID, response.clientId)
         assertFalse(response.isSuccessful)
         assertEquals(AuthorizationError.INVALID_REQUEST, response.error)
     }
@@ -99,59 +105,61 @@ class AuthorizationResponseFactoryTest {
         val code = "code"
         val stateRequest = "state_request"
         val stateResult = "state_result"
-        whenever(mockRequest.redirectUri).thenReturn(mockRedirectUri)
         whenever(mockUri.queryParameterNames).thenReturn(setOf(Json.KEY_CODE, Json.KEY_STATE))
         whenever(mockUri.code).thenReturn(code)
         whenever(mockUri.state).thenReturn(stateResult)
         whenever(mockRequest.state).thenReturn(stateRequest)
-        whenever(mockRequest.isNotMatching(stateResult)).thenReturn(true)
 
-        val response = factory.create(MCC_MNC, mockRequest, mockUri)
+        val response = factory.uri(MCC_MNC, mockRequest, mockUri)
 
         assertNotNull(response)
         assertEquals(MCC_MNC, response.mccMnc)
+        assertEquals(CLIENT_ID, response.clientId)
         assertFalse(response.isSuccessful)
         assertEquals(AuthorizationError.INVALID_REQUEST, response.error)
     }
 
     @Test
     fun shouldGetUnknownErrorResponse() {
-        whenever(mockRequest.redirectUri).thenReturn(mockRedirectUri)
         whenever(mockUri.queryParameterNames).thenReturn(emptySet())
 
-        val response = factory.create(MCC_MNC, mockRequest, mockUri)
+        val response = factory.uri(MCC_MNC, mockRequest, mockUri)
         assertNotNull(response)
         assertEquals(MCC_MNC, response.mccMnc)
+        assertEquals(CLIENT_ID, response.clientId)
         assertFalse(response.isSuccessful)
         assertEquals(AuthorizationError.UNKNOWN, response.error)
     }
 
     @Test
     fun shouldGetDiscoveryStateErrorResponseForAssetsNotFoundException() {
-        val response = factory.create(MCC_MNC, mockRedirectUri, AssetsNotFoundException("message"))
+        val response = factory.throwable(MCC_MNC, mockRequest, AssetsNotFoundException("message"))
 
         assertNotNull(response)
         assertEquals(MCC_MNC, response.mccMnc)
+        assertEquals(CLIENT_ID, response.clientId)
         assertFalse(response.isSuccessful)
         assertEquals(AuthorizationError.DISCOVERY_STATE, response.error)
     }
 
     @Test
     fun shouldGetInvalidConfigurationErrorResponseForHttpException() {
-        val response = factory.create(MCC_MNC, mockRedirectUri, HttpException(300, "{ \"error\":\"invalid_request\" }"))
+        val response = factory.throwable(MCC_MNC, mockRequest, HttpException(300, "{ \"error\":\"invalid_request\" }"))
 
         assertNotNull(response)
         assertEquals(MCC_MNC, response.mccMnc)
+        assertEquals(CLIENT_ID, response.clientId)
         assertFalse(response.isSuccessful)
-        assertEquals(AuthorizationError.INVALID_CONFIGURATION, response.error)
+        assertEquals(AuthorizationError.INVALID_REQUEST, response.error)
     }
 
     @Test
     fun shouldGetUnknownErrorResponseForException() {
-        val response = factory.create(MCC_MNC, mockRedirectUri, Exception())
+        val response = factory.throwable(MCC_MNC, mockRequest, Exception())
 
         assertNotNull(response)
         assertEquals(MCC_MNC, response.mccMnc)
+        assertEquals(CLIENT_ID, response.clientId)
         assertFalse(response.isSuccessful)
         assertEquals(AuthorizationError.UNKNOWN, response.error)
     }
@@ -171,21 +179,21 @@ class AuthorizationResponseFactoryTest {
     @Test
     fun shouldGetAuthorizationErrorErrorFromHttpExceptionWithoutDescription() {
         val error = factory.createError(HttpException(0, "{\"error\":\"invalid_request\"}"))
-        assertEquals(AuthorizationError.INVALID_CONFIGURATION, error)
-        assertNull(error.description())
+        assertEquals(AuthorizationError.INVALID_REQUEST, error)
+        assertNull(error.description)
     }
 
     @Test
     fun shouldGetAuthorizationErrorErrorFromHttpExceptionWithDescription() {
         val description = "description"
         val error = factory.createError(HttpException(0, "{\"error\":\"invalid_request\",\"error_description\":\"$description\"}"))
-        assertEquals(AuthorizationError.INVALID_CONFIGURATION, error)
-        assertEquals(description, error.description())
+        assertEquals(AuthorizationError.INVALID_REQUEST, error)
+        assertEquals(description, error.description)
     }
 
     @Test
     fun shouldGetAuthorizationErrorFromOAuth2Error() {
-        assertEquals(AuthorizationError.INVALID_CONFIGURATION,
+        assertEquals(AuthorizationError.INVALID_REQUEST,
                 factory.createError("invalid_request", null))
     }
 
@@ -212,6 +220,7 @@ class AuthorizationResponseFactoryTest {
 
     companion object {
         private const val MCC_MNC = "MCC_MNC"
+        private const val CLIENT_ID = "CLIENT_ID"
         private const val CODE_VERIFIER = "CODE_VERIFIER"
     }
 }

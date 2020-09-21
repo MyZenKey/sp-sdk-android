@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.xci.zenkey.sdk
+package com.xci.zenkey.sdk.internal
 
 import android.net.Uri
 import android.util.Base64
-import com.xci.zenkey.sdk.internal.DefaultAuthorizationService
 import com.xci.zenkey.sdk.internal.ktx.encodeToString
 import com.xci.zenkey.sdk.internal.model.AuthorizationRequest
 import com.xci.zenkey.sdk.param.ACR
 import com.xci.zenkey.sdk.param.Prompt
 import com.xci.zenkey.sdk.param.Scopes
+import com.xci.zenkey.sdk.param.Theme
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -35,30 +34,33 @@ import java.security.MessageDigest
 
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest = Config.NONE)
-class AuthorizeIntentBuilderTest {
+class DefaultAuthorizeIntentBuilderTest {
 
-    private lateinit var intentBuilder: AuthorizeIntentBuilder
+    private lateinit var intentBuilder: DefaultAuthorizeIntentBuilder
 
     private val mockMessageDigest = Mockito.mock(MessageDigest::class.java)
 
     @Before
     fun setUp() {
-        intentBuilder = AuthorizeIntentBuilder(PACKAGE_NAME, CLIENT_ID, mockMessageDigest, REDIRECT_URI)
+        intentBuilder = DefaultAuthorizeIntentBuilder(PACKAGE_NAME, CLIENT_ID, mockMessageDigest, REDIRECT_URI)
     }
 
     @Test
     fun shouldRemoveDuplicateScopes() {
-        assertEquals("email openid", intentBuilder.withScopes(Scopes.EMAIL, Scopes.EMAIL, Scopes.OPEN_ID).scope())
+        intentBuilder.withScopes(Scopes.EMAIL, Scopes.EMAIL, Scopes.OPEN_ID)
+        assertEquals("email openid",intentBuilder.scope())
     }
 
     @Test
     fun shouldBuildScopeString() {
-        assertEquals("email name openid", intentBuilder.withScopes(Scopes.EMAIL, Scopes.NAME, Scopes.OPEN_ID).scope())
+        intentBuilder.withScopes(Scopes.EMAIL, Scopes.NAME, Scopes.OPEN_ID)
+        assertEquals("email name openid", intentBuilder.scope())
     }
 
     @Test
     fun shouldHaveNullScope() {
-        assertNull(intentBuilder.withScopes().scope())
+        intentBuilder.withScopes()
+        assertNull(intentBuilder.scope())
 
     }
 
@@ -69,7 +71,8 @@ class AuthorizeIntentBuilderTest {
 
     @Test
     fun shouldUseSpecifiedScope() {
-        assertEquals("email name", intentBuilder.withScopes(Scopes.EMAIL, Scopes.NAME).scope())
+        intentBuilder.withScopes(Scopes.EMAIL, Scopes.NAME)
+        assertEquals("email name", intentBuilder.scope())
     }
 
     @Test
@@ -106,6 +109,29 @@ class AuthorizeIntentBuilderTest {
     }
 
     @Test
+    fun shouldHaveNullOptionsByDefault() {
+        assertNull(intentBuilder.options())
+    }
+
+    @Test
+    fun shouldSetDarkThemeOption() {
+        intentBuilder.withTheme(Theme.DARK)
+        assertEquals("dark", intentBuilder.options())
+    }
+
+    @Test
+    fun shouldSetLightThemeOption() {
+        intentBuilder.withTheme(Theme.LIGHT)
+        assertEquals("light", intentBuilder.options())
+    }
+
+    @Test
+    fun shouldNotSetThemeOption() {
+        intentBuilder.withTheme(null)
+        assertNull(intentBuilder.options())
+    }
+
+    @Test
     fun shouldBuildIntentWithExpectedValues() {
 
         val context = "context"
@@ -115,6 +141,7 @@ class AuthorizeIntentBuilderTest {
         val nonce = "nonce"
         val correlationId = "correlationId"
         val prompt = Prompt.CONSENT
+        val theme = Theme.DARK
 
         val intent = intentBuilder
                 .withScopes(scope)
@@ -124,6 +151,7 @@ class AuthorizeIntentBuilderTest {
                 .withPrompt(prompt)
                 .withCorrelationId(correlationId)
                 .withContext(context)
+                .withTheme(theme)
                 .build()
 
         assertNotNull(intent)
@@ -141,6 +169,7 @@ class AuthorizeIntentBuilderTest {
         assertEquals(prompt.value, request.prompt)
         assertEquals(correlationId, request.correlationId)
         assertEquals(context, request.context)
+        assertEquals(theme.value, request.options)
     }
 
     companion object {

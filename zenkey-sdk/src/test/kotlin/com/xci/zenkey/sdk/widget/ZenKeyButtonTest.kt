@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,27 +34,29 @@ import com.xci.zenkey.sdk.internal.ktx.getColorCompat
 import com.xci.zenkey.sdk.param.ACR
 import com.xci.zenkey.sdk.param.Prompt
 import com.xci.zenkey.sdk.param.Scopes
+import com.xci.zenkey.sdk.param.Theme
 import com.xci.zenkey.sdk.util.TestContentProvider
+import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyInt
-import org.mockito.ArgumentMatchers.anyString
-import org.powermock.api.mockito.PowerMockito
+import org.robolectric.Robolectric
 import org.robolectric.Robolectric.setupContentProvider
+import org.robolectric.RobolectricTestRunner
 
-@RunWith(AndroidJUnit4::class)
+@RunWith(RobolectricTestRunner::class)
 class ZenKeyButtonTest {
 
     private lateinit var zenKeyButton: ZenKeyButton
 
     private val mockContext = mock<Context>()
-    private val mockAttributeSet = mock<AttributeSet>()
+    private lateinit var attributeSet: AttributeSet
     private val mockTypedArray = mock<TypedArray>()
     private val mockButton = mock<Button>()
     private val mockValidRedirectUri = mock<Uri>()
-    private val mockIntentBuilder = PowerMockito.mock(AuthorizeIntentBuilder::class.java)
+    private val mockIntentBuilder = mock<AuthorizeIntentBuilder>()
     private val mockFragment = mock<Fragment>()
     private val mockActivity = mock<Activity>()
     private val mockIntent = mock<Intent>()
@@ -66,17 +68,11 @@ class ZenKeyButtonTest {
         COLOR_GREEN = context.getColorCompat(R.color.zenkey_green)
         COLOR_WHITE = context.getColorCompat(android.R.color.white)
         COLOR_TRANSPARENT = context.getColorCompat(android.R.color.transparent)
-        PowerMockito.`when`(mockContext.obtainStyledAttributes(mockAttributeSet, R.styleable.ZenKeyButton)).thenReturn(mockTypedArray)
+
+        attributeSet = Robolectric.buildAttributeSet().build()
+        whenever(mockContext.obtainStyledAttributes(attributeSet, R.styleable.ZenKeyButton)).thenReturn(mockTypedArray)
         whenever(mockValidRedirectUri.toString()).thenReturn("test://test")
 
-        doCallRealMethod().whenever(mockIntentBuilder).withScopes(any())
-        doCallRealMethod().whenever(mockIntentBuilder).withRedirectUri(any())
-        doCallRealMethod().whenever(mockIntentBuilder).withAcrValues(any())
-        doCallRealMethod().whenever(mockIntentBuilder).withNonce(anyString())
-        doCallRealMethod().whenever(mockIntentBuilder).withState(anyString())
-        doCallRealMethod().whenever(mockIntentBuilder).withCorrelationId(anyString())
-        doCallRealMethod().whenever(mockIntentBuilder).withPrompt(any())
-        doCallRealMethod().whenever(mockIntentBuilder).withContext(anyString())
         whenever(mockIntentBuilder.build()).thenReturn(mockIntent)
 
         zenKeyButton = ZenKeyButton(context)
@@ -85,8 +81,8 @@ class ZenKeyButtonTest {
     @Test
     fun allConstructorsShouldWork() {
         ZenKeyButton(ApplicationProvider.getApplicationContext())
-        ZenKeyButton(ApplicationProvider.getApplicationContext(), mockAttributeSet)
-        ZenKeyButton(ApplicationProvider.getApplicationContext<Context>(), mockAttributeSet, 0)
+        ZenKeyButton(ApplicationProvider.getApplicationContext(), attributeSet)
+        ZenKeyButton(ApplicationProvider.getApplicationContext(), attributeSet, 0)
     }
 
     @Test
@@ -105,19 +101,18 @@ class ZenKeyButtonTest {
     fun shouldInitDarkModeByDefault() {
         whenever(mockTypedArray.getInt(eq(R.styleable.ZenKeyButton_ZenKeyButtonMode), anyInt())).thenReturn(0)
 
+        zenKeyButton.init(attributeSet)
 
-        zenKeyButton.init(mockAttributeSet)
-
-        //verify(textView).setTextColor(COLOR_WHITE);
-        //mockActivity.launchActivity(MockActivity.get(com.xci.provider.sdk.test.R.layout.verify_button_test));
-        //verifyButton = mockActivityScenario.
+        assertEquals(ZenKeyButton.Mode.DARK, zenKeyButton.mode)
     }
 
     @Test
     fun shouldInitLightModeFromAttributeSet() {
         whenever(mockTypedArray.getInt(eq(R.styleable.ZenKeyButton_ZenKeyButtonText), anyInt())).thenReturn(ZenKeyButton.Mode.LIGHT.ordinal)
 
-        zenKeyButton.init(mockAttributeSet)
+        //attributeSet = Robolectric.buildAttributeSet().addAttribute(R.styleable.ZenKeyButton_ZenKeyButtonMode, ZenKeyButton.Mode.LIGHT.name).build()
+
+        zenKeyButton.init(attributeSet)
 
     }
 
@@ -164,6 +159,20 @@ class ZenKeyButtonTest {
         zenKeyButton.intentBuilder = mockIntentBuilder
         zenKeyButton.setScopes(Scopes.EMAIL, Scopes.NAME)
         verify(mockIntentBuilder).withScopes(Scopes.EMAIL, Scopes.NAME)
+    }
+
+    @Test
+    fun shouldSetDarkTheme() {
+        zenKeyButton.intentBuilder = mockIntentBuilder
+        zenKeyButton.setTheme(Theme.DARK)
+        verify(mockIntentBuilder).withTheme(Theme.DARK)
+    }
+
+    @Test
+    fun shouldSetLightTheme() {
+        zenKeyButton.intentBuilder = mockIntentBuilder
+        zenKeyButton.setTheme(Theme.LIGHT)
+        verify(mockIntentBuilder).withTheme(Theme.LIGHT)
     }
 
     @Test

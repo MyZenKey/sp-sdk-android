@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,16 @@ package com.xci.zenkey.sdk.internal
 
 import android.app.Activity
 import android.app.PendingIntent
-import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.telephony.TelephonyManager
+import com.xci.zenkey.sdk.AuthorizationError
+import com.xci.zenkey.sdk.AuthorizationError.*
+import com.xci.zenkey.sdk.AuthorizationError.Companion.MISSING_DISCOVER_UI_ENDPOINT
+import com.xci.zenkey.sdk.AuthorizationError.Companion.STATE_MISMATCHED
+import com.xci.zenkey.sdk.AuthorizationError.Companion.TOO_MANY_REDIRECT
+import com.xci.zenkey.sdk.AuthorizationError.Companion.UNEXPECTED_DISCOVERY_RESPONSE
 import com.xci.zenkey.sdk.AuthorizationResponse
 import com.xci.zenkey.sdk.internal.browser.NoBrowserException
 import com.xci.zenkey.sdk.internal.contract.*
@@ -34,8 +40,8 @@ import com.xci.zenkey.sdk.internal.model.exception.ProviderNotFoundException
 internal class DefaultAuthorizationService internal constructor(
         private val discoveryService: IDiscoveryService,
         private val intentFactory: AuthorizationIntentFactory,
-        private val simDataProvider: SimDataProvider,
-        internal val responseFactory: AuthorizationResponse.Factory
+        private val telephonyManager: TelephonyManager,
+        private val responseFactory: AuthorizationResponse.Factory
 ) : AuthorizationService {
 
     internal var state: AuthorizationState? = null
@@ -46,7 +52,7 @@ internal class DefaultAuthorizationService internal constructor(
     internal var completionIntent: PendingIntent? = null
     internal var cancellationIntent: PendingIntent? = null
 
-    override fun onCreate(activity: Activity, intent: Intent, savedInstanceState: Bundle?) {
+    override fun onCreate(activity: AuthorizationRequestActivity, intent: Intent, savedInstanceState: Bundle?) {
         if (savedInstanceState == null && intent.extras == null) {
             //TODO should setResult with error.
             activity.finish()
@@ -57,7 +63,7 @@ internal class DefaultAuthorizationService internal constructor(
         extractState(savedInstanceState ?: intent.extras!!)
     }
 
-    override fun onResume(activity: Activity, intent: Intent) {
+    override fun onResume(activity: AuthorizationRequestActivity, intent: Intent) {
         checkState(activity, intent)
     }
 
@@ -65,11 +71,11 @@ internal class DefaultAuthorizationService internal constructor(
         saveState(outState)
     }
 
-    override fun onNewIntent(activity: Activity, intent: Intent) {
+    override fun onNewIntent(activity: AuthorizationRequestActivity, intent: Intent) {
         activity.intent = intent
     }
 
-    override fun onDestroy(activity: Activity) {
+    override fun onDestroy(activity: AuthorizationRequestActivity) {
         this.intentFactory.unbindWebSession(activity)
     }
 
@@ -89,22 +95,22 @@ internal class DefaultAuthorizationService internal constructor(
         cancellationIntent = savedInstanceState.getParcelable(EXTRA_KEY_CANCELLATION_INTENT)
     }
 
-    internal fun checkState(activity: Activity, intent: Intent) {
+    internal fun checkState(activity: AuthorizationRequestActivity, intent: Intent) {
         val resultUri = intent.data
         when {
             this.state == NONE -> onStateNone(activity)
-            resultUri != null -> when {
-                this.state == DISCOVER_UI -> onStateDiscoverUI(activity, resultUri)
-                this.state == AUTHORIZE -> onStateAuthorize(activity, resultUri)
-                this.state == DISCOVER_USER_NOT_FOUND -> onStateDiscoverUserNotFound(activity, resultUri)
+            resultUri != null -> when (this.state) {
+                DISCOVER_UI -> onStateDiscoverUI(activity, resultUri)
+                AUTHORIZE -> onStateAuthorize(activity, resultUri)
+                DISCOVER_USER_NOT_FOUND -> onStateDiscoverUserNotFound(activity, resultUri)
                 else -> finishWithAuthorizationSuccess(activity, resultUri)
             }
             else -> setResultCanceledAndFinish(activity)
         }
     }
 
-    internal fun onStateNone(activity: Activity) {
-        updateMccMnc(simDataProvider.simOperator)
+    internal fun onStateNone(activity: AuthorizationRequestActivity) {
+        updateMccMnc(telephonyManager.simOperatorReady)
         Logger.get().begin(request, mccMnc)
         discoverOpenIdConfiguration(false,
                 { authorize(activity, it, AUTHORIZE, null) },
@@ -117,28 +123,28 @@ internal class DefaultAuthorizationService internal constructor(
                 })
     }
 
-    internal fun onStateDiscoverUI(activity: Activity, resultUri: Uri) {
-        if(request.isNotMatching(resultUri.state)){
-            finishWithStateMissMatchError(activity)
+    internal fun onStateDiscoverUI(activity: AuthorizationRequestActivity, resultUri: Uri) {
+        if(!request.state.isMatching(resultUri.state)){
+            finishWithAuthorizationError(activity, STATE_MISMATCHED)
         } else {
             updateMccMnc(resultUri.mccMnc)
             discoverOpenIdConfiguration(false,
                     { authorize(activity, it, AUTHORIZE, resultUri.loginHintToken) },
                     {
                         handleProviderNotFoundOrFinish(activity, it) {
-                            finishWithTooManyRedirectError(activity)
+                            finishWithAuthorizationError(activity, TOO_MANY_REDIRECT)
                         }
                     })
         }
     }
 
-    internal fun onStateAuthorize(activity: Activity, resultUri: Uri) {
+    internal fun onStateAuthorize(activity: AuthorizationRequestActivity, resultUri: Uri) {
         if (resultUri.isUserNotFoundError) {
             discoverOpenIdConfiguration( true,
                     {
                         //With the prompt=true parameter, this case can't happen.
                         //This parameter force the endpoint to return a ProviderNotFoundException
-                        finishWithUnexpectedOIDC(activity)
+                        finishWithAuthorizationError(activity, UNEXPECTED_DISCOVERY_RESPONSE)
                     },
                     { throwable ->
                         handleProviderNotFoundOrFinish(activity, throwable) {
@@ -152,17 +158,17 @@ internal class DefaultAuthorizationService internal constructor(
         }
     }
 
-    internal fun onStateDiscoverUserNotFound(activity: Activity,
+    internal fun onStateDiscoverUserNotFound(activity: AuthorizationRequestActivity,
                                              resultUri: Uri) {
-        if(request.isNotMatching(resultUri.state)){
-            finishWithStateMissMatchError(activity)
+        if(!request.state.isMatching(resultUri.state)){
+            finishWithAuthorizationError(activity, STATE_MISMATCHED)
         } else {
             updateMccMnc(resultUri.mccMnc)
             discoverOpenIdConfiguration(false,
                     { authorize(activity, it, AUTHORIZE_USER_NOT_FOUND, resultUri.loginHintToken) },
                     {
                         handleProviderNotFoundOrFinish(activity, it) {
-                            finishWithTooManyRedirectError(activity)
+                            finishWithAuthorizationError(activity, TOO_MANY_REDIRECT)
                         }
                     })
         }
@@ -174,7 +180,7 @@ internal class DefaultAuthorizationService internal constructor(
         this.discoveryService.discoverConfiguration(mccMnc, prompt, onSuccess, onError)
     }
 
-    internal fun authorize(activity: Activity,
+    internal fun authorize(activity: AuthorizationRequestActivity,
                            configuration: OpenIdConfiguration,
                            state: AuthorizationState,
                            loginHintToken: String?) {
@@ -193,7 +199,7 @@ internal class DefaultAuthorizationService internal constructor(
         outState.putParcelable(EXTRA_KEY_CANCELLATION_INTENT, cancellationIntent)
     }
 
-    internal fun startAuthorize(activity: Activity,
+    internal fun startAuthorize(activity: AuthorizationRequestActivity,
                                 openIdConfiguration: OpenIdConfiguration,
                                 loginHintToken: String?) {
         val authUri = request.withLoginHintToken(loginHintToken).toAuthorizationUri(openIdConfiguration.authorizationEndpoint)
@@ -204,12 +210,12 @@ internal class DefaultAuthorizationService internal constructor(
             finishWithNoBrowserAvailable(activity)
             return
         }
-        activity.startAuthorizationFlowActivity(intent){
+        activity.startAuthorize(intent){
             finishWithNoBrowserAvailable(activity)
         }
     }
 
-    internal fun startDiscoverUI(activity: Activity,
+    internal fun startDiscoverUI(activity: AuthorizationRequestActivity,
                                  discoverUIEndpoint: String) {
         val intent = try {
             intentFactory.createDiscoverUIIntent(request.toDiscoverUiUri(discoverUIEndpoint))
@@ -217,28 +223,137 @@ internal class DefaultAuthorizationService internal constructor(
             finishWithNoBrowserAvailable(activity)
             return
         }
-        activity.startAuthorizationFlowActivity(intent){
+        activity.startDiscoverUi(intent){
             finishWithNoBrowserAvailable(activity)
         }
     }
 
-    internal fun handleProviderNotFoundOrFinish(activity: Activity,
+    private fun handleProviderNotFoundOrFinish(activity: Activity,
                                                throwable: Throwable,
                                                onProviderNotFound: (String?) -> Unit){
         Logger.get().throwable(throwable)
         when {
             throwable is ProviderNotFoundException -> onProviderNotFound.invoke(throwable.discoverUiEndpoint)
-            throwable.isNetworkFailure -> finishWithNetworkFailure(activity, throwable.message)
+            throwable.isNetworkFailure ->
+                finishWithAuthorizationError(activity, NETWORK_FAILURE.withDescription(throwable.message))
+            throwable.isTimeout ->
+                finishWithAuthorizationError(activity, SERVER_ERROR.withDescription(throwable.message))
             else -> finishWithThrowableError(activity, throwable)
         }
     }
 
-    internal fun onProviderNotFoundError(activity: Activity,
+    internal fun onProviderNotFoundError(activity: AuthorizationRequestActivity,
                                          discoverUiEndpoint: String?) {
         if (discoverUiEndpoint != null) {
             startDiscoverUI(activity, discoverUiEndpoint)
         } else {
-            finishWithMissingDiscoverUIEndpoint(activity)
+            finishWithAuthorizationError(activity, MISSING_DISCOVER_UI_ENDPOINT)
+        }
+    }
+
+    internal fun updateState(
+            state: AuthorizationState
+    ) {
+        this.state = state
+        Logger.get().state(state)
+    }
+
+    private fun updateMccMncIfNotNull(
+            mccMnc: String?
+    ){
+        mccMnc?.let { updateMccMnc(it) }
+    }
+
+    private fun updateMccMnc(
+            mccMnc: String?
+    ){
+        this.mccMnc = mccMnc
+        Logger.get().d("Update MCC_MNC --> $mccMnc")
+    }
+
+    private fun finishWithNoBrowserAvailable(
+            activity: Activity
+    ){
+        val message = "No browser available"
+        Logger.get().e(message)
+        finishWithAuthorizationError(activity, DISCOVERY_STATE.withDescription(message))
+    }
+
+    private fun finishWithAuthorizationError(
+            activity: Activity,
+            authorizationError: AuthorizationError
+    ){
+        setResultOKAndFinish(activity, responseFactory.error(mccMnc, request, authorizationError))
+    }
+
+    private fun finishWithThrowableError(
+            activity: Activity,
+            throwable: Throwable
+    ){
+        setResultOKAndFinish(activity, responseFactory.throwable(mccMnc, request, throwable))
+    }
+
+    private fun finishWithAuthorizationSuccess(
+            activity: Activity,
+            resultUri: Uri
+    ){
+        setResultOKAndFinish(activity, responseFactory.uri(mccMnc!!, request, resultUri))
+    }
+
+    internal fun setResultOKAndFinish(
+            activity: Activity,
+            response: AuthorizationResponse
+    ) {
+        Logger.get().end(request, response)
+        if (response.isSuccessful && successIntent != null) {
+            try {
+                successIntent!!.send(activity, Activity.RESULT_OK, response.toIntent())
+            } catch (e: PendingIntent.CanceledException) {
+                Logger.get().e("Unable to start success pending intent")
+                activity.setResult(Activity.RESULT_OK, response.toIntent())
+                activity.finish()
+            }
+
+        } else if (!response.isSuccessful && failureIntent != null) {
+            try {
+                failureIntent!!.send(activity, Activity.RESULT_OK, response.toIntent())
+            } catch (e: PendingIntent.CanceledException) {
+                Logger.get().e("Unable to start failure pending intent")
+                activity.setResult(Activity.RESULT_OK, response.toIntent())
+                activity.finish()
+            }
+
+        } else if (completionIntent != null) {
+            try {
+                completionIntent!!.send(activity, Activity.RESULT_OK, response.toIntent())
+            } catch (e: PendingIntent.CanceledException) {
+                Logger.get().e("Unable to start completion pending intent")
+                activity.setResult(Activity.RESULT_OK, response.toIntent())
+                activity.finish()
+            }
+
+        } else {
+            activity.setResult(Activity.RESULT_OK, response.toIntent())
+            activity.finish()
+        }
+    }
+
+    internal fun setResultCanceledAndFinish(
+            activity: Activity
+    ) {
+        Logger.get().end(request, null)
+        if (cancellationIntent != null) {
+            try {
+                cancellationIntent!!.send(activity, Activity.RESULT_CANCELED, null)
+            } catch (e: PendingIntent.CanceledException) {
+                Logger.get().e("Unable to start cancellation pending intent")
+                activity.setResult(Activity.RESULT_CANCELED)
+                activity.finish()
+            }
+
+        } else {
+            activity.setResult(Activity.RESULT_CANCELED)
+            activity.finish()
         }
     }
 

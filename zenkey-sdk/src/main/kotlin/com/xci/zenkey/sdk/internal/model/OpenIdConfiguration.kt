@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,7 @@
  */
 package com.xci.zenkey.sdk.internal.model
 
-import java.util.ArrayList
-import java.util.Calendar
-import java.util.Date
+import java.util.*
 
 /**
  * Model for OpenId configuration.
@@ -38,7 +36,7 @@ internal class OpenIdConfiguration {
      */
     val authorizationEndpoint: String
     private val expiredAt: Date
-    var packages: List<Package> = ArrayList()
+    lateinit var packages: Map<String, List<String>>
 
     /**
      * Get the configuration Issuer.

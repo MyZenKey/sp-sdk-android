@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import com.nhaarman.mockitokotlin2.*
 import com.xci.zenkey.sdk.internal.contract.ICache
 import com.xci.zenkey.sdk.internal.model.DiscoveryResponse
 import com.xci.zenkey.sdk.internal.model.OpenIdConfiguration
-import com.xci.zenkey.sdk.internal.model.Package
 import com.xci.zenkey.sdk.internal.model.exception.AssetsNotFoundException
 import com.xci.zenkey.sdk.internal.model.exception.ProviderNotFoundException
 import com.xci.zenkey.sdk.internal.network.call.assetlinks.IAssetLinksCallFactory
@@ -29,15 +28,12 @@ import com.xci.zenkey.sdk.internal.network.call.discovery.IDiscoveryCallFactory
 import com.xci.zenkey.sdk.internal.network.stack.HttpCall
 import com.xci.zenkey.sdk.internal.network.stack.HttpException
 import com.xci.zenkey.sdk.internal.network.stack.HttpResponse
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyBoolean
 import org.mockito.ArgumentMatchers.anyString
 import java.net.HttpURLConnection
-import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
 @RunWith(AndroidJUnit4::class)
@@ -62,10 +58,10 @@ class DiscoveryServiceTest {
     private var oidcErrorUnitCaptor = argumentCaptor<(Exception) -> Unit>()
 
     //Assets
-    private val mockAssets = mock<List<Package>>()
-    private val mockAssetHttpCall = mock<HttpCall<List<Package>>>()
-    private val mockAssetsResponse = mock<HttpResponse<List<Package>>>()
-    private var assetsSuccessUnitCaptor = argumentCaptor<(HttpResponse<List<Package>>) -> Unit>()
+    //private val mockAssets = mock<Assets>()
+    private val mockAssetHttpCall = mock<HttpCall<Map<String, List<String>>>>()
+    private val mockAssetsResponse = mock<HttpResponse<Map<String, List<String>>>>()
+    private var assetsSuccessUnitCaptor = argumentCaptor<(HttpResponse<Map<String, List<String>>>) -> Unit>()
     private var assetsErrorUnitCaptor = argumentCaptor<(Exception) -> Unit>()
 
     private lateinit var discoveryService: DiscoveryService
@@ -79,7 +75,7 @@ class DiscoveryServiceTest {
         doNothing().whenever(mockAssetHttpCall).enqueue(assetsSuccessUnitCaptor.capture(), assetsErrorUnitCaptor.capture())
 
         whenever(mockOIDCResponse.body).thenReturn(mockDiscoveryResponse)
-        whenever(mockAssetsResponse.body).thenReturn(mockAssets)
+        whenever(mockAssetsResponse.body).thenReturn(PACKAGES)
 
         whenever(mockOidc.authorizationEndpoint).thenReturn(AUTHORIZATION_URI.toString())
         discoveryService = DiscoveryService(mockCache, mockDiscoveryCallFactory, mockAssetLinksCallFactory)
@@ -177,7 +173,7 @@ class DiscoveryServiceTest {
 
         assetsSuccessUnitCaptor.firstValue.invoke(mockAssetsResponse)
 
-        verify(mockOidc).packages = mockAssets
+        verify(mockOidc).packages = PACKAGES
         verify(mockSuccessUnit).invoke(mockOidc)
         verify(mockCache).put(MCC_MNC, mockOidc)
     }
@@ -269,5 +265,7 @@ class DiscoveryServiceTest {
                 .authority(AUTHORITY)
                 .path(PATH)
                 .build()
+
+        private val PACKAGES = emptyMap<String, List<String>>()
     }
 }

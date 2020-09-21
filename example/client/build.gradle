@@ -1,0 +1,56 @@
+import com.android.builder.core.BuilderConstants
+
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply from: "${project.rootDir}/gradle/dependencies.gradle"
+
+android {
+    compileSdkVersion buildConfig.compileSdk
+
+    defaultConfig {
+        minSdkVersion buildConfig.minSdk
+        targetSdkVersion buildConfig.targetSdk
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles 'consumer-rules.pro'
+    }
+
+    buildTypes {
+        qa {
+            minifyEnabled false
+            debuggable true
+            signingConfig signingConfigs.debug
+        }
+        prod {
+            minifyEnabled true
+            debuggable false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            consumerProguardFiles 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    variantFilter { variant ->
+        def build = variant.buildType.name
+        if (build == BuilderConstants.DEBUG || build == BuilderConstants.RELEASE) {
+            variant.setIgnore(true)
+        }
+    }
+
+    testOptions.unitTests.includeAndroidResources = true
+}
+
+dependencies {
+    implementation libs.kotlin.stdlib
+
+    implementation libs.moshi.kotlin
+    implementation libs.moshi.adapters
+    implementation libs.okhttp.loggingInterceptor
+    api libs.retrofit2.retrofit
+    implementation libs.retrofit2.converterMoshi
+
+    testImplementation libs.android.test.ext.junit
+}

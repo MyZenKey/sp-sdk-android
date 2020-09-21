@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ internal object Json {
     const val KEY_SDK_VERSION = "sdk_version"
     const val KEY_CODE_CHALLENGE = "code_challenge"
     const val KEY_CODE_CHALLENGE_METHOD = "code_challenge_method"
+    const val KEY_OPTIONS = "options"
 
     const val KEY_MCC_MNC = "mccmnc"
 

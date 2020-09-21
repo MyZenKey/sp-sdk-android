@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import com.xci.zenkey.sdk.internal.contract.IDiscoveryService
 import com.xci.zenkey.sdk.internal.ktx.isNetworkFailure
 import com.xci.zenkey.sdk.internal.model.DiscoveryResponse
 import com.xci.zenkey.sdk.internal.model.OpenIdConfiguration
-import com.xci.zenkey.sdk.internal.model.Package
 import com.xci.zenkey.sdk.internal.model.exception.AssetsNotFoundException
 import com.xci.zenkey.sdk.internal.model.exception.ProviderNotFoundException
 import com.xci.zenkey.sdk.internal.network.call.assetlinks.AssetLinksCallFactory
@@ -162,7 +161,7 @@ internal class DiscoveryService internal constructor(
                 })
     }
 
-    private fun onReceiveAssetsResponse(response: HttpResponse<List<Package>>,
+    private fun onReceiveAssetsResponse(response: HttpResponse<Map<String, List<String>>>,
                                         configuration: OpenIdConfiguration,
                                         onSuccess: (OpenIdConfiguration) -> Unit,
                                         onError: (Throwable) -> Unit) {

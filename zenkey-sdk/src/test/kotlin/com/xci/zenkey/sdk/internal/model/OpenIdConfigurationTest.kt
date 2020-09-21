@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,32 +15,30 @@
  */
 package com.xci.zenkey.sdk.internal.model
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.SmallTest
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-
-import java.util.ArrayList
-import java.util.Calendar
-
-import androidx.test.filters.SmallTest
-
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.runner.RunWith
+import java.util.*
 
 @SmallTest
+@RunWith(AndroidJUnit4::class)
 class OpenIdConfigurationTest {
-    private var configuration: OpenIdConfiguration? = null
+    private lateinit var configuration: OpenIdConfiguration
 
     @Before
     fun setUp() {
         configuration = OpenIdConfiguration(ISSUER, AUTHORIZATION_ENDPOINT, MCC_MNC, BRANDING)
+        configuration.packages = PACKAGES
     }
 
     @Test
     fun shouldHaveValidValues() {
-        assertEquals(ISSUER, configuration!!.issuer)
-        assertEquals(AUTHORIZATION_ENDPOINT, configuration!!.authorizationEndpoint)
-        assertEquals(MCC_MNC, configuration!!.mccMnc)
+        assertEquals(ISSUER, configuration.issuer)
+        assertEquals(AUTHORIZATION_ENDPOINT, configuration.authorizationEndpoint)
+        assertEquals(MCC_MNC, configuration.mccMnc)
     }
 
     @Test
@@ -60,6 +58,7 @@ class OpenIdConfigurationTest {
     @Test
     fun shouldBeEqual() {
         val configuration1 = OpenIdConfiguration(ISSUER, AUTHORIZATION_ENDPOINT, MCC_MNC, BRANDING)
+        configuration1.packages = PACKAGES
         val configuration2 = OpenIdConfiguration(configuration1)
         assertTrue(configuration1 == configuration2)
     }
@@ -67,7 +66,9 @@ class OpenIdConfigurationTest {
     @Test
     fun shouldNotBeEqualIfIssuerDifferent() {
         val configuration1 = OpenIdConfiguration(ISSUER, AUTHORIZATION_ENDPOINT, MCC_MNC, BRANDING)
+        configuration1.packages = PACKAGES
         val configuration2 = OpenIdConfiguration("any", AUTHORIZATION_ENDPOINT, MCC_MNC, BRANDING)
+        configuration2.packages = PACKAGES
         assertFalse(configuration1 == configuration2)
     }
 
@@ -100,14 +101,7 @@ class OpenIdConfigurationTest {
     fun shouldNotBeEqualIfTypeDifferent() {
         assertFalse(OpenIdConfiguration(ISSUER, AUTHORIZATION_ENDPOINT, MCC_MNC, BRANDING) == Any())
     }
-
-    @Test
-    fun shouldSetAndGetPackages() {
-        val packages = ArrayList<Package>()
-        configuration!!.packages = packages
-        assertEquals(packages, configuration!!.packages)
-    }
-
+    
     companion object {
         private const val CARRIER_TEXT = "CARRIER_TEXT"
         private const val CARRIER_LOGO = "CARRIER_LOGO"
@@ -115,5 +109,6 @@ class OpenIdConfigurationTest {
         private const val MCC_MNC = "MCC_MNC"
         private const val AUTHORIZATION_ENDPOINT = "AUTHORIZATION_ENDPOINT"
         private val BRANDING = Branding(CARRIER_TEXT, CARRIER_LOGO)
+        private val PACKAGES = emptyMap<String, List<String>>()
     }
 }

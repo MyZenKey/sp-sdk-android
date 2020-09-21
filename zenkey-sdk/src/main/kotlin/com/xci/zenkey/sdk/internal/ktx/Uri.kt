@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.xci.zenkey.sdk.internal.ktx
 
 import android.content.Intent
@@ -32,6 +31,7 @@ import com.xci.zenkey.sdk.internal.Json.KEY_ERROR_DESCRIPTION
 import com.xci.zenkey.sdk.internal.Json.KEY_LOGIN_HINT_TOKEN
 import com.xci.zenkey.sdk.internal.Json.KEY_MCC_MNC
 import com.xci.zenkey.sdk.internal.Json.KEY_NONCE
+import com.xci.zenkey.sdk.internal.Json.KEY_OPTIONS
 import com.xci.zenkey.sdk.internal.Json.KEY_PROMPT
 import com.xci.zenkey.sdk.internal.Json.KEY_REDIRECT_URI
 import com.xci.zenkey.sdk.internal.Json.KEY_SCOPE
@@ -91,6 +91,9 @@ internal val Uri.correlationId: String?
 internal val Uri.context: String?
     get() = getQueryParameter(KEY_CONTEXT)
 
+internal val Uri.options: String?
+    get() = getQueryParameter(KEY_OPTIONS)
+
 internal val Uri.nonce: String?
     get() = getQueryParameter(KEY_NONCE)
 
@@ -105,13 +108,14 @@ internal val Uri.intent: Intent
         return intent
     }
 
-internal fun Uri.isNotMatchingStateIn(authorizationRequest: AuthorizationRequest): Boolean {
-    return (authorizationRequest.state == null) and (state != null) ||
+internal fun Uri.isNotMatchingStateIn(
+        authorizationRequest: AuthorizationRequest
+): Boolean = (authorizationRequest.state == null) and (state != null) ||
             authorizationRequest.state != null && authorizationRequest.state != state
-}
 
-internal fun Array<out Uri>.toCustomTabBundles(startIndex: Int)
-        : List<Bundle> {
+internal fun Array<out Uri>.toCustomTabBundles(
+        startIndex: Int
+): List<Bundle> {
     require(startIndex >= 0) { "startIndex must be positive" }
 
     if (size <= startIndex) {

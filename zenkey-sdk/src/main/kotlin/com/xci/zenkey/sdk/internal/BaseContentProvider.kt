@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,39 +15,29 @@
  */
 package com.xci.zenkey.sdk.internal
 
-import android.app.Application
 import android.content.ContentProvider
 import android.content.ContentValues
 import android.content.Context
-import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
 import com.xci.zenkey.sdk.IdentityProvider
-import com.xci.zenkey.sdk.R
-import com.xci.zenkey.sdk.internal.model.AndroidMessageDigestAlgorithm
-import java.security.MessageDigest
+import com.xci.zenkey.sdk.internal.ktx.SHA256MessageDigest
+import com.xci.zenkey.sdk.internal.ktx.clientId
 
 internal abstract class BaseContentProvider
     : ContentProvider() {
 
-    private val applicationContext: Context
-        get() = getApplicationContext(context!!)
-
     override fun onCreate(): Boolean {
-        val packageName = applicationContext.packageName
-        clientId = getMetadata(
-                applicationContext.packageManager,
-                packageName,
-                getClientIdKey(applicationContext))
-        firstSimIdentityProvider = DefaultIdentityProvider(packageName,
+        val appContext = context!!.applicationContext
+        clientId = appContext.clientId
+        firstSimIdentityProvider = DefaultIdentityProvider(appContext.packageName,
                 clientId,
                 Uri.Builder()
                         .scheme(clientId)
                         .authority("com.xci.provider.sdk")
                         .build(),
-                MessageDigest.getInstance(AndroidMessageDigestAlgorithm.SHA_256.value))
-        create(clientId, applicationContext)
+                SHA256MessageDigest)
+        create(clientId, appContext)
         return false
     }
 
@@ -79,31 +69,6 @@ internal abstract class BaseContentProvider
                         selection: String?,
                         selectionArgs: Array<String>?): Int {
         return 0
-    }
-
-    internal fun getApplicationContext(context: Context): Context {
-        return context as? Application ?: context.applicationContext
-    }
-
-    internal fun getClientIdKey(context: Context): String {
-        return context.getString(R.string.zenkey_client_id)
-    }
-
-    fun getMetadata(packageManager: PackageManager, packageName: String, metadataKey: String): String {
-        val appInfo: ApplicationInfo?
-        try {
-            appInfo = packageManager.getApplicationInfo(packageName,
-                    PackageManager.GET_META_DATA)
-        } catch (e: PackageManager.NameNotFoundException) {
-            return ""
-        }
-
-        if (appInfo?.metaData != null) {
-            val value = appInfo.metaData.get(metadataKey)
-            if (value != null) return value.toString()
-        }
-
-        return ""
     }
 
     protected abstract fun create(clientId: String, context: Context)

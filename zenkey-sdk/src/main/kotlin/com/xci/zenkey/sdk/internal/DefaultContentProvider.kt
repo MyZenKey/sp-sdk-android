@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,9 @@ package com.xci.zenkey.sdk.internal
 
 import android.content.Context
 import com.xci.zenkey.sdk.internal.contract.AuthorizationService
-import com.xci.zenkey.sdk.internal.contract.SimDataProvider
-import com.xci.zenkey.sdk.internal.model.AndroidMessageDigestAlgorithm
+import com.xci.zenkey.sdk.internal.ktx.SHA256MessageDigest
+import com.xci.zenkey.sdk.internal.ktx.telephonyManager
 import com.xci.zenkey.sdk.internal.security.DefaultFingerprintFactory
-import java.security.MessageDigest
 import java.security.cert.CertificateFactory
 
 internal class DefaultContentProvider
@@ -30,10 +29,9 @@ internal class DefaultContentProvider
 
         val fingerprintFactory = DefaultFingerprintFactory(
                 CertificateFactory.getInstance(CERTIFICATE_FACTORY_TYPE),
-                MessageDigest.getInstance(AndroidMessageDigestAlgorithm.SHA_256.value))
+                SHA256MessageDigest)
 
         discoveryService = DiscoveryService(clientId)
-        simDataProvider = AndroidSimDataProvider(context)
 
         authorizationService = DefaultAuthorizationService(
                 discoveryService,
@@ -42,7 +40,7 @@ internal class DefaultContentProvider
                         AndroidPackageManager(
                                 context.packageManager,
                                 fingerprintFactory)),
-                simDataProvider,
+                context.telephonyManager,
                 AuthorizationResponseFactory())
     }
 
@@ -54,9 +52,6 @@ internal class DefaultContentProvider
 
         @Volatile
         internal lateinit var discoveryService: DiscoveryService
-
-        @Volatile
-        internal lateinit var simDataProvider: SimDataProvider
 
         internal fun authorizationService(): AuthorizationService {
             return authorizationService

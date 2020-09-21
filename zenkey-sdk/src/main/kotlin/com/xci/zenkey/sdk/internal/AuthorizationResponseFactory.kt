@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.xci.zenkey.sdk.internal
 import android.net.Uri
 import com.xci.zenkey.sdk.AuthorizationError
 import com.xci.zenkey.sdk.AuthorizationError.*
+import com.xci.zenkey.sdk.AuthorizationError.Companion.STATE_MISMATCHED
 import com.xci.zenkey.sdk.AuthorizationResponse
 import com.xci.zenkey.sdk.internal.contract.Logger
 import com.xci.zenkey.sdk.internal.ktx.*
@@ -29,38 +30,53 @@ import com.xci.zenkey.sdk.internal.model.exception.AssetsNotFoundException
 import com.xci.zenkey.sdk.internal.network.stack.HttpException
 import org.json.JSONException
 import org.json.JSONObject
+import javax.net.ssl.SSLException
 
 internal class AuthorizationResponseFactory
     : AuthorizationResponse.Factory {
 
-    override fun create(mcc_mnc: String, request: AuthorizationRequest, uri: Uri)
-            : AuthorizationResponse {
-        return if (uri.containError) {
-            create(mcc_mnc, request.redirectUri, createError(uri.error, uri.errorDescription))
-        } else if (uri.containCode) {
-            if (request.isNotMatching(uri.state)) {
-                create(mcc_mnc, request.redirectUri, INVALID_REQUEST.withDescription("state miss-match"))
+    override fun uri(
+            mcc_mnc: String,
+            request: AuthorizationRequest,
+            uri: Uri
+    ): AuthorizationResponse =
+            if (uri.containError) {
+                error(mcc_mnc, request, createError(uri.error, uri.errorDescription))
+            } else if (uri.containCode) {
+                if (!request.state.isMatching(uri.state)) {
+                    error(mcc_mnc, request, STATE_MISMATCHED)
+                } else {
+                    AuthorizationResponse.success(mcc_mnc, request, uri.code!!)
+                }
             } else {
-                AuthorizationResponse(mcc_mnc, request, uri.code!!)
+                error(mcc_mnc, request, UNKNOWN)
             }
-        } else {
-            create(mcc_mnc, request.redirectUri, UNKNOWN)
-        }
-    }
 
-    override fun create(mcc_mnc: String?, redirectUri: Uri, throwable: Throwable)
-            : AuthorizationResponse {
-        return when (throwable) {
-            is AssetsNotFoundException -> create(mcc_mnc, redirectUri, DISCOVERY_STATE.withDescription(throwable.message))
-            is HttpException -> create(mcc_mnc, redirectUri, createError(throwable))
-            else -> create(mcc_mnc, redirectUri, UNKNOWN.withDescription(throwable.message))
+    override fun throwable(
+            mcc_mnc: String?,
+            request: AuthorizationRequest,
+            throwable: Throwable
+    ): AuthorizationResponse =
+            when (throwable) {
+                is AssetsNotFoundException ->
+                    error(mcc_mnc, request, DISCOVERY_STATE.withDescription(throwable.message))
+                is HttpException ->
+                    error(mcc_mnc, request, createError(throwable))
+                is SSLException ->
+                    error(mcc_mnc, request, DISCOVERY_STATE.withDescription(
+                            "Your device doesn't support TLS 1.2 " +
+                                    "which is required for ZenKey to work." +
+                                    " Please make sure the Play Services are available " +
+                                    "and the Play Services updates are installed."))
+                else ->
+                    error(mcc_mnc, request, UNKNOWN.withDescription(throwable.message))
         }
-    }
 
-    override fun create(mcc_mnc: String?, redirectUri: Uri, error: AuthorizationError)
-            : AuthorizationResponse {
-        return AuthorizationResponse(mcc_mnc, redirectUri, error)
-    }
+    override fun error(
+            mcc_mnc: String?,
+            request: AuthorizationRequest,
+            error: AuthorizationError
+    ): AuthorizationResponse = AuthorizationResponse.failure(mcc_mnc, request, error)
 
     internal fun createError(exception: HttpException)
             : AuthorizationError {
@@ -87,16 +103,22 @@ internal class AuthorizationResponseFactory
         Logger.get().e("AuthorizationError: $error $description")
         val exposedError: AuthorizationError
         var enumError: Enum<*>? = null
-        if (error == null) {
-            exposedError = UNKNOWN
-        } else if ({ enumError = OAuth2Error.fromValue(error, description); enumError }() != null) {
-            exposedError = (enumError as OAuth2Error).asExposed()
-        } else if ({ enumError = OIDCError.fromValue(error, description); enumError }() != null) {
-            exposedError = (enumError as OIDCError).asExposed()
-        } else if ({ enumError = ZenKeyError.fromValue(error, description); enumError }() != null) {
-            exposedError = (enumError as ZenKeyError).asExposed()
-        } else {
-            exposedError = UNKNOWN
+        when {
+            error == null -> {
+                exposedError = UNKNOWN.withDescription(description)
+            }
+            { enumError = OAuth2Error.fromValue(error, description); enumError }() != null -> {
+                exposedError = (enumError as OAuth2Error).asExposed()
+            }
+            { enumError = OIDCError.fromValue(error, description); enumError }() != null -> {
+                exposedError = (enumError as OIDCError).asExposed()
+            }
+            { enumError = ZenKeyError.fromValue(error, description); enumError }() != null -> {
+                exposedError = (enumError as ZenKeyError).asExposed()
+            }
+            else -> {
+                exposedError = UNKNOWN.withDescription(description)
+            }
         }
         Logger.get().e("Exposed as: $exposedError")
         return exposedError

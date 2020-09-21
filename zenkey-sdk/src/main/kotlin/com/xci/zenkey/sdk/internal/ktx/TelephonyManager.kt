@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,25 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.xci.zenkey.sdk.internal.ktx
 
-package com.xci.zenkey.sdk.internal.model
+import android.telephony.TelephonyManager
 
-import java.lang.Exception
-
-internal enum class CodeChallengeMethod(
-        val value: String
-) {
-    SHA_256("S256"), PLAIN("plain");
-
-
-    internal companion object {
-
-        fun fromValue(v: String): CodeChallengeMethod {
-            for (value in values()){
-                if(value.value == v)
-                    return value
-            }
-            throw Exception("invalid CodeChallengeMethod key")
-        }
+internal val TelephonyManager.isSimReady: Boolean
+    get() {
+        return simState == TelephonyManager.SIM_STATE_READY
     }
-}
+
+internal val TelephonyManager.simOperatorReady: String?
+    get() {
+        return if (isSimReady) simOperator
+        else null
+    }
+

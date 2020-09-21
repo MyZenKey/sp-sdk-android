@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,22 +20,17 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Bundle
-
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-
 import com.xci.zenkey.sdk.util.TestContentProvider
-import org.junit.Assert.*
-
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyString
-import org.robolectric.Robolectric.setupContentProvider
 
 @RunWith(AndroidJUnit4::class)
 class BaseContentProviderTest {
@@ -44,7 +39,6 @@ class BaseContentProviderTest {
     private val mockApplication = mock<Application>()
     private val mockPackageManager = mock<PackageManager>()
     private val mockApplicationInfo = mock<ApplicationInfo>()
-    private val mockMetadata = mock<Bundle>()
 
     private lateinit var provider: BaseContentProvider
 
@@ -57,79 +51,6 @@ class BaseContentProviderTest {
         whenever(mockApplication.packageManager).thenReturn(mockPackageManager)
 
         whenever(mockPackageManager.getApplicationInfo(anyString(), anyInt())).thenReturn(mockApplicationInfo)
-        mockApplicationInfo.metaData = mockMetadata
-
-    }
-
-    @Test
-    fun shouldGetClientIdFromMetadata() {
-        val packageName = "packageName"
-        val clientIdKey = "clientIdKey"
-        val clientId = "clientId"
-        whenever(mockMetadata.get(clientIdKey)).thenReturn(clientId)
-
-        provider = TestContentProvider()
-        assertEquals(clientId, provider.getMetadata(mockPackageManager, packageName, clientIdKey))
-    }
-
-    //The 4 following test cases can't really happen. The SP isn't able to compile if they forget to put the manifestPlaceholder for clientId
-    @Test
-    @Throws(PackageManager.NameNotFoundException::class)
-    fun shouldGetEmptyStringFromMetadataIfThrow() {
-        val packageName = "packageName"
-        val clientIdKey = "clientIdKey"
-        whenever(mockPackageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA))
-                .thenThrow(PackageManager.NameNotFoundException::class.java)
-
-        provider = TestContentProvider()
-        assertTrue(provider.getMetadata(mockPackageManager, packageName, clientIdKey).isEmpty())
-    }
-
-    @Test
-    @Throws(PackageManager.NameNotFoundException::class)
-    fun shouldGetEmptyStringFromMetadataIfAppInfoNull() {
-        val packageName = "packageName"
-        val clientIdKey = "clientIdKey"
-
-        whenever(mockPackageManager.getApplicationInfo(anyString(), anyInt())).thenReturn(null)
-
-        provider = TestContentProvider()
-        assertTrue(provider.getMetadata(mockPackageManager, packageName, clientIdKey).isEmpty())
-    }
-
-    @Test
-    fun shouldGetEmptyStringFromMetadataIfMetadataNull() {
-        val packageName = "packageName"
-        val clientIdKey = "clientIdKey"
-
-        mockApplicationInfo.metaData = null
-
-        provider = TestContentProvider()
-        assertTrue(provider.getMetadata(mockPackageManager, packageName, clientIdKey).isEmpty())
-    }
-
-    @Test
-    fun shouldGetEmptyStringFromMetadataIfMetadataValueNUll() {
-        val packageName = "packageName"
-        val clientIdKey = "clientIdKey"
-
-        whenever(mockMetadata.get(clientIdKey)).thenReturn(null)
-
-        provider = TestContentProvider()
-        assertTrue(provider.getMetadata(mockPackageManager, packageName, clientIdKey).isEmpty())
-    }
-
-    /*@Test
-    public void shouldExtractClientId() {
-        provider = setupContentProvider(TestContentProvider.class);
-        Assert.assertNotNull(BaseContentProvider.clientId);
-    }*/
-
-    @Test
-    fun shouldGetApplicationContext() {
-        provider = setupContentProvider(TestContentProvider::class.java)
-        assertEquals(mockApplication, provider.getApplicationContext(mockContext))
-        assertEquals(mockApplication, provider.getApplicationContext(mockApplication))
     }
 
     @Test

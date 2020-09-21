@@ -1,5 +1,5 @@
-/*
- * Copyright 2019 ZenKey, LLC.
+/**
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.xci.zenkey.sdk.internal.contract;
+package com.xci.zenkey.example.client.extension
 
-/**
- * A contract for the SIM data provider.
- */
-internal interface SimDataProvider {
+import okhttp3.logging.HttpLoggingInterceptor
 
-    /**
-     * Get the MCC/MNC of the SIM in the first slot
-     *
-     * @return the MCC/MNC of the SIM in the first slot
-     * or null if the SIM Card isn't Ready.
-     */
-    val simOperator: String?
+internal val loggingInterceptor: HttpLoggingInterceptor by lazy {
+    HttpLoggingInterceptor().apply {
+        level = HttpLoggingInterceptor.Level.BODY
+    }
 }

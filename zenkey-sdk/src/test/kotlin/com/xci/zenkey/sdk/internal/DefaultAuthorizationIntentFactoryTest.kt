@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package com.xci.zenkey.sdk.internal
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
@@ -30,11 +29,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.anyString
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import java.util.*
 
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest = Config.NONE, sdk = [Build.VERSION_CODES.N])
@@ -60,7 +57,7 @@ class DefaultAuthorizationIntentFactoryTest {
         val webIntent = Intent()
         whenever(mockWebIntentFactory.create(mockUri)).thenReturn(webIntent)
 
-        val intent = factory.createAuthorizeIntent(mockUri, ArrayList())
+        val intent = factory.createAuthorizeIntent(mockUri, emptyMap())
 
         assertEquals(webIntent, intent)
     }
@@ -70,11 +67,11 @@ class DefaultAuthorizationIntentFactoryTest {
         val webIntent = Intent()
         whenever(mockWebIntentFactory.create(mockUri)).thenReturn(webIntent)
 
-        whenever(mockPackageManager.anyValidPackageFor(any(), ArgumentMatchers.anyList())).thenReturn(false)
+        whenever(mockPackageManager.anyValidPackageFor(mockUri, emptyMap())).thenReturn(false)
 
-        val intent = factory.createAuthorizeIntent(mockUri, ArrayList())
+        val intent = factory.createAuthorizeIntent(mockUri, emptyMap())
 
-        verify(mockPackageManager).anyValidPackageFor(any(), ArgumentMatchers.anyList())
+        verify(mockPackageManager).anyValidPackageFor(mockUri, emptyMap())
 
         assertEquals(webIntent, intent)
     }
@@ -84,11 +81,11 @@ class DefaultAuthorizationIntentFactoryTest {
         val uri = Uri.parse("https://test.xci.com/authorize")
         whenever(mockRequest.toAuthorizationUri(anyString())).thenReturn(uri)
 
-        whenever(mockPackageManager.anyValidPackageFor(any(), ArgumentMatchers.anyList())).thenReturn(true)
+        whenever(mockPackageManager.anyValidPackageFor(uri, emptyMap())).thenReturn(true)
 
-        val intent = factory.createAuthorizeIntent(uri, ArrayList())
+        val intent = factory.createAuthorizeIntent(uri, emptyMap())
 
-        verify(mockPackageManager).anyValidPackageFor(any(), ArgumentMatchers.anyList())
+        verify(mockPackageManager).anyValidPackageFor(uri, emptyMap())
 
         assertEquals(uri, intent.data)
     }

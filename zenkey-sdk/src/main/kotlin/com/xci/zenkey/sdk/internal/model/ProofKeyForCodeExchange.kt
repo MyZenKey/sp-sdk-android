@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.xci.zenkey.sdk.internal.model
 
 import android.os.Parcel
@@ -22,22 +21,29 @@ import android.os.Parcelable
 internal data class ProofKeyForCodeExchange(
         val codeVerifier: String,
         val codeChallenge: String,
-        val codeChallengeMethod: CodeChallengeMethod
+        val codeChallengeMethod: String
 ): Parcelable {
 
     constructor(parcel: Parcel) : this(
             parcel.readString()!!,
             parcel.readString()!!,
-            CodeChallengeMethod.fromValue(parcel.readString()!!))
+            parcel.readString()!!)
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(codeVerifier)
         parcel.writeString(codeChallenge)
-        parcel.writeString(codeChallengeMethod.value)
+        parcel.writeString(codeChallengeMethod)
     }
 
     override fun describeContents(): Int {
         return 0
+    }
+
+    override fun toString(): String {
+        return "ProofKeyForCodeExchange(" +
+                "codeVerifier='$codeVerifier', " +
+                "codeChallenge='$codeChallenge', " +
+                "codeChallengeMethod=$codeChallengeMethod)"
     }
 
     companion object CREATOR : Parcelable.Creator<ProofKeyForCodeExchange> {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import java.security.cert.X509Certificate
  */
 internal class DefaultPublicKeyFactory internal constructor(
         private val certificateFactory: CertificateFactory,
-        private val messageDigest: MessageDigest
+        private val messageDigest: MessageDigest?
 ) : PublicKeyFactory {
 
     /**
@@ -39,7 +39,7 @@ internal class DefaultPublicKeyFactory internal constructor(
      */
     @Throws(CertificateException::class)
     override fun create(signature: ByteArray): ByteArray {
-        return messageDigest.digest(generateCertificate(signature).encoded)
+        return messageDigest?.digest(generateCertificate(signature).encoded) ?: ByteArray(0)
     }
 
     /**

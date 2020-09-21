@@ -1,0 +1,5 @@
+ext {
+    clientId = System.getenv('CLIENT_ID') ?: "MY_CLIENT_ID"
+    baseUrl = System.getenv('API_ENDPOINT') ?: "MY_API_ENDPOINT"
+}
+

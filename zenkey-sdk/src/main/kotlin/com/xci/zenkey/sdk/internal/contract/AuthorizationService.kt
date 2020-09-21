@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,19 @@
  */
 package com.xci.zenkey.sdk.internal.contract
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import com.xci.zenkey.sdk.internal.AuthorizationRequestActivity
 
 internal interface AuthorizationService {
 
-    fun onCreate(activity: Activity, intent: Intent, savedInstanceState: Bundle?)
+    fun onCreate(activity: AuthorizationRequestActivity, intent: Intent, savedInstanceState: Bundle?)
 
-    fun onResume(activity: Activity, intent: Intent)
+    fun onResume(activity: AuthorizationRequestActivity, intent: Intent)
 
     fun onSaveInstanceState(outState: Bundle)
 
-    fun onNewIntent(activity: Activity, intent: Intent)
+    fun onNewIntent(activity: AuthorizationRequestActivity, intent: Intent)
 
-    fun onDestroy(activity: Activity)
+    fun onDestroy(activity: AuthorizationRequestActivity)
 }

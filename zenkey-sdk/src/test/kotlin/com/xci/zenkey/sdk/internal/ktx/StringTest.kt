@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.xci.zenkey.sdk.internal.ktx
 
-import android.app.Activity
-import android.content.ActivityNotFoundException
-import android.content.Intent
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.SmallTest
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import org.junit.runner.RunWith
 
-internal fun Activity.startAuthorizationFlowActivity(intentToStart: Intent, onActivityNotFound: () -> Unit){
-    intent = intent.setData(null)
-    try {
-        startActivity(intentToStart)
-    } catch (e: ActivityNotFoundException) {
-        onActivityNotFound.invoke()
+@RunWith(AndroidJUnit4::class)
+@SmallTest
+class StringTest {
+    @Test
+    fun `should build proper code verifier`() {
+        val verifier = codeVerifier
+        assertNotNull(verifier)
+        assertTrue(verifier.length == 128)
+        verifier.matches(Regex("[a-zA-Z0-9\\-._~]+"))
     }
 }

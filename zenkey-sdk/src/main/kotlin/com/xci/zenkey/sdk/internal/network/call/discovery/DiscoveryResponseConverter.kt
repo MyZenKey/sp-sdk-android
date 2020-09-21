@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ internal class DiscoveryResponseConverter
                     responseObject.getString(Json.KEY_ISSUER),
                     responseObject.getString(Json.KEY_AUTHORIZATION_ENDPOINT),
                     responseObject.optString(Json.KEY_MCC_MNC),
-                    Branding(responseObject.getString(Json.KEY_LINK_BRANDING),
+                    Branding(responseObject.optString(Json.KEY_LINK_BRANDING),
                                responseObject.optString(Json.KEY_BRANDING))))
         }
     }

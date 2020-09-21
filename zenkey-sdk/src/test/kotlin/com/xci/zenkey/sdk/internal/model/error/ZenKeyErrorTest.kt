@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,7 +102,7 @@ class ZenKeyErrorTest {
         val userNotFound = ZenKeyError.USER_NOT_FOUND.asExposed()
 
         assertEquals(AuthorizationError.DISCOVERY_STATE, userNotFound)
-        assertEquals(ZenKeyError.USER_NOT_FOUND.error, userNotFound.description())
+        assertEquals(ZenKeyError.USER_NOT_FOUND.error, userNotFound.description)
 
 
         assertEquals(AuthorizationError.DISCOVERY_STATE, ZenKeyError.INVALID_LOGIN_HINT_TOKEN.asExposed())

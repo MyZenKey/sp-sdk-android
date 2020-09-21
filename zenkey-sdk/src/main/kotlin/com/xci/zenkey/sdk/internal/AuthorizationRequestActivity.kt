@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package com.xci.zenkey.sdk.internal
 
 import android.app.Activity
 import android.app.PendingIntent
+import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -54,6 +55,33 @@ class AuthorizationRequestActivity
         super.onDestroy()
     }
 
+    internal fun startDiscoverUi(
+            intentToStart: Intent,
+            onActivityNotFound: () -> Unit
+    ){
+        startAuthorizationFlowActivity(intentToStart, onActivityNotFound,
+                { intent, activity ->  activity.startActivity(intent) })
+    }
+
+    internal fun startAuthorize(
+            intentToStart: Intent,
+            onActivityNotFound: () -> Unit
+    ){
+        startAuthorizationFlowActivity(intentToStart, onActivityNotFound,
+                { intent, activity ->  activity.startActivityForResult(intent, 0) })
+    }
+
+    private fun startAuthorizationFlowActivity(intentToStart: Intent,
+                                                         onActivityNotFound: () -> Unit,
+                                                         startActivity: (Intent, Activity) -> Unit){
+        intent = intent.setData(null)
+        try {
+            startActivity.invoke(intentToStart, this)
+        } catch (e: ActivityNotFoundException) {
+            onActivityNotFound.invoke()
+        }
+    }
+
     companion object IntentFactory {
 
         fun createResponseHandlingIntent(context: Context, data: Uri): Intent {
@@ -63,12 +91,14 @@ class AuthorizationRequestActivity
             return intent
         }
 
-        fun createStartForResultIntent(packageName: String,
-                                       request: AuthorizationRequest,
-                                       successIntent: PendingIntent?,
-                                       failureIntent: PendingIntent?,
-                                       completionIntent: PendingIntent?,
-                                       cancellationIntent: PendingIntent?): Intent {
+        internal fun createStartForResultIntent(
+                packageName: String,
+                request: AuthorizationRequest,
+                successIntent: PendingIntent?,
+                failureIntent: PendingIntent?,
+                completionIntent: PendingIntent?,
+                cancellationIntent: PendingIntent?
+        ): Intent {
             val intent = Intent()
             intent.component = ComponentName(packageName, AuthorizationRequestActivity::class.java.name)
             intent.putExtra(DefaultAuthorizationService.EXTRA_KEY_REQUEST, request)

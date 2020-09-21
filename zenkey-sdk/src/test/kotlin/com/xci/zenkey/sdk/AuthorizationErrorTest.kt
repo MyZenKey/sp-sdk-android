@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,6 @@ class AuthorizationErrorTest {
         val description = "description"
         val error = AuthorizationError.UNKNOWN.withDescription(description)
         Assert.assertEquals(AuthorizationError.UNKNOWN, error)
-        Assert.assertEquals(description, error.description())
+        Assert.assertEquals(description, error.description)
     }
 }

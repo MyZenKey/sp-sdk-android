@@ -1,0 +1,5 @@
+ext {
+    Project sdk = getGradle().getRootProject().getChildProjects().get("zenkey-sdk")
+    VERSION_NAME = sdk.SEMANTIC_VERSION.name
+    VERSION_CODE = sdk.SEMANTIC_VERSION.code
+}

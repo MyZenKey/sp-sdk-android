@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,5 +18,11 @@ package com.xci.zenkey.sdk.internal.ktx
 
 import android.net.Uri
 
-internal fun Uri.Builder.appendQueryParameterIfNotNull(key: String, value: String?)
-        : Uri.Builder = this.apply { value?.let { appendQueryParameter(key, it) } }
+internal fun Uri.Builder.appendQueryParameterIfNotNull(
+        key: String,
+        value: String?
+): Uri.Builder = this.apply {
+    value?.let {
+        appendQueryParameter(key, it)
+    }
+}

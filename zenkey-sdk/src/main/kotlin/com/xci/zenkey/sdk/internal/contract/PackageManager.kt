@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,6 @@ package com.xci.zenkey.sdk.internal.contract;
 
 import android.net.Uri
 
-import com.xci.zenkey.sdk.internal.model.Package
-
 /**
  * Contract for platform PackageManager
  */
@@ -27,9 +25,9 @@ internal interface PackageManager {
     /**
      * Check if any package responding to the URI is matching both name and certificate fingerprints.
      * If
-     * @param uri the uri to check.
-     * @param expectedPackages the expected [List] of [Package]
+     * @param expected the expected list of packages.
      * @return true if any package handling the Uri is matching both expected name and certificates fingerprints
      */
-    fun anyValidPackageFor(uri: Uri, expectedPackages: List<Package>): Boolean
+    fun anyValidPackageFor(authorizationUri: Uri,
+                           expected: Map<String, List<String>>): Boolean
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import android.net.Uri
 import com.xci.zenkey.sdk.internal.contract.PackageManager
 import com.xci.zenkey.sdk.internal.ktx.getPackageInfoCompat
 import com.xci.zenkey.sdk.internal.ktx.signaturesCompat
-import com.xci.zenkey.sdk.internal.model.Package
 import com.xci.zenkey.sdk.internal.security.FingerprintFactory
 
 import java.security.cert.CertificateException
@@ -35,17 +34,15 @@ internal class AndroidPackageManager internal constructor(
     /**
      * Check if any package responding to the URI is matching both name and certificate fingerprints.
      * If
-     *
-     * @param uri              the uri to check.
-     * @param expectedPackages the expected [List] of [Package]
+     * @param expected the expected packages.
      * @return true if any package handling the Uri is matching both expected name and certificates fingerprints
      */
-    override fun anyValidPackageFor(uri: Uri, expectedPackages: List<Package>): Boolean {
-        val availablePackages = getAvailablePackages(uri)
+    override fun anyValidPackageFor(authorizationUri: Uri, expected: Map<String, List<String>>): Boolean {
+        val availablePackages = getAvailablePackages(authorizationUri)
         for (availablePackageName in availablePackages) {
-            for (expectedPackage in expectedPackages) {
-                if (availablePackageName == expectedPackage.name) {
-                    if (allFingerprintsAreValid(expectedPackage.fingerprints, getCertificateFingerprints(availablePackageName)))
+            for (expectedPackage in expected) {
+                if (availablePackageName == expectedPackage.key) {
+                    if (allFingerprintsAreValid(expectedPackage.value, getCertificateFingerprints(availablePackageName)))
                         return true
                 }
             }

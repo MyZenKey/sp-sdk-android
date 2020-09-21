@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,22 +17,16 @@ package com.xci.zenkey.sdk.internal
 
 import android.content.Intent
 import android.net.Uri
-
 import com.xci.zenkey.sdk.AuthorizeIntentBuilder
+
 import com.xci.zenkey.sdk.IdentityProvider
 import com.xci.zenkey.sdk.ZenKey
-import com.xci.zenkey.sdk.internal.contract.SimDataProvider
 import java.security.MessageDigest
 
 /**
  * A [IdentityProvider] implementation.
  * This class is responsible to provide the [IdentityProvider] name's
  * and the [Intent] used to start the authorization code flow.
- *
- *
- * This class is responsible to retrieve the MCC/MNC from a device SIM card using a [SimDataProvider] implementation,
- * and to build the authorization intent.
- *
  *
  * This class isn't intended to be manually instantiated.
  * You can obtain an Instance of [IdentityProvider] using [ZenKey.identityProvider]
@@ -41,10 +35,10 @@ internal class DefaultIdentityProvider internal constructor(
         private val packageName: String,
         private val clientId: String,
         private val defaultRedirectUri: Uri,
-        private val messageDigest: MessageDigest
+        private val messageDigest: MessageDigest?
 ) : IdentityProvider {
 
     override fun authorizeIntent(): AuthorizeIntentBuilder {
-        return AuthorizeIntentBuilder(packageName, clientId, messageDigest, defaultRedirectUri)
+        return DefaultAuthorizeIntentBuilder(packageName, clientId, messageDigest, defaultRedirectUri)
     }
 }

@@ -12,20 +12,25 @@ scmVersion {
             'feature/.*' : 'incrementMinor',
             'hotfix/.*' : 'incrementPatch',
             'release/.*' : 'incrementPrerelease',
+            'major/.*' : 'incrementMajor',
+            'minor/.*' : 'incrementMinor',
             'develop' : 'incrementMinor',
             'master' : { c ->
-                if(isHotfix()){
-                    c.currentVersion.incrementPatchVersion()
-                } else {
+                if(isLastMergedBranchNamePrefix("major")) {
+                    c.currentVersion.incrementMajorVersion()
+                } else if(isLastMergedBranchNamePrefix("minor")
+                        || isLastMergedBranchNamePrefix("feature")) {
                     c.currentVersion.incrementMinorVersion()
+                } else {
+                    c.currentVersion.incrementPatchVersion()
                 }
             }
     ]
 }
 
-static boolean isHotfix(){
+static boolean isLastMergedBranchNamePrefix(String value){
     String lastMergedBranchPrefix = getLastMergedBranchPrefix()
-    return  lastMergedBranchPrefix == null || lastMergedBranchPrefix == "/hotfix/"
+    return  lastMergedBranchPrefix != null && lastMergedBranchPrefix == "/$value/"
 }
 
 static String getLastMergedBranchPrefix() {

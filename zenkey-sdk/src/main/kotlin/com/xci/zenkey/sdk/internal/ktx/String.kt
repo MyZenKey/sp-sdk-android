@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ZenKey, LLC.
+ * Copyright 2019-2020 ZenKey, LLC.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package com.xci.zenkey.sdk.internal.ktx
 
 import android.util.Base64
+import com.xci.zenkey.sdk.internal.model.ProofKeyForCodeExchange
 import java.nio.charset.Charset
 import java.util.*
 
@@ -38,3 +37,9 @@ internal val codeVerifier: String
         }
         return sb.toString()
     }
+
+internal val String.plainProofKeyForCodeExchange: ProofKeyForCodeExchange
+    get() {
+        return ProofKeyForCodeExchange(this, this, CODE_CHALLENGE_METHOD_PLAIN)
+    }
+
