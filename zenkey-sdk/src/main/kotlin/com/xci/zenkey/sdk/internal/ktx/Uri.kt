@@ -18,7 +18,7 @@ package com.xci.zenkey.sdk.internal.ktx
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.support.customtabs.CustomTabsService
+import androidx.browser.customtabs.CustomTabsService
 import com.xci.zenkey.sdk.internal.Json.KEY_ACR_VALUES
 import com.xci.zenkey.sdk.internal.Json.KEY_CLIENT_ID
 import com.xci.zenkey.sdk.internal.Json.KEY_CODE

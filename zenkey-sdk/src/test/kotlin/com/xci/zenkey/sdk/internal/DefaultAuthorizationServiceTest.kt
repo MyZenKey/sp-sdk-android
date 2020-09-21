@@ -310,7 +310,7 @@ class DefaultAuthorizationServiceTest {
 
         assertEquals(MCC_MNC, outState.getString(Json.KEY_MCC_MNC))
         assertEquals(AuthorizationState.AUTHORIZE_USER_NOT_FOUND, outState.getSerializable(EXTRA_KEY_STATE))
-        assertEquals(mockRequest, outState.getParcelable(EXTRA_KEY_REQUEST) as AuthorizationRequest)
+        assertEquals(mockRequest, outState.getParcelable<AuthorizationRequest>(EXTRA_KEY_REQUEST) as AuthorizationRequest)
     }
 
     @Test
@@ -329,10 +329,10 @@ class DefaultAuthorizationServiceTest {
 
         assertEquals(MCC_MNC, outState.getString(Json.KEY_MCC_MNC))
         assertEquals(AuthorizationState.AUTHORIZE_USER_NOT_FOUND, outState.getSerializable(EXTRA_KEY_STATE))
-        assertEquals(mockSuccessIntent, outState.getParcelable(EXTRA_KEY_SUCCESS_INTENT) as PendingIntent)
-        assertEquals(mockFailureIntent, outState.getParcelable(EXTRA_KEY_FAILURE_INTENT) as PendingIntent)
-        assertEquals(mockCompletionIntent, outState.getParcelable(EXTRA_KEY_COMPLETION_INTENT) as PendingIntent)
-        assertEquals(mockCancellationIntent, outState.getParcelable(EXTRA_KEY_CANCELLATION_INTENT) as PendingIntent)
+        assertEquals(mockSuccessIntent, outState.getParcelable<PendingIntent>(EXTRA_KEY_SUCCESS_INTENT) as PendingIntent)
+        assertEquals(mockFailureIntent, outState.getParcelable<PendingIntent>(EXTRA_KEY_FAILURE_INTENT) as PendingIntent)
+        assertEquals(mockCompletionIntent, outState.getParcelable<PendingIntent>(EXTRA_KEY_COMPLETION_INTENT) as PendingIntent)
+        assertEquals(mockCancellationIntent, outState.getParcelable<PendingIntent>(EXTRA_KEY_CANCELLATION_INTENT) as PendingIntent)
         //assertEquals(mockRequest, outState.getSerializable(EXTRA_KEY_REQUEST));
     }
 

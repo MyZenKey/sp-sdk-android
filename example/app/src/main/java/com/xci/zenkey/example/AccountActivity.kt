@@ -18,8 +18,8 @@ package com.xci.zenkey.example
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import com.xci.zenkey.example.client.AccountApiClient
 import com.xci.zenkey.example.client.model.UserResponse
 import com.xci.zenkey.example.extension.restartApplication

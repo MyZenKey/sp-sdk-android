@@ -24,7 +24,7 @@ import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
-import android.support.customtabs.CustomTabsService
+import androidx.browser.customtabs.CustomTabsService
 import com.xci.zenkey.sdk.internal.ktx.getPackageInfoCompat
 import java.util.*
 

@@ -18,9 +18,9 @@ package com.xci.zenkey.example
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.xci.zenkey.example.client.AuthApiClient
 import com.xci.zenkey.example.client.extension.body
 import com.xci.zenkey.example.client.extension.error

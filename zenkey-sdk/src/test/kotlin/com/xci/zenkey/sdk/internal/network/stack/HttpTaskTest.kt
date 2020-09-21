@@ -23,7 +23,7 @@ import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-
+import org.robolectric.annotation.LooperMode
 import java.io.IOException
 import java.net.URL
 import java.util.HashMap
@@ -55,6 +55,7 @@ class HttpTaskTest {
 
     @Test
     @Throws(IOException::class, JSONException::class)
+    @LooperMode(LooperMode.Mode.LEGACY)
     fun shouldGetSuccessfulResponse() {
         val resultBody = TestBody()
         whenever(mockResponse.body).thenReturn(resultBody)
@@ -73,6 +74,7 @@ class HttpTaskTest {
 
     @Test
     @Throws(IOException::class, JSONException::class)
+    @LooperMode(LooperMode.Mode.LEGACY)
     fun shouldGetIOException() {
         val exception = IOException()
         whenever(mockExecutor.execute(mockRequest, mockJsonConverter)).thenThrow(exception)
@@ -86,6 +88,7 @@ class HttpTaskTest {
 
     @Test
     @Throws(IOException::class, JSONException::class)
+    @LooperMode(LooperMode.Mode.LEGACY)
     fun shouldGetJSONException() {
         val exception = JSONException("")
         whenever(mockExecutor.execute(mockRequest, mockJsonConverter)).thenThrow(exception)

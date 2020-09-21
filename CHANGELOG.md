@@ -5,7 +5,7 @@ All releases before 1.0.0 may contain breaking changes.
 After 1.0.0 this project will adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Versions
-[1.0.0 - 2020-09-21](#100---2020-09-21)
+[1.1.0 - 2020-09-21](#110---2020-09-21)
 
 ## Updating
 When the Unreleased section becomes a new version, duplicate the Template to create a new Unreleased section.
@@ -26,6 +26,11 @@ When the Unreleased section becomes a new version, duplicate the Template to cre
 ### Deprecated
 ### Fixed
 ### Security
+
+## [1.1.0] - 2020-09-21
+### Changed
+- Migrate support library to androidx
+- Update compileSdk/targetSdk version to 30
 
 ## [1.0.0] - 2020-09-21
 ### Added
