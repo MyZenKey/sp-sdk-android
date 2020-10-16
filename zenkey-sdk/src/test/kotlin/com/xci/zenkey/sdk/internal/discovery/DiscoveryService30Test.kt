@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.xci.zenkey.sdk.internal
+package com.xci.zenkey.sdk.internal.discovery
 
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -21,9 +21,7 @@ import com.nhaarman.mockitokotlin2.*
 import com.xci.zenkey.sdk.internal.contract.ICache
 import com.xci.zenkey.sdk.internal.model.DiscoveryResponse
 import com.xci.zenkey.sdk.internal.model.OpenIdConfiguration
-import com.xci.zenkey.sdk.internal.model.exception.AssetsNotFoundException
 import com.xci.zenkey.sdk.internal.model.exception.ProviderNotFoundException
-import com.xci.zenkey.sdk.internal.network.call.assetlinks.IAssetLinksCallFactory
 import com.xci.zenkey.sdk.internal.network.call.discovery.IDiscoveryCallFactory
 import com.xci.zenkey.sdk.internal.network.stack.HttpCall
 import com.xci.zenkey.sdk.internal.network.stack.HttpException
@@ -37,13 +35,12 @@ import java.net.HttpURLConnection
 import java.net.UnknownHostException
 
 @RunWith(AndroidJUnit4::class)
-class DiscoveryServiceTest {
+class DiscoveryService30Test {
     
     private interface SuccessCallback : (OpenIdConfiguration) -> Unit
     private interface FailureCallback : (Throwable) -> Unit
 
     private val mockDiscoveryCallFactory = mock<IDiscoveryCallFactory>()
-    private val mockAssetLinksCallFactory = mock<IAssetLinksCallFactory>()
     private val mockCache = mock<ICache<String, OpenIdConfiguration>>()
 
     private val mockSuccessUnit = mock<SuccessCallback>()
@@ -57,56 +54,30 @@ class DiscoveryServiceTest {
     private var oidcSuccessUnitCaptor = argumentCaptor<(HttpResponse<DiscoveryResponse>) -> Unit>()
     private var oidcErrorUnitCaptor = argumentCaptor<(Exception) -> Unit>()
 
-    //Assets
-    //private val mockAssets = mock<Assets>()
-    private val mockAssetHttpCall = mock<HttpCall<Map<String, List<String>>>>()
-    private val mockAssetsResponse = mock<HttpResponse<Map<String, List<String>>>>()
-    private var assetsSuccessUnitCaptor = argumentCaptor<(HttpResponse<Map<String, List<String>>>) -> Unit>()
-    private var assetsErrorUnitCaptor = argumentCaptor<(Exception) -> Unit>()
-
     private lateinit var discoveryService: DiscoveryService
 
     @Before
     fun setUp() {
         whenever(mockDiscoveryCallFactory.create(anyString(), anyBoolean())).thenReturn(mockOIDCHttpCall)
-        whenever(mockAssetLinksCallFactory.create(any())).thenReturn(mockAssetHttpCall)
 
         doNothing().whenever(mockOIDCHttpCall).enqueue(oidcSuccessUnitCaptor.capture(), oidcErrorUnitCaptor.capture())
-        doNothing().whenever(mockAssetHttpCall).enqueue(assetsSuccessUnitCaptor.capture(), assetsErrorUnitCaptor.capture())
 
         whenever(mockOIDCResponse.body).thenReturn(mockDiscoveryResponse)
-        whenever(mockAssetsResponse.body).thenReturn(PACKAGES)
 
         whenever(mockOidc.authorizationEndpoint).thenReturn(AUTHORIZATION_URI.toString())
-        discoveryService = DiscoveryService(mockCache, mockDiscoveryCallFactory, mockAssetLinksCallFactory)
+        discoveryService = DiscoveryService(mockCache, mockDiscoveryCallFactory)
     }
 
     @Test
     fun shouldGetOIDC() {
         whenever(mockDiscoveryResponse.configuration).thenReturn(mockOidc)
         whenever(mockOIDCResponse.isSuccessful).thenReturn(true)
-        whenever(mockAssetsResponse.isSuccessful).thenReturn(true)
 
         discoveryService.discoverConfiguration(MCC_MNC, false, mockSuccessUnit, mockErrorUnit)
 
         oidcSuccessUnitCaptor.firstValue.invoke(mockOIDCResponse)
-        assetsSuccessUnitCaptor.firstValue.invoke(mockAssetsResponse)
 
         verify(mockSuccessUnit).invoke(mockOidc)
-    }
-
-    @Test
-    fun shouldGetAssetNotFoundException() {
-        whenever(mockDiscoveryResponse.configuration).thenReturn(mockOidc)
-        whenever(mockOIDCResponse.isSuccessful).thenReturn(true)
-        whenever(mockAssetsResponse.isSuccessful).thenReturn(false)
-
-        discoveryService.discoverConfiguration(MCC_MNC, false, mockSuccessUnit, mockErrorUnit)
-
-        oidcSuccessUnitCaptor.firstValue.invoke(mockOIDCResponse)
-        assetsSuccessUnitCaptor.firstValue.invoke(mockAssetsResponse)
-
-        verify(mockErrorUnit).invoke(isA<AssetsNotFoundException>())
     }
 
     @Test
@@ -167,28 +138,11 @@ class DiscoveryServiceTest {
     fun shouldGetOIDCAndCacheItOnReceiveOpenIdConfigurationResponse() {
         whenever(mockDiscoveryResponse.configuration).thenReturn(mockOidc)
         whenever(mockOIDCResponse.isSuccessful).thenReturn(true)
-        whenever(mockAssetsResponse.isSuccessful).thenReturn(true)
 
         discoveryService.onReceiveOpenIdConfigurationResponse(MCC_MNC, mockOIDCResponse, mockSuccessUnit, mockErrorUnit)
 
-        assetsSuccessUnitCaptor.firstValue.invoke(mockAssetsResponse)
-
-        verify(mockOidc).packages = PACKAGES
         verify(mockSuccessUnit).invoke(mockOidc)
         verify(mockCache).put(MCC_MNC, mockOidc)
-    }
-
-    @Test
-    fun shouldGetAssetsNotFoundExceptionOnReceiveOpenIdConfigurationResponse() {
-        whenever(mockDiscoveryResponse.configuration).thenReturn(mockOidc)
-        whenever(mockOIDCResponse.isSuccessful).thenReturn(true)
-        whenever(mockAssetsResponse.isSuccessful).thenReturn(false)
-
-        discoveryService.onReceiveOpenIdConfigurationResponse(MCC_MNC, mockOIDCResponse, mockSuccessUnit, mockErrorUnit)
-
-        assetsSuccessUnitCaptor.firstValue.invoke(mockAssetsResponse)
-
-        verify(mockErrorUnit).invoke(isA<AssetsNotFoundException>())
     }
 
     @Test
@@ -226,35 +180,6 @@ class DiscoveryServiceTest {
         verify(mockErrorUnit).invoke(exception)
     }
 
-    @Test
-    fun shouldGetAssetsNetworkError() {
-        val exception = Exception()
-        discoveryService.getAssets(mockOidc, mockSuccessUnit, mockErrorUnit)
-
-        assetsErrorUnitCaptor.firstValue.invoke(exception)
-        verify(mockErrorUnit).invoke(exception)
-    }
-
-    @Test
-    fun shouldGetAssetsNotFoundException() {
-        whenever(mockAssetsResponse.isSuccessful).thenReturn(false)
-        discoveryService.getAssets(mockOidc, mockSuccessUnit, mockErrorUnit)
-
-        assetsSuccessUnitCaptor.firstValue.invoke(mockAssetsResponse)
-        verify(mockErrorUnit).invoke(isA<AssetsNotFoundException>())
-    }
-
-    @Test
-    fun shouldGetOidcWithAssets() {
-        whenever(mockAssetsResponse.isSuccessful).thenReturn(true)
-        discoveryService.getAssets(mockOidc, mockSuccessUnit, mockErrorUnit)
-
-        assetsSuccessUnitCaptor.firstValue.invoke(mockAssetsResponse)
-        verify(mockSuccessUnit).invoke(mockOidc)
-    }
-
-
-
     companion object {
         private const val MCC_MNC = "MCC_MNC"
         private const val SCHEME = "https"
@@ -266,6 +191,5 @@ class DiscoveryServiceTest {
                 .path(PATH)
                 .build()
 
-        private val PACKAGES = emptyMap<String, List<String>>()
     }
 }

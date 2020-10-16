@@ -16,7 +16,11 @@
 package com.xci.zenkey.sdk.internal
 
 import android.content.Context
+import android.os.Build
 import com.xci.zenkey.sdk.internal.contract.AuthorizationService
+import com.xci.zenkey.sdk.internal.contract.IDiscoveryService
+import com.xci.zenkey.sdk.internal.discovery.DiscoveryService16
+import com.xci.zenkey.sdk.internal.discovery.DiscoveryService
 import com.xci.zenkey.sdk.internal.ktx.SHA256MessageDigest
 import com.xci.zenkey.sdk.internal.ktx.telephonyManager
 import com.xci.zenkey.sdk.internal.security.DefaultFingerprintFactory
@@ -31,7 +35,11 @@ internal class DefaultContentProvider
                 CertificateFactory.getInstance(CERTIFICATE_FACTORY_TYPE),
                 SHA256MessageDigest)
 
-        discoveryService = DiscoveryService(clientId)
+        discoveryService = if(Build.VERSION.SDK_INT < Build.VERSION_CODES.R){
+            DiscoveryService16(clientId)
+        } else {
+            DiscoveryService(clientId)
+        }
 
         authorizationService = DefaultAuthorizationService(
                 discoveryService,
@@ -51,7 +59,7 @@ internal class DefaultContentProvider
         internal lateinit var authorizationService: AuthorizationService
 
         @Volatile
-        internal lateinit var discoveryService: DiscoveryService
+        internal lateinit var discoveryService: IDiscoveryService
 
         internal fun authorizationService(): AuthorizationService {
             return authorizationService

@@ -36,7 +36,7 @@ internal class OpenIdConfiguration {
      */
     val authorizationEndpoint: String
     private val expiredAt: Date
-    lateinit var packages: Map<String, List<String>>
+    var packages: Map<String, List<String>>? = null
 
     /**
      * Get the configuration Issuer.

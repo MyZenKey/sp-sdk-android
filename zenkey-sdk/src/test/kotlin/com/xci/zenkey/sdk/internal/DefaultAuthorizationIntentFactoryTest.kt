@@ -91,11 +91,11 @@ class DefaultAuthorizationIntentFactoryTest {
     }
 
     @Test
-    fun shouldCreateDiscoverUIIntent() {
+    fun shouldCreateBrowserIntent() {
         val discoverUiIntent = Intent()
         whenever(mockWebIntentFactory.create(mockUri)).thenReturn(discoverUiIntent)
 
-        val intent = factory.createDiscoverUIIntent(mockUri)
+        val intent = factory.createBrowserIntent(mockUri)
 
         verify(mockWebIntentFactory).create(mockUri)
         assertEquals(discoverUiIntent, intent)

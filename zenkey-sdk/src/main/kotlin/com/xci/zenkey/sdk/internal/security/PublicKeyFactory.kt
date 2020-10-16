@@ -20,6 +20,7 @@ import java.security.cert.CertificateException
 /**
  * Contract for a Certificate signature public key factory.
  */
+@Deprecated("Deprecated since Android 30 (R)")
 internal interface PublicKeyFactory {
 
     /**

@@ -26,6 +26,7 @@ import com.xci.zenkey.sdk.internal.security.FingerprintFactory
 import java.security.cert.CertificateException
 import java.util.ArrayList
 
+@Deprecated("Deprecated since Android 30 (R)")
 internal class AndroidPackageManager internal constructor(
         private val androidPackageManager: android.content.pm.PackageManager,
         private val fingerprintFactory: FingerprintFactory?
