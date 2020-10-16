@@ -28,7 +28,7 @@ import com.xci.zenkey.sdk.internal.model.AuthorizationRequest
 class AuthorizationRequestActivity
     : Activity() {
 
-    internal var authorizationService = DefaultContentProvider.authorizationService()
+    private var authorizationService = DefaultContentProvider.authorizationService()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,25 +55,27 @@ class AuthorizationRequestActivity
         super.onDestroy()
     }
 
-    internal fun startDiscoverUi(
+    internal fun startBrowser(
             intentToStart: Intent,
             onActivityNotFound: () -> Unit
     ){
-        startAuthorizationFlowActivity(intentToStart, onActivityNotFound,
+        startNextStep(intentToStart, onActivityNotFound,
                 { intent, activity ->  activity.startActivity(intent) })
     }
 
-    internal fun startAuthorize(
+    internal fun startZenKeyApp(
             intentToStart: Intent,
             onActivityNotFound: () -> Unit
     ){
-        startAuthorizationFlowActivity(intentToStart, onActivityNotFound,
+        startNextStep(intentToStart, onActivityNotFound,
                 { intent, activity ->  activity.startActivityForResult(intent, 0) })
     }
 
-    private fun startAuthorizationFlowActivity(intentToStart: Intent,
-                                                         onActivityNotFound: () -> Unit,
-                                                         startActivity: (Intent, Activity) -> Unit){
+    private fun startNextStep(
+        intentToStart: Intent,
+        onActivityNotFound: () -> Unit,
+        startActivity: (Intent, Activity) -> Unit
+    ){
         intent = intent.setData(null)
         try {
             startActivity.invoke(intentToStart, this)

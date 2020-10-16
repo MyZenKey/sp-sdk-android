@@ -24,6 +24,7 @@ import java.security.cert.CertificateFactory
  * Implementation of [FingerprintFactory]
  * This class is responsible to create fingerprint of certificate signature.
  */
+@Deprecated("Deprecated since Android 30 (R)")
 internal class DefaultFingerprintFactory internal constructor(
         private val publicKeyFactory: PublicKeyFactory
 ) : FingerprintFactory {

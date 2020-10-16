@@ -26,6 +26,7 @@ import java.security.cert.X509Certificate
  * A [PublicKeyFactory] implementation.
  * This class is responsible to create certificate signature public key's.
  */
+@Deprecated("Deprecated since Android 30 (R)")
 internal class DefaultPublicKeyFactory internal constructor(
         private val certificateFactory: CertificateFactory,
         private val messageDigest: MessageDigest?

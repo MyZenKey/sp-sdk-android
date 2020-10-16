@@ -20,6 +20,7 @@ import android.net.Uri
 /**
  * Contract for platform PackageManager
  */
+@Deprecated("Deprecated since Android 30 (R)")
 internal interface PackageManager {
 
     /**

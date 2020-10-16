@@ -53,7 +53,7 @@ internal object BrowserSelector {
      */
     internal val BROWSER_INTENT = Intent(
             Intent.ACTION_VIEW,
-            Uri.parse("http://www.example.com"))
+            Uri.parse("https://www.example.com"))
 
     /**
      * Retrieves the full list of browsers installed on the device. Two entries will exist

@@ -32,7 +32,7 @@ internal interface IDiscoveryService {
      *
      * @param mccMnc  a tuple containing the MCC and MNC of the SIM Card.
      * @param prompt   the prompt parameter.
-     * @param listener the listener receiving the result of the [OpenIdConfiguration] discovery.
+     * @param onSuccess the listener receiving the result of the [OpenIdConfiguration] discovery.
      * This listener might receive the following errors:
      * [ProviderNotFoundException] if the remote or local discovery
      * wasn't able to match an [OpenIdConfiguration] for the provided MCC/MNC tuple.
