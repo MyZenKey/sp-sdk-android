@@ -22,6 +22,7 @@ import com.xci.zenkey.sdk.internal.network.stack.HttpCall
 /**
  * Contract for [IAssetLinksCallFactory]
  */
+@Deprecated("Deprecated since Android 30 (R)")
 internal interface IAssetLinksCallFactory {
 
     /**

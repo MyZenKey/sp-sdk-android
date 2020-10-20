@@ -24,7 +24,7 @@ import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
-import android.support.customtabs.CustomTabsService
+import androidx.browser.customtabs.CustomTabsService
 import com.xci.zenkey.sdk.internal.ktx.getPackageInfoCompat
 import java.util.*
 
@@ -53,7 +53,7 @@ internal object BrowserSelector {
      */
     internal val BROWSER_INTENT = Intent(
             Intent.ACTION_VIEW,
-            Uri.parse("http://www.example.com"))
+            Uri.parse("https://www.example.com"))
 
     /**
      * Retrieves the full list of browsers installed on the device. Two entries will exist

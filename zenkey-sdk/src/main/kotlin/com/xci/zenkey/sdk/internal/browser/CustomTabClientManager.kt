@@ -15,7 +15,7 @@
  */
 package com.xci.zenkey.sdk.internal.browser
 
-import android.support.customtabs.CustomTabsClient
+import androidx.browser.customtabs.CustomTabsClient
 
 internal interface CustomTabClientManager {
 

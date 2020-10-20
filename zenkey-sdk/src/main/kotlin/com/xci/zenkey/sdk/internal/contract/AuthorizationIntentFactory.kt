@@ -23,10 +23,12 @@ import com.xci.zenkey.sdk.internal.browser.NoBrowserException
 internal interface AuthorizationIntentFactory {
 
     @Throws(NoBrowserException::class)
-    fun createAuthorizeIntent(authorizationUri: Uri, packages: Map<String, List<String>>): Intent
+    @Deprecated("This method is useless since Android R, " +
+        "we can no longer validate a package signature(s)")
+    fun createAuthorizeIntent(authorizationUri: Uri, packages: Map<String, List<String>>?): Intent
 
     @Throws(NoBrowserException::class)
-    fun createDiscoverUIIntent(uri: Uri): Intent
+    fun createBrowserIntent(uri: Uri): Intent
 
     fun bindWebSession(context: Context)
 

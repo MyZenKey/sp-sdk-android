@@ -29,7 +29,7 @@ Next, add your `client_id` to the ZenKey SDK Example app:
 ## 2. Create a sample backend server
 
 The ZenKey SDK Example app can only start the ZenKey authorization flow. For security, the final token request must be made from a secure server. To test the complete authorization flow, use the provided Python sample code to set up a server instance. In the instance, you set the ZenKey secret you got from the portal. The server sample code and instructions are here:
-[API Backend Sample Repo](https://github.com/MyZenKey/sp-sdk-provider-integration-web/Examples/APIBackend).
+[API Backend Sample Repo](https://github.com/MyZenKey/sp-sdk-provider-integration-web/tree/master/Examples/APIBackend).
 
 Note: Never store the ZenKey secret in a public binary.
 
@@ -45,7 +45,7 @@ You can run the ZenKey SDK Example app on a real phone with a real SIM card to a
 
 To test a carrier authorization request:
 1. Launch the ZenKey SDK Example app and tap "Sign in with ZenKey".
-2. The SDK Determines if it is running on a primary or secondary device and helps you install the ZenKey app for your carrier, if needed.
+2. The SDK determines if it is running on a primary or secondary device and helps you install the ZenKey app for your carrier, if needed.
 3. The SDK launches the ZenKey app which asks you to authorize your app.
 4. The ZenKey app redirects you back to the ZenKey SDK Example app with an `AuthorizationResponse` from the user's carrier.
 5. The ZenKey SDK Example app uses the `AuthorizationResponse` to request a sign-in from the sample server.

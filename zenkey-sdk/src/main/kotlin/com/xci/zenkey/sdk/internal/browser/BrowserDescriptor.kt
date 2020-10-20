@@ -37,7 +37,7 @@ internal class BrowserDescriptor private constructor(
     internal constructor(packageInfo: PackageInfo, useCustomTab: Boolean) : this(
             packageInfo.packageName,
             generateSignatureHashes(packageInfo.signaturesCompat),
-            packageInfo.versionName,
+            packageInfo.versionName ?: "",
             useCustomTab)
 
     override fun equals(other: Any?): Boolean {

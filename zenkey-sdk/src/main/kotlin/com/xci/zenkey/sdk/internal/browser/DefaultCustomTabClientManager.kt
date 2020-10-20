@@ -15,8 +15,7 @@
  */
 package com.xci.zenkey.sdk.internal.browser
 
-import android.support.customtabs.CustomTabsClient
-
+import androidx.browser.customtabs.CustomTabsClient
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference

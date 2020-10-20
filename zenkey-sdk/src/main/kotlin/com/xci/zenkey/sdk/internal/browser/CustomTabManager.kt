@@ -18,9 +18,9 @@ package com.xci.zenkey.sdk.internal.browser
 import android.content.ComponentName
 import android.content.Context
 import android.net.Uri
-import android.support.customtabs.CustomTabsClient
-import android.support.customtabs.CustomTabsIntent.Builder
-import android.support.customtabs.CustomTabsServiceConnection
+import androidx.browser.customtabs.CustomTabsClient
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.browser.customtabs.CustomTabsServiceConnection
 import com.xci.zenkey.sdk.internal.contract.Logger
 
 /**
@@ -90,8 +90,8 @@ internal class CustomTabManager {
      * should be ordered such that the most likely URI to be requested is first. If the selected
      * browser does not support custom tabs, then the URI list has no effect.
      */
-    fun createTabBuilder(vararg possibleUris: Uri): Builder {
-        return Builder(
-                sessionFactory.create(clientManager.get(), null, *possibleUris))
+    fun createTabBuilder(vararg possibleUris: Uri): CustomTabsIntent.Builder {
+        return CustomTabsIntent.Builder(
+            sessionFactory.create(clientManager.get(), null, *possibleUris))
     }
 }

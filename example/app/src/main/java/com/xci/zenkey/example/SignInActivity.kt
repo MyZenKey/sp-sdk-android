@@ -18,9 +18,9 @@ package com.xci.zenkey.example
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.xci.zenkey.example.client.AuthApiClient
 import com.xci.zenkey.example.client.extension.body
 import com.xci.zenkey.example.client.extension.error
@@ -58,7 +58,7 @@ class SignInActivity : AppCompatActivity() {
     private fun configureZenKeyButtonRequest() {
         //Enable the logs if it's a debug-able version of the application.
         ZenKey.logs(BuildConfig.DEBUG)
-        // other scopes registered for this client_id through the SP portal should be added here.
+        // other scopes registered for this client_id through the developer portal should be added here.
         zenkeyButton.setScopes(Scopes.OPEN_ID)
         //Set a request code to use for starting the ZenKey activity for result
         //By default the ZenKeyButton will use the following default request code value [ZenKeyButton.DEFAULT_REQUEST_CODE]
@@ -103,6 +103,25 @@ class SignInActivity : AppCompatActivity() {
     /**
      * Try exchanging authorization code to a token.
      * @param response the [AuthorizationResponse] received from the ZenKey SDK.
+     * We recommended that you send the entire contents of the AuthorizationResponse
+     * to your secure backend. An AuthorizationResponse contains the parameters needed for the
+     * token request, except for your ZenKey secret. It also contains parameters that you can
+     * use to validate the token response.
+     *
+     * This signInWithZenkey function is only an example of how you might set up your endpoint.
+     *
+     * In account migration scenarios, where a user of your app has changed from one phone
+     * carrier to another, the carrier's token endpoint response will contain one or more
+     * `port_token` values for previous carriers associated with this user. Your
+     * backend can use that port token to update the user in your database, and return
+     * the appropriate user for this sign-in request.
+     *
+     * However, there are some scenarios in which the backend will be unable to associate it
+     * with an existing user and a returning user may appear to be a new user in this sign-in
+     * response. (In the code example below, both a new user and a returning user that can't
+     * be associated in the backend are represented with "unlinked_user".) For this reason,
+     * you should always give what appears to be a new user the opportunity to link to an
+     * existing account in your database.
      */
     private fun signInWithZenkey(response: AuthorizationResponse) {
         AuthApiClient.getInstance(
@@ -128,7 +147,13 @@ class SignInActivity : AppCompatActivity() {
                         if(response.isSuccessful){
                             onUserAuthenticated(response.body)
                         } else {
-                            onZenKeyError(response.error)
+                            if(response.error.error == "unlinked_user") {
+                                // Handle account linking
+                                // This user has not signed in with ZenKey previously
+                                onUnlinkedUser()
+                            } else {
+                                onZenKeyError(response.error)
+                            }
                         }
                         hideLoading()
                     }
@@ -142,8 +167,18 @@ class SignInActivity : AppCompatActivity() {
         AccountActivity.start(this, tokenResponse.token)
     }
 
+    /**
+     * Sample error message
+     */
     private fun onZenKeyError(error: ErrorResponse) {
         Toast.makeText(this, error.error, Toast.LENGTH_LONG).show()
+    }
+
+    /**
+     * Sample unlinked user message
+     */
+    private fun onUnlinkedUser() {
+        Toast.makeText(this, "User has not previously signed in with ZenKey", Toast.LENGTH_LONG).show()
     }
 
     /**

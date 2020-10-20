@@ -5,7 +5,6 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply from: "$projectDir/gradle/environment.gradle"
 apply from: "$projectDir/gradle/version.gradle"
-apply from: "$projectDir/gradle/publication.gradle"
 
 android {
     compileSdkVersion buildConfig.compileSdk
@@ -65,7 +64,7 @@ dependencies {
     implementation project(':example:client')
 
     implementation libs.kotlin.stdlib
-    implementation libs.android.support.appCompat
-    implementation libs.android.support.cardview
-    implementation libs.android.support.constraintlayout
+    implementation libs.android.x.appCompat
+    implementation libs.android.x.cardview
+    implementation libs.android.x.constraintlayout
 }

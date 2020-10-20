@@ -5,7 +5,7 @@ All releases before 1.0.0 may contain breaking changes.
 After 1.0.0 this project will adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Versions
-[0.14.2 - 2020-07-10](#0142---2020-07-10)
+[1.1.2 - 2020-09-28](#112---2020-09-28)
 
 ## Updating
 When the Unreleased section becomes a new version, duplicate the Template to create a new Unreleased section.
@@ -21,11 +21,34 @@ When the Unreleased section becomes a new version, duplicate the Template to cre
 ## [Unreleased]
 ### Added
 ### Changed
-- Force Android Security Provider Update.
 ### Removed
 ### Deprecated
 ### Fixed
 ### Security
+
+## [1.1.2] - 2020-09-28
+### Fixed
+- Fixed crash on startup when a browser has no versionName
+- Bypass checking visibility of ZenKey app of SDK 30
+
+## [1.1.1] - 2020-09-23
+### Changed
+- Force Android Security Provider Update.
+### Fixed
+- Lack of browser visibility on Android 11
+
+## [1.1.0] - 2020-09-21
+### Changed
+- Migrate support library to androidx
+- Update compileSdk/targetSdk version to 30
+
+## [1.0.0] - 2020-09-21
+### Added
+- Example for user carrier migration
+### Changed
+- Update support library to 28.0.0
+- Update README.md with minor edits
+- Update the name of the Developer Portal throughout the docs
 
 ## [0.14.2] - 2020-07-10
 ### Changed

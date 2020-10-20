@@ -78,8 +78,8 @@ class DefaultAuthorizationServiceTest {
         whenever(mockRequest.toDiscoverUiUri(DISCOVER_UI_ENDPOINT)).thenReturn(mockDiscoverUIUri)
         whenever(mockRequest.redirectUri).thenReturn(REDIRECT_URI)
 
-        doCallRealMethod().whenever(mockAuthorizationRequestActivity).startAuthorize(any(), any())
-        doCallRealMethod().whenever(mockAuthorizationRequestActivity).startDiscoverUi(any(), any())
+        doCallRealMethod().whenever(mockAuthorizationRequestActivity).startZenKeyApp(any(), any())
+        doCallRealMethod().whenever(mockAuthorizationRequestActivity).startBrowser(any(), any())
 
         whenever(mockTelephonyManager.simState).thenReturn(TelephonyManager.SIM_STATE_READY)
 
@@ -310,7 +310,7 @@ class DefaultAuthorizationServiceTest {
 
         assertEquals(MCC_MNC, outState.getString(Json.KEY_MCC_MNC))
         assertEquals(AuthorizationState.AUTHORIZE_USER_NOT_FOUND, outState.getSerializable(EXTRA_KEY_STATE))
-        assertEquals(mockRequest, outState.getParcelable(EXTRA_KEY_REQUEST) as AuthorizationRequest)
+        assertEquals(mockRequest, outState.getParcelable<AuthorizationRequest>(EXTRA_KEY_REQUEST) as AuthorizationRequest)
     }
 
     @Test
@@ -329,10 +329,10 @@ class DefaultAuthorizationServiceTest {
 
         assertEquals(MCC_MNC, outState.getString(Json.KEY_MCC_MNC))
         assertEquals(AuthorizationState.AUTHORIZE_USER_NOT_FOUND, outState.getSerializable(EXTRA_KEY_STATE))
-        assertEquals(mockSuccessIntent, outState.getParcelable(EXTRA_KEY_SUCCESS_INTENT) as PendingIntent)
-        assertEquals(mockFailureIntent, outState.getParcelable(EXTRA_KEY_FAILURE_INTENT) as PendingIntent)
-        assertEquals(mockCompletionIntent, outState.getParcelable(EXTRA_KEY_COMPLETION_INTENT) as PendingIntent)
-        assertEquals(mockCancellationIntent, outState.getParcelable(EXTRA_KEY_CANCELLATION_INTENT) as PendingIntent)
+        assertEquals(mockSuccessIntent, outState.getParcelable<PendingIntent>(EXTRA_KEY_SUCCESS_INTENT) as PendingIntent)
+        assertEquals(mockFailureIntent, outState.getParcelable<PendingIntent>(EXTRA_KEY_FAILURE_INTENT) as PendingIntent)
+        assertEquals(mockCompletionIntent, outState.getParcelable<PendingIntent>(EXTRA_KEY_COMPLETION_INTENT) as PendingIntent)
+        assertEquals(mockCancellationIntent, outState.getParcelable<PendingIntent>(EXTRA_KEY_CANCELLATION_INTENT) as PendingIntent)
         //assertEquals(mockRequest, outState.getSerializable(EXTRA_KEY_REQUEST));
     }
 
@@ -342,12 +342,12 @@ class DefaultAuthorizationServiceTest {
         val activityIntent = Intent()
         val discoverUIIntent = Intent()
         whenever(mockAuthorizationRequestActivity.intent).thenReturn(activityIntent)
-        whenever(mockIntentFactory.createDiscoverUIIntent(mockDiscoverUIUri)).thenReturn(discoverUIIntent)
+        whenever(mockIntentFactory.createBrowserIntent(mockDiscoverUIUri)).thenReturn(discoverUIIntent)
         doNothing().whenever(mockAuthorizationRequestActivity).startActivity(discoverUIIntent)
 
-        authorizationService.startDiscoverUI(mockAuthorizationRequestActivity, DISCOVER_UI_ENDPOINT)
+        authorizationService.startBrowser(mockAuthorizationRequestActivity, mockDiscoverUIUri)
 
-        verify(mockIntentFactory).createDiscoverUIIntent(mockDiscoverUIUri)
+        verify(mockIntentFactory).createBrowserIntent(mockDiscoverUIUri)
         verify(mockAuthorizationRequestActivity).startActivity(discoverUIIntent)
         verify(mockAuthorizationRequestActivity).intent
         verify(mockAuthorizationRequestActivity).intent = activityIntent
@@ -415,7 +415,7 @@ class DefaultAuthorizationServiceTest {
 
         doNothing().whenever(mockDiscoveryService).discoverConfiguration(eq(MCC_MNC), eq(false), oidcSuccessUnitCaptor.capture(), oidcErrorUnitCaptor.capture())
         val discoverUIIntent = Intent()
-        whenever(mockIntentFactory.createDiscoverUIIntent(mockDiscoverUIUri)).thenReturn(discoverUIIntent)
+        whenever(mockIntentFactory.createBrowserIntent(mockDiscoverUIUri)).thenReturn(discoverUIIntent)
         doNothing().whenever(mockAuthorizationRequestActivity).startActivity(discoverUIIntent)
 
 
@@ -425,7 +425,7 @@ class DefaultAuthorizationServiceTest {
 
         oidcErrorUnitCaptor.firstValue.invoke(providerNotFoundException)
         assertEquals(AuthorizationState.DISCOVER_UI, authorizationService.state)
-        verify(mockIntentFactory).createDiscoverUIIntent(mockDiscoverUIUri)
+        verify(mockIntentFactory).createBrowserIntent(mockDiscoverUIUri)
         verify(mockAuthorizationRequestActivity).startActivity(discoverUIIntent)
         verify(mockAuthorizationRequestActivity).intent
         verify(mockAuthorizationRequestActivity).intent = activityIntent
@@ -622,7 +622,7 @@ class DefaultAuthorizationServiceTest {
 
         doNothing().whenever(mockDiscoveryService).discoverConfiguration(eq(MCC_MNC), eq(true), oidcSuccessUnitCaptor.capture(), oidcErrorUnitCaptor.capture())
 
-        whenever(mockIntentFactory.createDiscoverUIIntent(mockDiscoverUIUri)).thenReturn(discoverUIIntent)
+        whenever(mockIntentFactory.createBrowserIntent(mockDiscoverUIUri)).thenReturn(discoverUIIntent)
         doNothing().whenever(mockAuthorizationRequestActivity).startActivity(discoverUIIntent)
 
         authorizationService.onStateAuthorize(mockAuthorizationRequestActivity, redirect)
@@ -632,7 +632,7 @@ class DefaultAuthorizationServiceTest {
         oidcErrorUnitCaptor.firstValue.invoke(throwable)
 
         assertEquals(AuthorizationState.DISCOVER_USER_NOT_FOUND, authorizationService.state)
-        verify(mockIntentFactory).createDiscoverUIIntent(mockDiscoverUIUri)
+        verify(mockIntentFactory).createBrowserIntent(mockDiscoverUIUri)
         verify(mockAuthorizationRequestActivity).startActivity(discoverUIIntent)
         verify(mockAuthorizationRequestActivity).intent
         verify(mockAuthorizationRequestActivity).intent = activityIntent
@@ -918,12 +918,12 @@ class DefaultAuthorizationServiceTest {
         val activityIntent = Intent()
         val discoverUiIntent = Intent()
         whenever(mockAuthorizationRequestActivity.intent).thenReturn(activityIntent)
-        whenever(mockIntentFactory.createDiscoverUIIntent(mockDiscoverUIUri)).thenReturn(discoverUiIntent)
+        whenever(mockIntentFactory.createBrowserIntent(mockDiscoverUIUri)).thenReturn(discoverUiIntent)
         doNothing().whenever(mockAuthorizationRequestActivity).startActivity(discoverUiIntent)
 
         authorizationService.onProviderNotFoundError(mockAuthorizationRequestActivity, DISCOVER_UI_ENDPOINT)
 
-        verify(mockIntentFactory).createDiscoverUIIntent(mockDiscoverUIUri)
+        verify(mockIntentFactory).createBrowserIntent(mockDiscoverUIUri)
         verify(mockAuthorizationRequestActivity).startActivity(discoverUiIntent)
         verify(mockAuthorizationRequestActivity).intent
         verify(mockAuthorizationRequestActivity).intent = activityIntent

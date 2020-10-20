@@ -18,9 +18,12 @@ package com.xci.zenkey.sdk.internal
 import android.app.Activity
 import android.app.PendingIntent
 import android.content.Intent
+import android.content.Intent.*
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.telephony.TelephonyManager
+import androidx.annotation.RequiresApi
 import com.xci.zenkey.sdk.AuthorizationError
 import com.xci.zenkey.sdk.AuthorizationError.*
 import com.xci.zenkey.sdk.AuthorizationError.Companion.MISSING_DISCOVER_UI_ENDPOINT
@@ -38,10 +41,10 @@ import com.xci.zenkey.sdk.internal.model.OpenIdConfiguration
 import com.xci.zenkey.sdk.internal.model.exception.ProviderNotFoundException
 
 internal class DefaultAuthorizationService internal constructor(
-        private val discoveryService: IDiscoveryService,
-        private val intentFactory: AuthorizationIntentFactory,
-        private val telephonyManager: TelephonyManager,
-        private val responseFactory: AuthorizationResponse.Factory
+    private val discoveryService: IDiscoveryService,
+    private val intentFactory: AuthorizationIntentFactory,
+    private val telephonyManager: TelephonyManager,
+    private val responseFactory: AuthorizationResponse.Factory
 ) : AuthorizationService {
 
     internal var state: AuthorizationState? = null
@@ -52,7 +55,11 @@ internal class DefaultAuthorizationService internal constructor(
     internal var completionIntent: PendingIntent? = null
     internal var cancellationIntent: PendingIntent? = null
 
-    override fun onCreate(activity: AuthorizationRequestActivity, intent: Intent, savedInstanceState: Bundle?) {
+    override fun onCreate(
+        activity: AuthorizationRequestActivity,
+        intent: Intent,
+        savedInstanceState: Bundle?
+    ) {
         if (savedInstanceState == null && intent.extras == null) {
             //TODO should setResult with error.
             activity.finish()
@@ -63,27 +70,39 @@ internal class DefaultAuthorizationService internal constructor(
         extractState(savedInstanceState ?: intent.extras!!)
     }
 
-    override fun onResume(activity: AuthorizationRequestActivity, intent: Intent) {
+    override fun onResume(
+        activity: AuthorizationRequestActivity,
+        intent: Intent
+    ) {
         checkState(activity, intent)
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
+    override fun onSaveInstanceState(
+        outState: Bundle
+    ) {
         saveState(outState)
     }
 
-    override fun onNewIntent(activity: AuthorizationRequestActivity, intent: Intent) {
+    override fun onNewIntent(
+        activity: AuthorizationRequestActivity,
+        intent: Intent
+    ) {
         activity.intent = intent
     }
 
-    override fun onDestroy(activity: AuthorizationRequestActivity) {
+    override fun onDestroy(
+        activity: AuthorizationRequestActivity
+    ) {
         this.intentFactory.unbindWebSession(activity)
     }
 
-    private fun extractState(savedInstanceState: Bundle) {
+    private fun extractState(
+        savedInstanceState: Bundle
+    ) {
         request = savedInstanceState.getParcelable(EXTRA_KEY_REQUEST)!!
         mccMnc = savedInstanceState.getString(Json.KEY_MCC_MNC, null)
 
-        if(savedInstanceState.containsKey(EXTRA_KEY_STATE)){
+        if (savedInstanceState.containsKey(EXTRA_KEY_STATE)) {
             state = savedInstanceState.getSerializable(EXTRA_KEY_STATE) as AuthorizationState
         } else {
             updateState(NONE)
@@ -95,7 +114,10 @@ internal class DefaultAuthorizationService internal constructor(
         cancellationIntent = savedInstanceState.getParcelable(EXTRA_KEY_CANCELLATION_INTENT)
     }
 
-    internal fun checkState(activity: AuthorizationRequestActivity, intent: Intent) {
+    internal fun checkState(
+        activity: AuthorizationRequestActivity,
+        intent: Intent
+    ) {
         val resultUri = intent.data
         when {
             this.state == NONE -> onStateNone(activity)
@@ -109,87 +131,101 @@ internal class DefaultAuthorizationService internal constructor(
         }
     }
 
-    internal fun onStateNone(activity: AuthorizationRequestActivity) {
+    internal fun onStateNone(
+        activity: AuthorizationRequestActivity
+    ) {
         updateMccMnc(telephonyManager.simOperatorReady)
         Logger.get().begin(request, mccMnc)
         discoverOpenIdConfiguration(false,
-                { authorize(activity, it, AUTHORIZE, null) },
-                { throwable ->
-                    handleProviderNotFoundOrFinish(activity, throwable) {
-                        discoverUiEndpoint ->
-                        updateState(DISCOVER_UI)
-                        onProviderNotFoundError(activity, discoverUiEndpoint)
-                    }
-                })
+            { authorize(activity, it, AUTHORIZE, null) },
+            { throwable ->
+                handleProviderNotFoundOrFinish(activity, throwable) { discoverUiEndpoint ->
+                    updateState(DISCOVER_UI)
+                    onProviderNotFoundError(activity, discoverUiEndpoint)
+                }
+            })
     }
 
-    internal fun onStateDiscoverUI(activity: AuthorizationRequestActivity, resultUri: Uri) {
-        if(!request.state.isMatching(resultUri.state)){
+    internal fun onStateDiscoverUI(
+        activity: AuthorizationRequestActivity,
+        resultUri: Uri
+    ) {
+        if (!request.state.isMatching(resultUri.state)) {
             finishWithAuthorizationError(activity, STATE_MISMATCHED)
         } else {
             updateMccMnc(resultUri.mccMnc)
             discoverOpenIdConfiguration(false,
-                    { authorize(activity, it, AUTHORIZE, resultUri.loginHintToken) },
-                    {
-                        handleProviderNotFoundOrFinish(activity, it) {
-                            finishWithAuthorizationError(activity, TOO_MANY_REDIRECT)
-                        }
-                    })
+                { authorize(activity, it, AUTHORIZE, resultUri.loginHintToken) },
+                {
+                    handleProviderNotFoundOrFinish(activity, it) {
+                        finishWithAuthorizationError(activity, TOO_MANY_REDIRECT)
+                    }
+                })
         }
     }
 
-    internal fun onStateAuthorize(activity: AuthorizationRequestActivity, resultUri: Uri) {
+    internal fun onStateAuthorize(
+        activity: AuthorizationRequestActivity,
+        resultUri: Uri
+    ) {
         if (resultUri.isUserNotFoundError) {
-            discoverOpenIdConfiguration( true,
-                    {
-                        //With the prompt=true parameter, this case can't happen.
-                        //This parameter force the endpoint to return a ProviderNotFoundException
-                        finishWithAuthorizationError(activity, UNEXPECTED_DISCOVERY_RESPONSE)
-                    },
-                    { throwable ->
-                        handleProviderNotFoundOrFinish(activity, throwable) {
-                            discoverUiEndpoint ->
-                            updateState(DISCOVER_USER_NOT_FOUND)
-                            onProviderNotFoundError(activity, discoverUiEndpoint)
-                        }
-                    })
+            discoverOpenIdConfiguration(true,
+                {
+                    //With the prompt=true parameter, this case can't happen.
+                    //This parameter force the endpoint to return a ProviderNotFoundException
+                    finishWithAuthorizationError(activity, UNEXPECTED_DISCOVERY_RESPONSE)
+                },
+                { throwable ->
+                    handleProviderNotFoundOrFinish(activity, throwable) { discoverUiEndpoint ->
+                        updateState(DISCOVER_USER_NOT_FOUND)
+                        onProviderNotFoundError(activity, discoverUiEndpoint)
+                    }
+                })
         } else {
             finishWithAuthorizationSuccess(activity, resultUri)
         }
     }
 
-    internal fun onStateDiscoverUserNotFound(activity: AuthorizationRequestActivity,
-                                             resultUri: Uri) {
-        if(!request.state.isMatching(resultUri.state)){
+    internal fun onStateDiscoverUserNotFound(
+        activity: AuthorizationRequestActivity,
+        resultUri: Uri
+    ) {
+        if (!request.state.isMatching(resultUri.state)) {
             finishWithAuthorizationError(activity, STATE_MISMATCHED)
         } else {
             updateMccMnc(resultUri.mccMnc)
             discoverOpenIdConfiguration(false,
-                    { authorize(activity, it, AUTHORIZE_USER_NOT_FOUND, resultUri.loginHintToken) },
-                    {
-                        handleProviderNotFoundOrFinish(activity, it) {
-                            finishWithAuthorizationError(activity, TOO_MANY_REDIRECT)
-                        }
-                    })
+                { authorize(activity, it, AUTHORIZE_USER_NOT_FOUND, resultUri.loginHintToken) },
+                {
+                    handleProviderNotFoundOrFinish(activity, it) {
+                        finishWithAuthorizationError(activity, TOO_MANY_REDIRECT)
+                    }
+                })
         }
     }
 
-    private fun discoverOpenIdConfiguration(prompt: Boolean,
-                                            onSuccess: (OpenIdConfiguration) -> Unit,
-                                            onError: (Throwable) -> Unit){
+    private fun discoverOpenIdConfiguration(
+        prompt: Boolean,
+        onSuccess: (OpenIdConfiguration) -> Unit,
+        onError: (Throwable) -> Unit
+    ) {
         this.discoveryService.discoverConfiguration(mccMnc, prompt, onSuccess, onError)
     }
 
-    internal fun authorize(activity: AuthorizationRequestActivity,
-                           configuration: OpenIdConfiguration,
-                           state: AuthorizationState,
-                           loginHintToken: String?) {
+    internal fun authorize(
+        activity: AuthorizationRequestActivity,
+        configuration: OpenIdConfiguration,
+        state: AuthorizationState,
+        loginHintToken: String?
+    ) {
         updateMccMncIfNotNull(configuration.mccMnc)
         updateState(state)
         startAuthorize(activity, configuration, loginHintToken)
     }
 
-    internal fun saveState(outState: Bundle) {
+    internal fun saveState(
+        outState: Bundle
+    ) {
         outState.putSerializable(EXTRA_KEY_STATE, state)
         outState.putParcelable(EXTRA_KEY_REQUEST, request)
         outState.putString(Json.KEY_MCC_MNC, mccMnc)
@@ -199,38 +235,73 @@ internal class DefaultAuthorizationService internal constructor(
         outState.putParcelable(EXTRA_KEY_CANCELLATION_INTENT, cancellationIntent)
     }
 
-    internal fun startAuthorize(activity: AuthorizationRequestActivity,
-                                openIdConfiguration: OpenIdConfiguration,
-                                loginHintToken: String?) {
-        val authUri = request.withLoginHintToken(loginHintToken).toAuthorizationUri(openIdConfiguration.authorizationEndpoint)
+    internal fun startAuthorize(
+        activity: AuthorizationRequestActivity,
+        openIdConfiguration: OpenIdConfiguration,
+        loginHintToken: String?
+    ) {
+        val authUri = request.withLoginHintToken(loginHintToken)
+            .toAuthorizationUri(openIdConfiguration.authorizationEndpoint)
         Logger.get().request(authUri)
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            startAuthorize16(activity, openIdConfiguration, authUri)
+        } else {
+            startAuthorize30(activity, authUri)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.R)
+    internal fun startAuthorize30(
+        activity: AuthorizationRequestActivity,
+        uri: Uri
+    ) {
+        activity.startZenKeyApp(
+            uri.intent.apply {
+                flags = FLAG_ACTIVITY_REQUIRE_DEFAULT or FLAG_ACTIVITY_REQUIRE_NON_BROWSER
+            }
+        ) {
+            startBrowser(activity, uri)
+        }
+    }
+
+    @Deprecated("Deprecated since Android 30 (R)")
+    private fun startAuthorize16(
+        activity: AuthorizationRequestActivity,
+        openIdConfiguration: OpenIdConfiguration,
+        uri: Uri
+    ) {
         val intent = try {
-            intentFactory.createAuthorizeIntent(authUri, openIdConfiguration.packages)
-        } catch (e: NoBrowserException){
+            intentFactory.createAuthorizeIntent(uri, openIdConfiguration.packages)
+        } catch (e: NoBrowserException) {
             finishWithNoBrowserAvailable(activity)
             return
         }
-        activity.startAuthorize(intent){
+        activity.startZenKeyApp(intent) {
             finishWithNoBrowserAvailable(activity)
         }
     }
 
-    internal fun startDiscoverUI(activity: AuthorizationRequestActivity,
-                                 discoverUIEndpoint: String) {
+    internal fun startBrowser(
+        activity: AuthorizationRequestActivity,
+        uri: Uri
+    ) {
         val intent = try {
-            intentFactory.createDiscoverUIIntent(request.toDiscoverUiUri(discoverUIEndpoint))
-        } catch (e: NoBrowserException){
+            intentFactory.createBrowserIntent(uri)
+        } catch (e: NoBrowserException) {
             finishWithNoBrowserAvailable(activity)
             return
         }
-        activity.startDiscoverUi(intent){
+        activity.startBrowser(intent) {
             finishWithNoBrowserAvailable(activity)
         }
     }
 
-    private fun handleProviderNotFoundOrFinish(activity: Activity,
-                                               throwable: Throwable,
-                                               onProviderNotFound: (String?) -> Unit){
+    private fun handleProviderNotFoundOrFinish(
+        activity: Activity,
+        throwable: Throwable,
+        onProviderNotFound: (String?) -> Unit
+    ) {
         Logger.get().throwable(throwable)
         when {
             throwable is ProviderNotFoundException -> onProviderNotFound.invoke(throwable.discoverUiEndpoint)
@@ -242,67 +313,69 @@ internal class DefaultAuthorizationService internal constructor(
         }
     }
 
-    internal fun onProviderNotFoundError(activity: AuthorizationRequestActivity,
-                                         discoverUiEndpoint: String?) {
+    internal fun onProviderNotFoundError(
+        activity: AuthorizationRequestActivity,
+        discoverUiEndpoint: String?
+    ) {
         if (discoverUiEndpoint != null) {
-            startDiscoverUI(activity, discoverUiEndpoint)
+            startBrowser(activity, request.toDiscoverUiUri(discoverUiEndpoint))
         } else {
             finishWithAuthorizationError(activity, MISSING_DISCOVER_UI_ENDPOINT)
         }
     }
 
     internal fun updateState(
-            state: AuthorizationState
+        state: AuthorizationState
     ) {
         this.state = state
         Logger.get().state(state)
     }
 
     private fun updateMccMncIfNotNull(
-            mccMnc: String?
-    ){
+        mccMnc: String?
+    ) {
         mccMnc?.let { updateMccMnc(it) }
     }
 
     private fun updateMccMnc(
-            mccMnc: String?
-    ){
+        mccMnc: String?
+    ) {
         this.mccMnc = mccMnc
         Logger.get().d("Update MCC_MNC --> $mccMnc")
     }
 
     private fun finishWithNoBrowserAvailable(
-            activity: Activity
-    ){
+        activity: Activity
+    ) {
         val message = "No browser available"
         Logger.get().e(message)
         finishWithAuthorizationError(activity, DISCOVERY_STATE.withDescription(message))
     }
 
     private fun finishWithAuthorizationError(
-            activity: Activity,
-            authorizationError: AuthorizationError
-    ){
+        activity: Activity,
+        authorizationError: AuthorizationError
+    ) {
         setResultOKAndFinish(activity, responseFactory.error(mccMnc, request, authorizationError))
     }
 
     private fun finishWithThrowableError(
-            activity: Activity,
-            throwable: Throwable
-    ){
+        activity: Activity,
+        throwable: Throwable
+    ) {
         setResultOKAndFinish(activity, responseFactory.throwable(mccMnc, request, throwable))
     }
 
     private fun finishWithAuthorizationSuccess(
-            activity: Activity,
-            resultUri: Uri
-    ){
+        activity: Activity,
+        resultUri: Uri
+    ) {
         setResultOKAndFinish(activity, responseFactory.uri(mccMnc!!, request, resultUri))
     }
 
     internal fun setResultOKAndFinish(
-            activity: Activity,
-            response: AuthorizationResponse
+        activity: Activity,
+        response: AuthorizationResponse
     ) {
         Logger.get().end(request, response)
         if (response.isSuccessful && successIntent != null) {
@@ -339,7 +412,7 @@ internal class DefaultAuthorizationService internal constructor(
     }
 
     internal fun setResultCanceledAndFinish(
-            activity: Activity
+        activity: Activity
     ) {
         Logger.get().end(request, null)
         if (cancellationIntent != null) {
