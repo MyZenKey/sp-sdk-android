@@ -28,5 +28,5 @@ enum class Scopes(override val value: String)
     ADDRESS("address"),
     BIRTH_DATE("birthdate"),
     PROOFING("proofing"),
-
+    LAST_4_SOCIAL("last_4_social"),
 }

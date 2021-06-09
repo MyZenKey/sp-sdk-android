@@ -59,7 +59,7 @@ class SignInActivity : AppCompatActivity() {
         //Enable the logs if it's a debug-able version of the application.
         ZenKey.logs(BuildConfig.DEBUG)
         // other scopes registered for this client_id through the developer portal should be added here.
-        zenkeyButton.setScopes(Scopes.OPEN_ID)
+        zenkeyButton.setScopes(Scopes.OPEN_ID, Scopes.ADDRESS, Scopes.BIRTH_DATE, Scopes.LAST_4_SOCIAL, Scopes.PROOFING)
         //Set a request code to use for starting the ZenKey activity for result
         //By default the ZenKeyButton will use the following default request code value [ZenKeyButton.DEFAULT_REQUEST_CODE]
         zenkeyButton.setRequestCode(ZENKEY_REQUEST_CODE)
