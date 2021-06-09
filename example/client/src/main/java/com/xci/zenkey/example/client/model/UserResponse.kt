@@ -35,5 +35,7 @@ data class UserResponse (
     @Json(name = "birthdate")
     val birthdate: StringResponse? = null,
     @Json(name = "address")
-    val address: AddressResponse? = null
+    val address: AddressResponse? = null,
+    @Json(name = "proofing")
+    val proofing: StringResponse?=null
 )
