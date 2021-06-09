@@ -17,7 +17,7 @@ android {
         versionName VERSION_NAME
 
         //Replace "clientId" with your actual client id
-        manifestPlaceholders = [zenKeyClientId : clientId]
+        manifestPlaceholders = [zenKeyClientId : "ccid-0m0eu9j0g9tjj8dn"]
 
         //Replace "baseUrl" with your example api endpoint
         buildConfigField "String", "SAMPLE_API_ENDPOINT", "\"$baseUrl\""

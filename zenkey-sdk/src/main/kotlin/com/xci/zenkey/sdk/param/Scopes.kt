@@ -27,4 +27,6 @@ enum class Scopes(override val value: String)
     POSTAL_CODE("postal_code"),
     ADDRESS("address"),
     BIRTH_DATE("birthdate"),
+    PROOFING("proofing"),
+
 }
