@@ -1,6 +1,6 @@
 ![ZenKey](image/ZenKey_rgb.png "ZenKey")
 
-# ZenKey SDKs and Web Integrations
+# ZenKey SDKs and Web Integrations.
 
 ZenKey SDKs (iOS and Android) and web integrations provide effective resources for you as a service provider to authenticate users accessing your apps with their mobile device or web browser. There are several resources you can access to get started integrating your apps with ZenKey. 
 
