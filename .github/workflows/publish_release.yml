@@ -1,12 +1,14 @@
-name: Publish Release
+name: Maven Package
 
 on:
-  push:
-    tags:
-      - zenkey-sdk-[0-9]+.[0-9]+.[0-9]+
-jobs:
   release:
+    types: [created]
+
+jobs:
+  build:
+
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v2
         with:
