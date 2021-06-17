@@ -1,0 +1,26 @@
+{
+  "name": "sp-sdk-android",
+  "version": "1.1.2",
+  "description": "ZenKey SDK",
+  "main": "index.js",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "test": "exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MyZenKey/sp-sdk-android.git"
+  },
+  "keywords": [
+    "ZenKey",
+    "SDK"
+  ],
+  "author": "ZenKey",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MyZenKey/sp-sdk-android/issues"
+  },
+  "homepage": "https://github.com/MyZenKey/sp-sdk-android#readme"
+}
