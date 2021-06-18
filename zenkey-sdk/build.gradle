@@ -76,5 +76,4 @@ dependencies {
 
 apply from: "$projectDir/gradle/documentation.gradle"
 apply from: "$projectDir/gradle/publication.gradle"
-apply from: "$projectDir/gradle/bintray.gradle"
 
