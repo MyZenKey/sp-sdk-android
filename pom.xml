@@ -6,7 +6,7 @@
  <groupId>com.xci.android</groupId>
  <artifactId>zenkey-sdk</artifactId>
  <version>1.0.0</version>
- <packaging>aar</packaging>
+ <packaging>jar</packaging>
  <name>zenkey-sdk</name>
  <url>https://github.com/MyZenKey/sp-sdk-android#readme</url>
  <organization>
@@ -111,7 +111,7 @@
   <repository>
    <id>github</id>
    <name>GitHub Packages</name>
-   <url>https://maven.pkg.github.com/MyZenKey/zenkey-sdk</url>
+   <url>https://maven.pkg.github.com/myzenkey/zenkey-sdk</url>
   </repository>
  </distributionManagement>
 </project>
