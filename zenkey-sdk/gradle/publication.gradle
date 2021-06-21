@@ -28,9 +28,14 @@ task generateDocumentationJar(type: Jar) {
 }
 
 publishing {
+    def key = System.getenv("GITHUB_TOKEN")
     repositories {
         maven {
             url "https://maven.pkg.github.com/MyZenKey/sp-sdk-android"
+            credentials {
+                username = "myzenkey"
+                password = "${key}"
+            }
         }
     }
     publications {
