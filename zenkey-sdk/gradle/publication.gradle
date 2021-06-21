@@ -31,6 +31,10 @@ publishing {
     repositories {
         maven {
             url "https://maven.pkg.github.com/MyZenKey/sp-sdk-android"
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
         }
     }
     publications {
