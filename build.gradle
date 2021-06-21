@@ -2,6 +2,7 @@
 
 buildscript {
     apply from: "${project.rootDir}/gradle/dependencies.gradle"
+    ext.jacocoVersion = '0.8.7'
     repositories {
         google()
         jcenter()
@@ -11,11 +12,11 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.1'
+        classpath 'com.android.tools.build:gradle:4.0.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin"
 
-        classpath 'com.hiya:jacoco-android:0.2'
-        classpath "org.jetbrains.dokka:dokka-gradle-plugin:0.9.18"
+        classpath 'org.jacoco:org.jacoco.core:0.8.7'
+        classpath "org.jetbrains.dokka:dokka-gradle-plugin:1.4.0"
         classpath group: 'pl.allegro.tech.build', name: 'axion-release-plugin', version: '1.10.2'
 
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
