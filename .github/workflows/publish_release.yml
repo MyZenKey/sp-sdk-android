@@ -24,4 +24,4 @@ jobs:
       - name: Publish to GitHub packages
         run: ./gradlew build publish
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPSY_SECRET: ${{ secrets.REPSY_SECRET }}
