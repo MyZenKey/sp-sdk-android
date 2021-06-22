@@ -30,17 +30,18 @@ task generateDocumentationJar(type: Jar) {
 publishing {
     repositories {
         maven {
-            url "https://maven.pkg.github.com/MyZenKey/sp-sdk-android"
+            url "https://repo.repsy.io/mvn/myzenkey/sp-sdk-android"
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
+                password = System.getenv("REPSY_SECRET")
             }
         }
     }
     publications {
         android.libraryVariants.all { variant ->
             variant.outputs.all { output ->
-                if (outputFile != null && outputFileName.endsWith('.aar')) {
+                def outputFile = output.outputFile
+                if (outputFile != null && outputFile.name.endsWith('.aar')) {
                     outputFileName = "${project.name}-${project.version}.aar"
                 }
             }
