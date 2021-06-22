@@ -32,7 +32,7 @@ publishing {
         maven {
             url "https://repo.repsy.io/mvn/myzenkey/sp-sdk-android"
             credentials {
-                username = System.getenv("GITHUB_ACTOR")
+                username = System.getenv("REPSY_USER")
                 password = System.getenv("REPSY_SECRET")
             }
         }

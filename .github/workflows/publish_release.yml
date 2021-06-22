@@ -24,4 +24,5 @@ jobs:
       - name: Publish to GitHub packages
         run: ./gradlew build publish
         env:
+          REPSY_USER: ${{ secrets.REPSY_USER }}
           REPSY_SECRET: ${{ secrets.REPSY_SECRET }}
